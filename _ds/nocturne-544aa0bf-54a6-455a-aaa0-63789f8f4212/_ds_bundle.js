@@ -1,17 +1,12 @@
 /* @ds-bundle: {"format":4,"namespace":"Nocturne_noctur","components":[],"sourceHashes":{},"inlinedExternals":[],"unexposedExports":[]} */
 
 (() => {
-
 const __ds_ns = (window.Nocturne_noctur = window.Nocturne_noctur || {});
 const __ds_scope = {};
 (__ds_ns.__errors = __ds_ns.__errors || []);
 
-/* O Surto Artificial — integração Asaas Sandbox.
-   Patch de produção aplicado sobre a lógica do Design Component para preservar
-   o deploy otimizado (assets-min) enquanto o Project Archive do Claude exporta
-   a pasta deploy sem as alterações mais recentes do arquivo .dc.html. */
-(function applySurtoAsaasPatch() {
-  if (window.__surtoAsaasPatchApplied) return;
+(function applySurtoProductionPatchV2() {
+  if (window.__surtoProductionPatchV2) return;
 
   const patch = () => {
     if (!window.__dcUpdate || !window.__dcRootName) {
@@ -23,21 +18,25 @@ const __ds_scope = {};
     if (!scriptEl || !scriptEl.textContent) return;
 
     let src = scriptEl.textContent;
-    if (src.includes("asaas-create-support-payment")) {
-      window.__surtoAsaasPatchApplied = true;
-      return;
-    }
+    let changed = false;
 
-    const stateOld = "    pay: 'idle', demo: 'fila', perfilOk: false,\n    cupom: '', cupomOk: false, admTab: 'todos', admSel: null, toast: null, vip: 'pendente',";
-    const stateNew = "    pay: 'idle', demo: 'fila', perfilOk: false,\n    payBusy: false,\n    cupom: '', cupomOk: false, admTab: 'todos', admSel: null, toast: null, vip: 'pendente',";
+    /* ── Asaas Sandbox ───────────────────────────────────────────── */
+    if (!src.includes("asaas-create-support-payment")) {
+      const stateOld = "    pay: 'idle', demo: 'fila', perfilOk: false,\n    cupom: '', cupomOk: false, admTab: 'todos', admSel: null, toast: null, vip: 'pendente',";
+      const stateNew = "    pay: 'idle', demo: 'fila', perfilOk: false,\n    payBusy: false,\n    cupom: '', cupomOk: false, admTab: 'todos', admSel: null, toast: null, vip: 'pendente',";
 
-    const method = `  /* ── Apoio avulso · Asaas Sandbox via Edge Function ────────── */
+      const method = `  /* ── Apoio avulso · Asaas Sandbox via Edge Function ────────── */
   async startAvulsoPayment() {
     if (this.state.payBusy) return;
     const s = this.state;
     const session = this._session || s.session;
     if (!session) {
-      this.setState({ authMode: 'login', authErr: null,
+      try {
+        window.sessionStorage.setItem('surto-support-intent', JSON.stringify({
+          tier: s.tier, caminho: s.caminho, valor: s.valor, returnRoute: 'checkout'
+        }));
+      } catch (e) {}
+      this.setState({ authMode: 'login', authReturn: 'checkout', authErr: null,
         authMsg: 'Entre na sua conta para concluir seu apoio.' });
       this.nav('auth');
       return;
@@ -68,19 +67,142 @@ const __ds_scope = {};
 
 `;
 
-    const renderOld = "      pagarLabel: metodo === 'pix' ? 'GERAR PIX' : (s.modo === 'mensal' ? 'ASSINAR ' + brl(totalNum) + '/MÊS' : 'PAGAR ' + brl(totalNum)),\n      pagar: () => { if (metodo === 'pix') { this.setState({ pay:'aguardando' }); } else { this.setState({ pay:'aprovado' }); this.nav('pago'); } },";
-    const renderNew = "      pagarLabel: s.payBusy ? 'PROCESSANDO…' : (metodo === 'pix' ? 'GERAR PIX' : (s.modo === 'mensal' ? 'ASSINAR ' + brl(totalNum) + '/MÊS' : 'PAGAR ' + brl(totalNum))),\n      pagar: () => {\n        if (s.modo === 'mensal') {\n          this.flash('A assinatura mensal ainda não está aberta. Escolha Apoio avulso para apoiar agora.');\n          return;\n        }\n        this.startAvulsoPayment();\n      },";
+      const renderOld = "      pagarLabel: metodo === 'pix' ? 'GERAR PIX' : (s.modo === 'mensal' ? 'ASSINAR ' + brl(totalNum) + '/MÊS' : 'PAGAR ' + brl(totalNum)),\n      pagar: () => { if (metodo === 'pix') { this.setState({ pay:'aguardando' }); } else { this.setState({ pay:'aprovado' }); this.nav('pago'); } },";
+      const renderNew = "      pagarLabel: s.payBusy ? 'PROCESSANDO…' : (metodo === 'pix' ? 'GERAR PIX' : (s.modo === 'mensal' ? 'ASSINAR ' + brl(totalNum) + '/MÊS' : 'PAGAR ' + brl(totalNum))),\n      pagar: () => {\n        if (s.modo === 'mensal') {\n          this.flash('A assinatura mensal ainda não está aberta. Escolha Apoio avulso para apoiar agora.');\n          return;\n        }\n        this.startAvulsoPayment();\n      },";
 
-    if (!src.includes(stateOld) || !src.includes("  nav(route) {") || !src.includes(renderOld)) {
-      console.error('[O Surto Artificial] Patch Asaas não aplicado: estrutura inesperada.');
+      if (src.includes(stateOld)) {
+        src = src.replace(stateOld, stateNew);
+        changed = true;
+      }
+      if (src.includes("  nav(route) {")) {
+        src = src.replace("  nav(route) {", method + "  nav(route) {");
+        changed = true;
+      }
+      if (src.includes(renderOld)) {
+        src = src.replace(renderOld, renderNew);
+        changed = true;
+      }
+    }
+
+    /* ── Corrige loop plano → login → área → plano ──────────────── */
+    const planOld = "          go: () => { this.setState({ tier: sel, caminho: sel === 'livre' ? 'livre' : 'aparecer', valor: sel === 'vip' ? 300 : sel === 'destaque' ? 100 : sel === 'apoiador' ? 50 : 25, authMode: 'cadastro', valorExtra: false }); this.nav('auth'); } };";
+    const planNew = `          go: () => {
+            const next = {
+              tier: sel,
+              caminho: sel === 'livre' ? 'livre' : 'aparecer',
+              valor: sel === 'vip' ? 300 : sel === 'destaque' ? 100 : sel === 'apoiador' ? 50 : 25,
+              authMode: 'cadastro',
+              valorExtra: false,
+              authReturn: 'modalidade'
+            };
+            this.setState(next);
+            if (this._session || s.session) {
+              this.setState({ authReturn: null });
+              this.nav('modalidade');
+              return;
+            }
+            try {
+              window.sessionStorage.setItem('surto-support-intent', JSON.stringify({
+                tier: next.tier,
+                caminho: next.caminho,
+                valor: next.valor,
+                returnRoute: 'modalidade'
+              }));
+            } catch (e) {}
+            this.nav('auth');
+          } };`;
+
+    if (src.includes(planOld)) {
+      src = src.replace(planOld, planNew);
+      changed = true;
+    }
+
+    const sessionOld = `      const r = this.state.route;
+      if (oauthBack || r === 'confirmaEmail' || r === 'auth') {
+        this.setState({ authErr: null, authMsg: null, pendingEmail: '' });
+        this.nav('appHome');
+      }`;
+    const sessionNew = `      const r = this.state.route;
+      if (oauthBack || r === 'confirmaEmail' || r === 'auth') {
+        let supportIntent = null;
+        try {
+          const rawIntent = window.sessionStorage.getItem('surto-support-intent');
+          if (rawIntent) supportIntent = JSON.parse(rawIntent);
+          window.sessionStorage.removeItem('surto-support-intent');
+        } catch (e) {}
+        const returnRoute = (supportIntent && supportIntent.returnRoute) || this.state.authReturn;
+        if (returnRoute === 'modalidade' || returnRoute === 'checkout') {
+          const restore = supportIntent ? {
+            tier: supportIntent.tier,
+            caminho: supportIntent.caminho,
+            valor: supportIntent.valor
+          } : {};
+          this.setState({ ...restore, authReturn: null, authErr: null, authMsg: null, pendingEmail: '' });
+          this.nav(returnRoute);
+        } else {
+          this.setState({ authReturn: null, authErr: null, authMsg: null, pendingEmail: '' });
+          this.nav('appHome');
+        }
+      }`;
+
+    if (src.includes(sessionOld)) {
+      src = src.replace(sessionOld, sessionNew);
+      changed = true;
+    }
+
+    const signupOld = `    if (data && data.session) {
+      this._session = data.session;
+      this.setState({ authBusy: false, fSenha: '', fSenha2: '', authErr: null, authMsg: null });
+      this.nav('appHome');
+      return;
+    }`;
+    const signupNew = `    if (data && data.session) {
+      this._session = data.session;
+      const returnRoute = this.state.authReturn || ((this.state.route === 'modalidade' || this.state.route === 'checkout') ? this.state.route : null);
+      this.setState({ authBusy: false, fSenha: '', fSenha2: '', authErr: null, authMsg: null, authReturn: null });
+      this.nav(returnRoute === 'modalidade' || returnRoute === 'checkout' ? returnRoute : 'appHome');
+      return;
+    }`;
+
+    if (src.includes(signupOld)) {
+      src = src.replace(signupOld, signupNew);
+      changed = true;
+    }
+
+    const loginOld = `    this.setState({ authBusy: false, fSenha: '', fSenha2: '', authErr: null, authMsg: null });
+    if (data && data.session) this.nav('appHome');`;
+    const loginNew = `    const returnRoute = this.state.authReturn || ((this.state.route === 'modalidade' || this.state.route === 'checkout') ? this.state.route : null);
+    this.setState({ authBusy: false, fSenha: '', fSenha2: '', authErr: null, authMsg: null, authReturn: null });
+    if (data && data.session) this.nav(returnRoute === 'modalidade' || returnRoute === 'checkout' ? returnRoute : 'appHome');`;
+
+    if (src.includes(loginOld)) {
+      src = src.replace(loginOld, loginNew);
+      changed = true;
+    }
+
+    const entrarOld = `    const goEntrar = () => {
+      if (this._session || s.session) { this.nav('appHome'); return; }
+      this.setState({ authMode: 'login', authErr: null, authMsg: null });
+      this.nav('auth');
+    };`;
+    const entrarNew = `    const goEntrar = () => {
+      try { window.sessionStorage.removeItem('surto-support-intent'); } catch (e) {}
+      if (this._session || s.session) { this.setState({ authReturn: null }); this.nav('appHome'); return; }
+      this.setState({ authMode: 'login', authReturn: null, authErr: null, authMsg: null });
+      this.nav('auth');
+    };`;
+
+    if (src.includes(entrarOld)) {
+      src = src.replace(entrarOld, entrarNew);
+      changed = true;
+    }
+
+    if (!changed) {
+      console.error('[O Surto Artificial] Nenhum patch foi aplicado; estrutura inesperada.');
       return;
     }
 
-    src = src.replace(stateOld, stateNew);
-    src = src.replace("  nav(route) {", method + "  nav(route) {");
-    src = src.replace(renderOld, renderNew);
-
-    window.__surtoAsaasPatchApplied = true;
+    window.__surtoProductionPatchV2 = true;
     window.__dcUpdate(window.__dcRootName(), 'js', src, false);
   };
 
