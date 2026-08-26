@@ -7,5 +7,5 @@
     document.head.appendChild(s);
   };
   load('/surto-payment-patch.js?v=20260826-1');
-  load('/supporter-dashboard-real.js?v=20260826-1');
+  load('/supporter-dashboard-real-v2.js?v=20260826-2');
 })();
