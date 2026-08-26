@@ -39,6 +39,7 @@
   let rendering = false;
   let timer = null;
   let upgradeData = null;
+  let lastNav = null;
 
   const norm = v => String(v || '').replace(/\s+/g, ' ').trim().toUpperCase();
   const esc = v => String(v == null ? '' : v)
@@ -62,7 +63,7 @@
     if (client) return client;
     if (!window.supabase || !window.supabase.createClient) return null;
     client = window.supabase.createClient(SB_URL, SB_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'surto-auth' }
     });
     return client;
   }
@@ -98,7 +99,7 @@
       el.addEventListener('click', () => {
         currentRoute = ROUTES[label];
         upgradeData = null;
-        setTimeout(() => schedule(true), 90);
+        setTimeout(() => schedule(false), 90);
       }, true);
     });
   }
@@ -314,28 +315,60 @@
       if (!currentRoute) currentRoute=inferRoute(shell);
       ensureCss();
       let root=shell.querySelector('#surto-supporter-real-v2');
-      if (!root){root=document.createElement('div');root.id='surto-supporter-real-v2';shell.appendChild(root);}
+      if (!root){
+        root=document.createElement('div');
+        root.id='surto-supporter-real-v2';
+        shell.appendChild(root);
+      }
       Array.from(shell.children).forEach(ch=>{if(ch!==nav&&ch!==root)ch.style.display='none';});
       root.style.display='block';
-      root.innerHTML=empty('Carregando sua área','Buscando seus dados reais no Clube do Surto...');
+
+      const alreadyHasRealContent = !!dataModel && root.childElementCount > 0;
+      if (!alreadyHasRealContent) {
+        root.innerHTML=empty('Carregando sua área','Buscando seus dados reais no Clube do Surto...');
+      }
+
       const m=await loadData(force);
       root.innerHTML=htmlFor(currentRoute,m);
       bindRoot(root);
       document.documentElement.dataset.surtoDashboard='v2-real';
     } catch(e) {
       const root=shell.querySelector('#surto-supporter-real-v2');
-      if(root)root.innerHTML=empty('Não conseguimos carregar sua área','Atualize a página. Seu pagamento não foi perdido.');
+      if(root && !dataModel)root.innerHTML=empty('Não conseguimos carregar sua área','Atualize a página. Seu pagamento não foi perdido.');
       console.error('[O Surto Artificial] supporter dashboard v2',e);
     } finally { rendering=false; }
   }
 
-  function schedule(force=false){clearTimeout(timer);timer=setTimeout(()=>render(force),60);}
+  function schedule(force=false){
+    clearTimeout(timer);
+    timer=setTimeout(()=>render(force),45);
+  }
+
   function boot(){
     ensureCss();
-    const obs=new MutationObserver(()=>schedule(false));
+
+    const checkStructure = () => {
+      const nav = findNav();
+      if (!nav) {
+        lastNav = null;
+        return;
+      }
+      if (nav !== lastNav) {
+        lastNav = nav;
+        schedule(false);
+      }
+    };
+
+    const obs=new MutationObserver(mutations=>{
+      if (rendering) return;
+      const root=document.getElementById('surto-supporter-real-v2');
+      const relevant=mutations.some(m=>!root || !root.contains(m.target));
+      if (relevant) checkStructure();
+    });
     obs.observe(document.documentElement,{subtree:true,childList:true});
-    setInterval(()=>{if(findNav())schedule(false);},600);
-    schedule(false);
+
+    checkStructure();
   }
+
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
