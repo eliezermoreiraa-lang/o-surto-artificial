@@ -9,20 +9,20 @@
 
   load('/surto-payment-patch.js?v=20260826-1');
   load('/supporter-dashboard-guard.js?v=20260826-1');
+  load('/surto-shared-supabase.js?v=20260826-1');
 
+  let dashboardStarted = false;
   const startDashboard = () => {
-    if (window.supabase && window.supabase.createClient) {
+    if (dashboardStarted) return;
+    if (window.supabase && window.supabase.createClient && window.__surtoSharedSupabaseShim) {
+      dashboardStarted = true;
       load('/supporter-dashboard-real-v2.js?v=20260826-4');
       load('/supporter-profile-workflow-v4.js?v=20260826-1');
       load('/supporter-timeline-fix-v2.js?v=20260826-1');
       return;
     }
-    setTimeout(startDashboard, 50);
+    setTimeout(startDashboard, 25);
   };
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', startDashboard, { once: true });
-  } else {
-    startDashboard();
-  }
+  startDashboard();
 })();
