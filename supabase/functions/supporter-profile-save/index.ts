@@ -39,13 +39,13 @@ Deno.serve(async (req: Request) => {
   if (!displayName) return json(req, { error: "Informe o nome de divulgação" }, 400);
   if (!["instagram", "tiktok", "youtube", "x", "facebook", "outro"].includes(socialNetwork)) return json(req, { error: "Rede social inválida" }, 400);
   if (!socialHandle) return json(req, { error: "Informe o @ ou usuário" }, 400);
-  if (!/^https:\/\//i.test(socialUrl)) return json(req, { error: "Informe um link válido começando com https://" }, 400);
+  if (socialUrl && !/^https:\/\//i.test(socialUrl)) return json(req, { error: "Quando informado, o link deve começar com https://" }, 400);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(notificationEmail)) return json(req, { error: "Informe um e-mail válido" }, 400);
   if (!publicConsent) return json(req, { error: "Autorize a divulgação para continuar" }, 400);
 
   const { data: existing } = await admin.from("publicity_profiles").select("submission_completed_at").eq("user_id", user.id).maybeSingle();
   if (existing?.submission_completed_at) return json(req, { error: "Seu material já foi concluído e está em modo de visualização" }, 409);
-  const { data, error } = await admin.from("publicity_profiles").upsert({ user_id: user.id, display_name: displayName, social_network: socialNetwork, social_handle: socialHandle, social_url: socialUrl, notification_email: notificationEmail, public_consent: true, updated_at: new Date().toISOString() }, { onConflict: "user_id" }).select().single();
+  const { data, error } = await admin.from("publicity_profiles").upsert({ user_id: user.id, display_name: displayName, social_network: socialNetwork, social_handle: socialHandle, social_url: socialUrl || null, notification_email: notificationEmail, public_consent: true, updated_at: new Date().toISOString() }, { onConflict: "user_id" }).select().single();
   if (error) return json(req, { error: "Não foi possível salvar o perfil" }, 500);
   return json(req, { ok: true, profile: data });
 });

@@ -24,11 +24,12 @@ Deno.serve(async (req: Request) => {
   if (!user) return new Response(JSON.stringify({ error: "Sessão inválida" }), { status: 401, headers: cors(req) });
   const admin = createClient(URL, SERVICE);
 
-  const [{ data: profile }, { data: supports }, { data: subscriptions }, { data: publicity }] = await Promise.all([
+  const [{ data: profile }, { data: supports }, { data: subscriptions }, { data: publicity }, { data: vipBriefings }] = await Promise.all([
     admin.from("profiles").select("id,display_name,created_at,status").eq("id", user.id).maybeSingle(),
     admin.from("supports").select("id,production_id,tier,billing_mode,amount,payment_status,paid_at,created_at,provider_payment_id,upgrade_from_support_id,upgrade_credit_amount").eq("user_id", user.id).eq("payment_status", "paid").order("created_at", { ascending: false }),
     admin.from("subscriptions").select("id,tier,amount,status,next_due_date,started_at,cancelled_at,created_at").eq("user_id", user.id).order("created_at", { ascending: false }),
     admin.from("publicity_profiles").select("display_name,social_network,social_handle,social_url,notification_email,source_photo_path,face_photo_path,body_photo_path,official_avatar_path,public_consent,information_confirmed_at,submission_completed_at,avatar_status,created_at,updated_at").eq("user_id", user.id).maybeSingle(),
+    admin.from("vip_briefings").select("id,support_id,promotion_goal,scene_idea,product_or_material,additional_notes,status,submitted_at,updated_at").eq("user_id", user.id).order("updated_at", { ascending: false }),
   ]);
   const paidSupports = supports || [];
   const effective = paidSupports.slice().sort((a: any, b: any) => (rank[b.tier] - rank[a.tier]) || (new Date(b.created_at).getTime() - new Date(a.created_at).getTime()))[0] || null;
@@ -62,6 +63,7 @@ Deno.serve(async (req: Request) => {
     appearances,
     episodes: realEpisodes,
     vipAccess: currentTier === "vip",
+    vipBriefing: effective?.tier === "vip" ? (vipBriefings || []).find((briefing: any) => briefing.support_id === effective.id) || null : null,
     currentTier,
     currentCredit,
     upgrades,

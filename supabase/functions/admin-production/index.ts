@@ -109,25 +109,26 @@ async function sendQueuedEmail(event: any) {
 }
 
 async function dashboard() {
-  const [users, profiles, supports, subscriptions, publicity, appearances, episodes, productions, emails, settings] = await Promise.all([
+  const [users, profiles, supports, subscriptions, publicity, vipBriefings, appearances, episodes, productions, emails, settings] = await Promise.all([
     listAuthUsers(),
     admin.from("profiles").select("id,role,status,display_name,created_at"),
     admin.from("supports").select("id,user_id,production_id,tier,billing_mode,amount,payment_status,paid_at,created_at,provider_payment_id,provider_checkout_id,productions(title,slug)").order("created_at", { ascending: false }),
     admin.from("subscriptions").select("id,user_id,tier,amount,status,next_due_date,started_at,created_at").order("created_at", { ascending: false }),
     admin.from("publicity_profiles").select("user_id,display_name,social_network,social_handle,social_url,notification_email,face_photo_path,body_photo_path,official_avatar_path,submission_completed_at,avatar_status,updated_at"),
+    admin.from("vip_briefings").select("id,user_id,support_id,promotion_goal,scene_idea,product_or_material,additional_notes,status,submitted_at,updated_at"),
     admin.from("appearances").select("id,support_id,episode_id,status,queue_priority,estimated_episode_number,estimated_date,confirmed_at,published_at,published_url,admin_notes,created_at,episodes(episode_number,scheduled_date,published_at,instagram_url,tiktok_url,youtube_url,cover_image_url)").order("queue_priority", { ascending: false }).order("created_at"),
     admin.from("episodes").select("id,production_id,episode_number,scheduled_date,published_at,instagram_url,tiktok_url,youtube_url,cover_image_url,is_locked,productions(title,slug)").order("episode_number", { ascending: false }),
     admin.from("productions").select("id,slug,title,status,current_episode,is_current").order("created_at", { ascending: false }),
     admin.from("supporter_email_events").select("id,user_id,support_id,event_type,recipient_email,subject,status,attempts,last_error,sent_at,created_at").order("created_at", { ascending: false }).limit(100),
     admin.from("app_settings").select("key,value,updated_at").eq("key", "renewal_reminders").maybeSingle(),
   ]);
-  const results = [profiles, supports, subscriptions, publicity, appearances, episodes, productions, emails, settings];
+  const results = [profiles, supports, subscriptions, publicity, vipBriefings, appearances, episodes, productions, emails, settings];
   const failed = results.find((r: any) => r.error);
   if (failed?.error) throw failed.error;
   return {
     users,
     profiles: profiles.data || [], supports: supports.data || [], subscriptions: subscriptions.data || [],
-    publicity: publicity.data || [], appearances: appearances.data || [], episodes: episodes.data || [],
+    publicity: publicity.data || [], vipBriefings: vipBriefings.data || [], appearances: appearances.data || [], episodes: episodes.data || [],
     productions: productions.data || [], emails: emails.data || [], reminders: settings.data?.value || { enabled: true, days: 30 },
   };
 }
@@ -147,11 +148,12 @@ Deno.serve(async (req: Request) => {
 
     if (action === "supporter_detail") {
       const userId = cleanText(body.user_id, 80);
-      const [{ data: authUser }, { data: profile }, { data: supports }, { data: publicity }, { data: appearances }] = await Promise.all([
+      const [{ data: authUser }, { data: profile }, { data: supports }, { data: publicity }, { data: vipBriefings }, { data: appearances }] = await Promise.all([
         admin.auth.admin.getUserById(userId),
         admin.from("profiles").select("*").eq("id", userId).maybeSingle(),
         admin.from("supports").select("*,productions(title,slug)").eq("user_id", userId).order("created_at", { ascending: false }),
         admin.from("publicity_profiles").select("*").eq("user_id", userId).maybeSingle(),
+        admin.from("vip_briefings").select("*").eq("user_id", userId).order("updated_at", { ascending: false }),
         admin.from("appearances").select("*,episodes(*)").in("support_id", (await admin.from("supports").select("id").eq("user_id", userId)).data?.map((x: any) => x.id) || ["00000000-0000-0000-0000-000000000000"]),
       ]);
       const signed: Record<string, string | null> = { face: null, body: null };
@@ -161,7 +163,7 @@ Deno.serve(async (req: Request) => {
           signed[key] = data?.signedUrl || null;
         }
       }
-      return json(req, { ok: true, user: { id: userId, email: authUser.user?.email }, profile, supports: supports || [], publicity, appearances: appearances || [], signed });
+      return json(req, { ok: true, user: { id: userId, email: authUser.user?.email }, profile, supports: supports || [], publicity, vipBriefings: vipBriefings || [], appearances: appearances || [], signed });
     }
 
     if (action === "register_avatar") {

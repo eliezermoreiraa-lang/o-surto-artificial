@@ -13,8 +13,8 @@
 
   const startDashboard = () => {
     if (window.supabase && window.supabase.createClient) {
-      load('/supporter-dashboard-real-v2.js?v=20260827-4');
-      load('/supporter-profile-workflow-v4.js?v=20260827-3');
+      load('/supporter-dashboard-real-v2.js?v=20260827-5');
+      load('/supporter-profile-workflow-v4.js?v=20260827-4');
       return;
     }
     setTimeout(startDashboard, 50);

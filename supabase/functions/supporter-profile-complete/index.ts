@@ -31,7 +31,7 @@ Deno.serve(async (req: Request) => {
   const { data: profile, error } = await admin.from("publicity_profiles").select("*").eq("user_id", user.id).maybeSingle();
   if (error || !profile) return json(req, { error: "Complete seu perfil antes de concluir" }, 400);
   if (profile.submission_completed_at) return json(req, { ok: true, profile, alreadyCompleted: true });
-  const required = [profile.display_name, profile.social_network, profile.social_handle, profile.social_url, profile.notification_email, profile.face_photo_path, profile.body_photo_path];
+  const required = [profile.display_name, profile.social_network, profile.social_handle, profile.notification_email, profile.face_photo_path, profile.body_photo_path];
   if (required.some(value => !value) || !profile.public_consent) return json(req, { error: "Preencha o perfil e envie as duas fotos antes de concluir" }, 400);
   const now = new Date().toISOString();
   const { data: updated, error: updateError } = await admin.from("publicity_profiles").update({ submission_completed_at: now, avatar_status: profile.official_avatar_path ? "ready" : "awaiting", updated_at: now }).eq("user_id", user.id).select().single();
