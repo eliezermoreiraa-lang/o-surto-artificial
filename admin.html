@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>Produção · O Surto Artificial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin-production.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+</head>
+<body>
+  <div id="toast" class="toast" role="status"></div>
+
+  <main id="loginView" class="login-wrap">
+    <section class="login-card">
+      <img src="assets-min/logo-surto.png" alt="O Surto Artificial" class="login-logo">
+      <span class="eyebrow">ACESSO RESTRITO</span>
+      <h1>Painel da produção</h1>
+      <p>Entre com a conta autorizada da produção.</p>
+      <form id="loginForm" class="stack">
+        <label>E-mail<input id="loginEmail" type="email" autocomplete="username" value="eliezermoreiraa@gmail.com" required></label>
+        <label>Senha<input id="loginPassword" type="password" autocomplete="current-password" required></label>
+        <button class="btn primary" type="submit">ENTRAR NO PAINEL</button>
+      </form>
+      <div class="or"><span>ou</span></div>
+      <button id="googleLogin" class="btn google" type="button">ENTRAR COM GOOGLE</button>
+      <button id="resetPassword" class="text-btn" type="button">Criar ou recuperar minha senha</button>
+      <a href="/" class="back-link">← Voltar ao site</a>
+    </section>
+  </main>
+
+  <div id="loadingView" class="loading-view hidden"><div class="spinner"></div><p>Carregando dados reais da produção…</p></div>
+
+  <div id="appView" class="app hidden">
+    <aside class="sidebar">
+      <a href="/" class="brand"><img src="assets-min/logo-surto.png" alt="O Surto Artificial"></a>
+      <div class="side-label">PRODUÇÃO</div>
+      <nav id="nav">
+        <button data-view="overview" class="active">Visão geral</button>
+        <button data-view="supporters">Apoiadores</button>
+        <button data-view="payments">Pagamentos</button>
+        <button data-view="queue">Fila e avatares</button>
+        <button data-view="episodes">Episódios</button>
+        <button data-view="emails">E-mails</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <small id="adminEmail"></small>
+        <button id="logout" class="text-btn">Sair do painel</button>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <button id="mobileMenu" class="menu-btn" aria-label="Abrir menu">☰</button>
+        <div><span class="eyebrow">DADOS REAIS</span><h1 id="pageTitle">Visão geral</h1></div>
+        <div class="live"><i></i> Atualizado agora</div>
+      </header>
+      <section id="content" class="content"></section>
+    </div>
+  </div>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Gerenciar apoiador">
+    <div class="modal-card">
+      <button id="closeModal" class="modal-close" aria-label="Fechar">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script src="admin-production.js"></script>
+</body>
+</html>
