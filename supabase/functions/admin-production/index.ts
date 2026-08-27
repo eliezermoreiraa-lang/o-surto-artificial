@@ -50,8 +50,8 @@ async function requireAdmin(req: Request) {
   const { data: authData } = await client.auth.getUser(token);
   const user = authData.user;
   if (!user) return null;
-  const { data: profile } = await admin.from("profiles").select("id,role,status").eq("id", user.id).maybeSingle();
-  if (profile?.role !== "admin" || profile?.status !== "active") return null;
+  const { data: allowed, error: adminCheckError } = await client.rpc("is_admin");
+  if (adminCheckError || allowed !== true) return null;
   return user;
 }
 
