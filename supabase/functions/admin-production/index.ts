@@ -14,7 +14,7 @@ function headers(req: Request) {
     origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:");
   return {
     "Access-Control-Allow-Origin": allowed ? origin : "https://osurtoartificial.com.br",
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Headers": req.headers.get("access-control-request-headers") || "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Content-Type": "application/json",
     "Vary": "Origin",
@@ -44,15 +44,14 @@ function emailFrame(title: string, message: string, buttonLabel?: string) {
 
 async function requireAdmin(req: Request) {
   const authorization = req.headers.get("Authorization") || "";
-  if (!authorization.startsWith("Bearer ")) return null;
+  if (!authorization.startsWith("Bearer ")) return { allowed: false, user: null, reason: "missing_token" };
   const client = createClient(URL, ANON, { global: { headers: { Authorization: authorization } } });
   const token = authorization.slice(7);
   const { data: authData } = await client.auth.getUser(token);
   const user = authData.user;
-  if (!user) return null;
+  if (!user) return { allowed: false, user: null, reason: "invalid_session" };
   const { data: allowed, error: adminCheckError } = await client.rpc("is_admin");
-  if (adminCheckError || allowed !== true) return null;
-  return user;
+  return { allowed: !adminCheckError && allowed === true, user, reason: adminCheckError?.message || (allowed === true ? null : "not_admin") };
 }
 
 async function listAuthUsers() {
@@ -136,8 +135,9 @@ async function dashboard() {
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: headers(req) });
   if (req.method !== "POST") return json(req, { error: "Método não permitido" }, 405);
-  const user = await requireAdmin(req);
-  if (!user) return json(req, { error: "Acesso exclusivo da produção" }, 403);
+  const access = await requireAdmin(req);
+  if (!access.allowed || !access.user) return json(req, { error: access.user?.email ? `Acesso exclusivo da produção. Conta atual: ${access.user.email}` : "Acesso exclusivo da produção", reason: access.reason }, 403);
+  const user = access.user;
 
   try {
     const body = await req.json().catch(() => ({}));
