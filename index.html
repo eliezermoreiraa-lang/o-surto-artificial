@@ -99,10 +99,10 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
     <div>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:clamp(20px,3vh,30px);animation:saUp .8s both">
         <span style="width:8px;height:8px;border-radius:50%;background:#E50914;box-shadow:0 0 12px rgba(229,9,20,.9);animation:saPulse 1.7s infinite;flex:none"></span>
-        <span style="font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:color-mix(in srgb,#F5F5F5 72%,transparent);line-height:1.5">Agora em exibição · Ep. 54 · Últimas semanas</span>
+        <span style="font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:color-mix(in srgb,#F5F5F5 72%,transparent);line-height:1.5">Aguardando apoiadores · La Linha do Bairro</span>
       </div>
       <h1 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(50px,6.6vw,94px);line-height:.92;letter-spacing:.005em;margin:0;color:#F5F5F5;text-wrap:balance;animation:saUp .8s .06s both">O SURTO CONTINUA <span style="color:#E50914">COM VOCÊ.</span></h1>
-      <p style="max-width:44ch;font-size:clamp(15px,1.5vw,17.5px);line-height:1.6;color:color-mix(in srgb,#F5F5F5 70%,transparent);margin:clamp(20px,3vh,28px) 0 clamp(28px,4vh,36px);text-wrap:pretty;animation:saUp .8s .14s both">Entre para o Clube do Surto, ajude a manter nossas produções no ar e, se quiser, faça parte das próximas novelinhas.</p>
+      <p style="max-width:48ch;font-size:clamp(15px,1.5vw,17.5px);line-height:1.6;color:color-mix(in srgb,#F5F5F5 70%,transparent);margin:clamp(20px,3vh,28px) 0 clamp(28px,4vh,36px);text-wrap:pretty;animation:saUp .8s .14s both">Entre para o Clube do Surto e ajude as próximas produções a entrarem no ar. Você ainda pode fazer parte das nossas novelinhas.</p>
       <div onClick="{{ go.clube }}" style="display:inline-flex;align-items:center;gap:12px;cursor:pointer;height:60px;padding:0 32px;border-radius:8px;font-size:14px;letter-spacing:.14em;color:#F5F5F5;background:color-mix(in srgb,#E50914 18%,transparent);box-shadow:0 0 0 1px #E50914,0 0 38px rgba(229,9,20,.28);transition:background .22s,box-shadow .22s,transform .2s;animation:saUp .8s .2s both" style-hover="background:color-mix(in srgb,#E50914 40%,transparent);box-shadow:0 0 0 1px #E50914,0 0 54px rgba(229,9,20,.5);transform:translateY(-2px)">QUERO ENTRAR PARA O CLUBE <span style="font-size:16px">→</span></div>
       <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-top:clamp(20px,3vh,26px);animation:saUp .8s .26s both">
         <sc-for list="{{ heroBenef }}" as="b" hint-placeholder-count="3">
@@ -115,15 +115,13 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
     </div>
 
     <div style="position:relative;display:flex;justify-content:center;animation:saIn 1.2s .1s both">
-      <div style="position:absolute;inset:-14% -6%;background:radial-gradient(circle at 50% 45%,rgba(229,9,20,.34),transparent 62%);filter:blur(50px)"></div>
-      <div style="position:relative;width:100%;max-width:clamp(280px,34vw,440px);animation:saFloat 12s ease-in-out infinite">
-        <img src="assets-min/ursupadollra.jpg" alt="A UrsupaDOLLra" style="width:100%;display:block;border-radius:10px;-webkit-mask-image:radial-gradient(120% 100% at 50% 42%,#000 58%,transparent 100%);mask-image:radial-gradient(120% 100% at 50% 42%,#000 58%,transparent 100%);box-shadow:0 40px 90px rgba(0,0,0,.6)">
-        <div style="position:absolute;inset:0;border-radius:10px;background:repeating-linear-gradient(180deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px);mix-blend-mode:multiply;opacity:.55"></div>
-        <div style="position:absolute;inset:0;border-radius:10px;background:linear-gradient(180deg,transparent 62%,rgba(11,13,19,.92))"></div>
-        <div style="position:absolute;left:6%;right:6%;bottom:5%;display:flex;align-items:center;gap:10px">
-          <span style="font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:#00E5FF">novelinha</span>
-          <span style="flex:1;height:1px;background:linear-gradient(90deg,rgba(0,229,255,.6),transparent)"></span>
-          <span style="font-size:9.5px;letter-spacing:.16em;color:color-mix(in srgb,#F5F5F5 62%,transparent)">EP. 54</span>
+      <div style="position:absolute;inset:-14% -6%;background:radial-gradient(circle at 50% 45%,rgba(0,229,255,.28),transparent 62%);filter:blur(50px)"></div>
+      <div style="position:relative;width:100%;max-width:clamp(280px,34vw,420px);animation:saFloat 12s ease-in-out infinite">
+        <img src="assets-min/poster-la-linha-do-bairro.webp" alt="La Linha do Bairro — próxima novelinha em produção" style="width:100%;display:block;border-radius:12px;box-shadow:0 40px 90px rgba(0,0,0,.68),0 0 0 1px rgba(0,229,255,.18)">
+        <div style="position:absolute;inset:0;border-radius:12px;background:repeating-linear-gradient(180deg,rgba(0,0,0,.14) 0 1px,transparent 1px 3px);mix-blend-mode:multiply;opacity:.42;pointer-events:none"></div>
+        <div style="position:absolute;left:5%;right:5%;top:4%;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="display:inline-flex;padding:7px 10px;border-radius:99px;background:rgba(11,13,19,.82);box-shadow:inset 0 0 0 1px rgba(229,9,20,.65);backdrop-filter:blur(8px);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:#F5F5F5">Em produção</span>
+          <span style="display:inline-flex;padding:7px 10px;border-radius:99px;background:rgba(11,13,19,.82);box-shadow:inset 0 0 0 1px rgba(0,229,255,.55);backdrop-filter:blur(8px);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:#00E5FF">Aguardando apoio</span>
         </div>
       </div>
     </div>
@@ -2585,12 +2583,6 @@ class Component extends DCLogic {
     };
     tick();
   }
-  componentDidUpdate(prev) {
-    if (this.state.route === 'exibicao' && prev.route !== 'exibicao') {
-      if (this._castRaf) cancelAnimationFrame(this._castRaf);
-      setTimeout(() => this._initCastDrag(), 80);
-    }
-  }
   componentDidMount() {
     if (this.state.route === 'exibicao') setTimeout(() => this._initCastDrag(), 100);
     this.initAuth();
@@ -2658,11 +2650,23 @@ class Component extends DCLogic {
     const i = items.findIndex(c => c.dataset.navItem === this.state.route);
     if (i < 0) { if (this.state.barOn) this.setState({ barOn: 0 }); return; }
     const b = items[i].getBoundingClientRect(), p = wrap.getBoundingClientRect();
-    this.setState({ barX: Math.round(b.left - p.left) + 'px', barW: Math.round(b.width) + 'px', barOn: 1 });
+    const barX = Math.round(b.left - p.left) + 'px', barW = Math.round(b.width) + 'px';
+    if (this.state.barX === barX && this.state.barW === barW && this.state.barOn === 1) return;
+    this.setState({ barX, barW, barOn: 1 });
   }
 
-  componentDidUpdate(prev) {
-    if (prev.route !== this.state.route || prev.w !== this.state.w) {
+  componentDidUpdate() {
+    const route = this.state.route;
+    const enteredExibicao = route === 'exibicao' && this._lastUpdatedRoute !== 'exibicao';
+    const navMeasureKey = route + '|' + this.state.w;
+    const navChanged = this._lastNavMeasureKey !== navMeasureKey;
+    this._lastUpdatedRoute = route;
+    if (enteredExibicao) {
+      if (this._castRaf) cancelAnimationFrame(this._castRaf);
+      setTimeout(() => this._initCastDrag(), 80);
+    }
+    if (navChanged) {
+      this._lastNavMeasureKey = navMeasureKey;
       this.measureNav();
       setTimeout(() => this.scanReveal(), 30);
     }
@@ -2672,6 +2676,7 @@ class Component extends DCLogic {
     window.removeEventListener('scroll', this._tick);
     window.removeEventListener('resize', this._tick);
     if (this._win) { this._win.removeEventListener('scroll', this._tick); this._win.removeEventListener('resize', this._tick); }
+    if (this._castRaf) cancelAnimationFrame(this._castRaf);
     clearInterval(this._pollId);
   }
 

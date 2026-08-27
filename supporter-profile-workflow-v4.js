@@ -113,9 +113,19 @@
   async function renderProfile(root,m){if(!root||root.dataset.sv4Busy==='1')return;root.dataset.sv4Busy='1';try{if(m.publicityProfile?.submission_completed_at)await renderCompleted(root,m);else await renderEditable(root,m)}finally{root.dataset.sv4Busy='0'}}
 
   function progress(m){
-    const p=m.publicityProfile||{},pay=!!m.currentSupport,prof=profileOk(p),pics=photosOk(p),av=!!p.official_avatar_path,app=(m.appearances||[]).some(a=>a.status!=='cancelled');const steps=[['Pagamento',pay,'Apoio confirmado'],['Perfil',prof,prof?'Dados salvos':'Preencha seus dados'],['Fotos',pics,pics?'Referências recebidas':'Envie rosto e corpo'],['Avatar',av,av?'Avatar pronto':p.submission_completed_at?(p.avatar_status==='in_production'?'Em produção':'Aguardando produção'):'Aguardando conclusão'],['Aparição',app,app?'Em andamento':'Aguardando produção']];const first=steps.findIndex(x=>!x[1]);
-    let text='',button='';if(!prof){text='Complete seu Perfil de Divulgação para continuar.';button='PREENCHER PERFIL →'}else if(!pics){text='Seu perfil está pronto. Agora envie as referências para a criação do seu avatar.';button='ENVIAR FOTOS →'}else if(!p.submission_completed_at){text='Seu material está pronto para revisão. Conclua o envio para entregar à produção.';button='CONCLUIR ENVIO →'}else if(!av){text=p.avatar_status==='in_production'?'Seu avatar está em produção. Agora é com a equipe do Surto.':'Tudo certo do seu lado. Agora é com a produção do Surto.'}else if(!app)text='Seu avatar está pronto. Agora aguarde a programação da sua aparição.';else text='Sua participação já tem andamento cadastrado.';
-    return `<section class="sv4-progress" id="sv4-progress"><div class="sv4-kicker">CONFIGURAÇÃO DO SEU APOIO</div><h2>SEU CAMINHO ATÉ A APARIÇÃO</h2><p>Acompanhe o que já está pronto e o que ainda falta.</p><div class="sv4-track">${steps.map((x,i)=>`<div class="sv4-item ${x[1]?'done':i===first?'current':''}"><div class="sv4-dot">${x[1]?'✓':i+1}</div><b>${x[0]}</b><span>${x[2]}</span></div>`).join('')}</div><div class="sv4-next"><p>${text}</p>${button?`<button class="sv4-btn cyan" id="sv4-go-profile">${button}</button>`:''}</div></section>`
+    const p=m.publicityProfile||{},pay=!!m.currentSupport,prof=profileOk(p),pics=photosOk(p),av=!!p.official_avatar_path;
+    const activeAppearances=(m.appearances||[]).filter(a=>String(a.status||'').toLowerCase()!=='cancelled');
+    const appeared=activeAppearances.some(a=>String(a.status||'').toLowerCase()==='published'||!!a.published_at);
+    const hasAppearance=activeAppearances.length>0;
+    const steps=[
+      ['Pagamento',pay,'Apoio confirmado'],
+      ['Perfil',prof,prof?'Dados salvos':'Preencha seus dados'],
+      ['Fotos',pics,pics?'Referências recebidas':'Envie rosto e corpo'],
+      ['Avatar',av,av?'Avatar pronto':p.submission_completed_at?(p.avatar_status==='in_production'?'Em produção':'Aguardando produção'):'Aguardando conclusão'],
+      ['Aparição',appeared,appeared?'Aparição publicada':hasAppearance?'Ainda não apareceu':'Aguardando produção']
+    ];
+    let text='',button='';if(!prof){text='Complete seu Perfil de Divulgação para continuar.';button='PREENCHER PERFIL →'}else if(!pics){text='Seu perfil está pronto. Agora envie as referências para a criação do seu avatar.';button='ENVIAR FOTOS →'}else if(!p.submission_completed_at){text='Seu material está pronto para revisão. Conclua o envio para entregar à produção.';button='CONCLUIR ENVIO →'}else if(!av){text=p.avatar_status==='in_production'?'Seu avatar está em produção. Agora é com a equipe do Surto.':'Tudo certo do seu lado. Agora é com a produção do Surto.'}else if(!appeared)text=hasAppearance?'Sua participação está em andamento. A etapa será concluída quando a aparição for publicada.':'Seu avatar está pronto. Agora aguarde a programação da sua aparição.';else text='Sua aparição já foi publicada.';
+    return `<section class="sv4-progress" id="sv4-progress"><div class="sv4-kicker">CONFIGURAÇÃO DO SEU APOIO</div><h2>SEU CAMINHO ATÉ A APARIÇÃO</h2><p>Acompanhe o que já está pronto e o que ainda falta.</p><div class="sv4-track">${steps.map((x,i)=>`<div class="sv4-item ${x[1]?'done':'current'}"><div class="sv4-dot">${x[1]?'✓':i+1}</div><b>${x[0]}</b><span>${x[2]}</span></div>`).join('')}</div><div class="sv4-next"><p>${text}</p>${button?`<button class="sv4-btn cyan" id="sv4-go-profile">${button}</button>`:''}</div></section>`
   }
 
   async function enhance(){
@@ -124,7 +134,7 @@
       if(root.querySelector('.sd-hero')){const old=root.querySelector('#sv4-progress');if(old)old.remove();const hero=root.querySelector('.sd-hero');hero.insertAdjacentHTML('afterend',progress(m));const go=root.querySelector('#sv4-go-profile');if(go)go.onclick=goProfile;if(profileOk(m.publicityProfile||{})){Array.from(root.querySelectorAll('.sd-card')).forEach(c=>{if(norm(c.textContent).includes('COMPLETE SEU PERFIL DE DIVULGAÇÃO'))c.remove()})}}
     }finally{busy=false}
   }
-  function schedule(){clearTimeout(timer);timer=setTimeout(enhance,45)}
+  function schedule(){clearTimeout(timer);timer=setTimeout(enhance,0)}
   const mo=new MutationObserver(()=>schedule());mo.observe(document.documentElement,{childList:true,subtree:true});
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
 })();
