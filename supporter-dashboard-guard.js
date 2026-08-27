@@ -10,6 +10,19 @@
   let hasPaidSupport = null;
   let checking = false;
 
+  async function sharedDashboardData(){
+    for(let attempt=0;attempt<20;attempt+=1){
+      if(typeof window.__surtoGetSupporterDashboardData==='function'){
+        return window.__surtoGetSupporterDashboardData();
+      }
+      await new Promise(resolve=>setTimeout(resolve,50));
+    }
+    const c=client();
+    if(!c)return null;
+    const {data,error}=await c.functions.invoke('supporter-dashboard-data',{body:{}});
+    return error?null:data;
+  }
+
   const norm = v => String(v || '').replace(/\s+/g,' ').trim().toUpperCase();
 
   function ensureCss(){
@@ -86,8 +99,8 @@
     try {
       const {data:sess} = await c.auth.getSession();
       if (!sess?.session?.user) { hasPaidSupport = false; return; }
-      const {data,error} = await c.functions.invoke('supporter-dashboard-data',{body:{}});
-      if (!error && data?.ok) hasPaidSupport = !!data.currentSupport;
+      const data = await sharedDashboardData();
+      if (data?.ok) hasPaidSupport = !!data.currentSupport;
     } catch (_) {
       hasPaidSupport = null;
     } finally {
