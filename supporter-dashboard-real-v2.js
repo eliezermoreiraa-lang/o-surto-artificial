@@ -34,6 +34,7 @@
 
   let client = null;
   let dataModel = null;
+  let dataPromise = null;
   let currentUserId = null;
   let currentRoute = 'home';
   let rendering = false;
@@ -127,11 +128,22 @@
     const session = sessionData && sessionData.session;
     if (!session || !session.user) throw new Error('not_authenticated');
     if (!force && dataModel && currentUserId === session.user.id) return dataModel;
-    const { data, error } = await sb.functions.invoke('supporter-dashboard-data', { body: {} });
-    if (error || !data || !data.ok) throw new Error('dashboard_data_failed');
-    dataModel = data;
-    currentUserId = session.user.id;
-    return dataModel;
+    if (dataPromise) return dataPromise;
+    dataPromise=(async()=>{
+      let timeout;
+      try{
+        const result=await Promise.race([
+          sb.functions.invoke('supporter-dashboard-data', { body: {} }),
+          new Promise((_,reject)=>{timeout=setTimeout(()=>reject(new Error('dashboard_data_timeout')),8000)})
+        ]);
+        const {data,error}=result||{};
+        if (error || !data || !data.ok) throw new Error('dashboard_data_failed');
+        dataModel=data;
+        currentUserId=session.user.id;
+        return dataModel;
+      }finally{clearTimeout(timeout)}
+    })();
+    try{return await dataPromise}finally{dataPromise=null}
   }
 
   function ensureCss(){
@@ -302,8 +314,16 @@
     if (target) target.click();
   }
 
+  function openRoute(key){
+    if (!key) return;
+    currentRoute=key;
+    upgradeData=null;
+    window.scrollTo(0,0);
+    schedule(false);
+  }
+
   function bindRoot(root){
-    root.querySelectorAll('[data-route]').forEach(el => el.addEventListener('click',()=>gotoOriginalRoute(el.dataset.route),{once:true}));
+    root.querySelectorAll('[data-route]').forEach(el => el.addEventListener('click',()=>openRoute(el.dataset.route),{once:true}));
     root.querySelectorAll('[data-join]').forEach(el=>el.addEventListener('click',()=>{currentRoute='join';checkoutData=null;checkoutTier=null;window.scrollTo(0,0);schedule(false)},{once:true}));
     root.querySelectorAll('[data-change-plan]').forEach(el=>el.addEventListener('click',()=>{checkoutData=null;checkoutTier=null;schedule(false)},{once:true}));
     root.querySelectorAll('[data-join-tier]').forEach(el=>el.addEventListener('click',()=>{checkoutTier=el.dataset.joinTier;checkoutData=null;window.scrollTo(0,0);schedule(false)},{once:true}));
@@ -390,6 +410,20 @@
       const m=await loadData(force);
       root.innerHTML=htmlFor(currentRoute,m);
       bindRoot(root);
+      window.__surtoGetSupporterDashboardModel=()=>dataModel;
+      window.dispatchEvent(new CustomEvent('surto:supporter-dashboard-rendered',{detail:{route:currentRoute}}));
+      if(currentRoute==='perfil'&&m.currentSupport){
+        if(typeof window.__surtoRenderSupporterProfile==='function'){
+          await window.__surtoRenderSupporterProfile(root,m);
+        }else{
+          setTimeout(()=>{
+            if(currentRoute!=='perfil'||!root.isConnected||!root.querySelector('.sd-profile-loading'))return;
+            root.innerHTML=`<h1 class="sd-title">Perfil de Divulgação</h1>${empty('O perfil demorou mais que o esperado','Tente novamente. Seus dados e seu pagamento estão seguros.','<button class="sd-btn secondary" id="sd-retry-profile">TENTAR NOVAMENTE →</button>')}`;
+            const retry=root.querySelector('#sd-retry-profile');
+            if(retry)retry.addEventListener('click',()=>schedule(true),{once:true});
+          },8000);
+        }
+      }
       document.documentElement.dataset.surtoDashboard='v2-real';
     } catch(e) {
       const root=shell.querySelector('#surto-supporter-real-v2');
@@ -431,6 +465,10 @@
 
   window.__surtoOpenUpgrade=()=>{currentRoute='upgrade';upgradeData=null;upgradeTarget=null;window.scrollTo(0,0);schedule(false)};
   window.__surtoOpenSupporterHome=()=>{currentRoute='home';upgradeData=null;upgradeTarget=null;checkoutData=null;checkoutTier=null;window.scrollTo(0,0);schedule(true)};
+  window.__surtoOpenSupporterProfile=()=>openRoute('perfil');
+  window.__surtoGetSupporterDashboardModel=()=>dataModel;
+  window.__surtoGetSupporterDashboardData=()=>loadData(false);
+  window.__surtoSetSupporterDashboardModel=m=>{if(m?.ok)dataModel=m};
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();

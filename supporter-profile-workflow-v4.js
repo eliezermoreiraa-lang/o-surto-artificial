@@ -7,7 +7,7 @@
   const SB_KEY='sb_publishable_RQVP_F6Ix1ZxHhu9HzO9bA_yy9wfb8C';
   const FACE_REF='/assets-min/onboarding-foto-rosto-exemplo.webp.b64.txt';
   const BODY_REF='/assets-min/onboarding-foto-corpo-exemplo.webp.b64.txt';
-  let sb=null, model=null, busy=false, timer=null, examples={};
+  let sb=null, model=null, loadPromise=null, busy=false, timer=null, examples={};
 
   const norm=v=>String(v||'').replace(/\s+/g,' ').trim().toUpperCase();
   const esc=v=>String(v==null?'':v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
@@ -42,8 +42,12 @@
   }
 
   async function load(force=false){
-    if(model&&!force)return model;const c=client();if(!c)return null;
-    const {data,error}=await c.functions.invoke('supporter-dashboard-data',{body:{}});if(error||!data?.ok)return null;model=data;return model;
+    const dashboardModel=typeof window.__surtoGetSupporterDashboardModel==='function'?window.__surtoGetSupporterDashboardModel():null;
+    if(!force&&dashboardModel){model=dashboardModel;return model}
+    if(!force&&typeof window.__surtoGetSupporterDashboardData==='function'){try{const shared=await window.__surtoGetSupporterDashboardData();if(shared){model=shared;return model}}catch{return null}}
+    if(model&&!force)return model;if(loadPromise)return loadPromise;const c=client();if(!c)return null;
+    loadPromise=(async()=>{const {data,error}=await c.functions.invoke('supporter-dashboard-data',{body:{}});if(error||!data?.ok)return null;model=data;if(typeof window.__surtoSetSupporterDashboardModel==='function')window.__surtoSetSupporterDashboardModel(model);return model})().finally(()=>{loadPromise=null});
+    return loadPromise;
   }
   async function refImage(kind){
     if(examples[kind])return examples[kind];const url=kind==='face'?FACE_REF:BODY_REF;
@@ -58,11 +62,15 @@
   function findProfileNav(){
     return Array.from(document.querySelectorAll('div')).find(el=>norm(el.textContent)==='PERFIL DE DIVULGAÇÃO'&&el.getBoundingClientRect().width>0);
   }
-  function goProfile(){const t=findProfileNav();if(t)t.click()}
+  function goProfile(){if(typeof window.__surtoOpenSupporterProfile==='function'){window.__surtoOpenSupporterProfile();return}const t=findProfileNav();if(t)t.click()}
+
+  function hydrateFrame(root,id,src,alt){
+    if(!root?.isConnected)return;const box=root.querySelector(`#${id}`);if(box)box.innerHTML=src?`<img src="${esc(src)}" alt="${esc(alt)}">`:'<span>Imagem não disponível.</span>';
+  }
 
   async function renderEditable(root,m){
     const p=m.publicityProfile||{}, ok=profileOk(p), pics=photosOk(p);
-    const [face,body,faceRef,bodyRef]=await Promise.all([signed(p.face_photo_path),signed(p.body_photo_path),refImage('face'),refImage('body')]);
+    const [face,body]=await Promise.all([signed(p.face_photo_path),signed(p.body_photo_path)]);
     const opts=[['instagram','Instagram'],['tiktok','TikTok'],['youtube','YouTube'],['x','X / Twitter'],['facebook','Facebook'],['outro','Outra']];const net=String(p.social_network||'').toLowerCase();
     root.innerHTML=`<div class="sv4"><h1 class="sv4-title">Perfil de Divulgação</h1><p class="sv4-lead">Preencha seus dados, salve a primeira etapa e depois envie as referências que a produção usará para criar seu avatar.</p>
       <section class="sv4-step"><div class="sv4-kicker">ETAPA 1 DE 2</div><h2>PERFIL DE DIVULGAÇÃO</h2><p>Essas informações serão usadas quando você aparecer nas produções do Surto.</p><div class="sv4-form">
@@ -75,19 +83,21 @@
         <div class="sv4-msg ${ok?'ok':''}" id="sv4-profile-msg">${ok?'Etapa salva ✓':''}</div><div><button class="sv4-btn cyan" id="sv4-save">SALVAR ETAPA</button></div>
       </div></section>
       <section class="sv4-step ${ok?'':'locked'}"><div class="sv4-kicker">ETAPA 2 DE 2</div><h2>FOTOS PARA O SEU AVATAR</h2><p>Mostre como você gostaria de aparecer no Surto. As fotos ficam privadas e são usadas pela produção para criar seu avatar oficial.</p><div class="sv4-photos">
-        <article class="sv4-photo"><div class="sv4-label">EXEMPLO — FOTO DE ROSTO</div>${frame(faceRef,'Exemplo de foto de rosto','ref')}<h3>FOTO DE ROSTO</h3><p>Rosto próximo e bem visível, olhando para frente, boa iluminação e fundo simples.</p><div class="sv4-label">SUA FOTO</div><div id="sv4-face-preview">${frame(face,'Sua foto de rosto')}</div><input class="sv4-file" id="sv4-face" type="file" accept="image/jpeg,image/png,image/webp"><label class="sv4-btn cyan" for="sv4-face" id="sv4-face-btn">${p.face_photo_path?'TROCAR FOTO':'ENVIAR FOTO'}</label><div class="sv4-status ${p.face_photo_path?'ok':''}" id="sv4-face-status">${p.face_photo_path?'Foto salva ✓':'Pendente'}</div></article>
-        <article class="sv4-photo"><div class="sv4-label">EXEMPLO — FOTO DE CORPO / LOOK</div>${frame(bodyRef,'Exemplo de foto de corpo inteiro','ref')}<h3>FOTO DE CORPO / LOOK</h3><p>Foto de corpo inteiro, dos pés à cabeça, em pose natural e com uma roupa que represente como você gostaria de aparecer.</p><div class="sv4-label">SUA FOTO</div><div id="sv4-body-preview">${frame(body,'Sua foto de corpo')}</div><input class="sv4-file" id="sv4-body" type="file" accept="image/jpeg,image/png,image/webp"><label class="sv4-btn" for="sv4-body" id="sv4-body-btn">${p.body_photo_path?'TROCAR FOTO':'ENVIAR FOTO'}</label><div class="sv4-status ${p.body_photo_path?'ok':''}" id="sv4-body-status">${p.body_photo_path?'Foto salva ✓':'Pendente'}</div></article>
+        <article class="sv4-photo"><div class="sv4-label">EXEMPLO — FOTO DE ROSTO</div><div class="sv4-frame ref empty" id="sv4-face-ref"><span>Carregando exemplo…</span></div><h3>FOTO DE ROSTO</h3><p>Rosto próximo e bem visível, olhando para frente, boa iluminação e fundo simples.</p><div class="sv4-label">SUA FOTO</div><div id="sv4-face-preview">${frame(face,'Sua foto de rosto')}</div><input class="sv4-file" id="sv4-face" type="file" accept="image/jpeg,image/png,image/webp"><label class="sv4-btn cyan" for="sv4-face" id="sv4-face-btn">${p.face_photo_path?'TROCAR FOTO':'ENVIAR FOTO'}</label><div class="sv4-status ${p.face_photo_path?'ok':''}" id="sv4-face-status">${p.face_photo_path?'Foto salva ✓':'Pendente'}</div></article>
+        <article class="sv4-photo"><div class="sv4-label">EXEMPLO — FOTO DE CORPO / LOOK</div><div class="sv4-frame ref empty" id="sv4-body-ref"><span>Carregando exemplo…</span></div><h3>FOTO DE CORPO / LOOK</h3><p>Foto de corpo inteiro, dos pés à cabeça, em pose natural e com uma roupa que represente como você gostaria de aparecer.</p><div class="sv4-label">SUA FOTO</div><div id="sv4-body-preview">${frame(body,'Sua foto de corpo')}</div><input class="sv4-file" id="sv4-body" type="file" accept="image/jpeg,image/png,image/webp"><label class="sv4-btn" for="sv4-body" id="sv4-body-btn">${p.body_photo_path?'TROCAR FOTO':'ENVIAR FOTO'}</label><div class="sv4-status ${p.body_photo_path?'ok':''}" id="sv4-body-status">${p.body_photo_path?'Foto salva ✓':'Pendente'}</div></article>
       </div><div class="sv4-finish"><p>Revise tudo antes de concluir. Depois disso o material será entregue à produção e ficará somente para visualização.</p><button class="sv4-btn" id="sv4-finish" ${pics?'':'disabled'}>CONCLUIR ENVIO</button></div></section></div>`;
     bindEditable(root);
+    Promise.all([refImage('face'),refImage('body')]).then(([faceRef,bodyRef])=>{hydrateFrame(root,'sv4-face-ref',faceRef,'Exemplo de foto de rosto');hydrateFrame(root,'sv4-body-ref',bodyRef,'Exemplo de foto de corpo inteiro')});
   }
 
   async function renderCompleted(root,m){
-    const p=m.publicityProfile||{};const [face,body]=await Promise.all([signed(p.face_photo_path),signed(p.body_photo_path)]);const av=avatar(p.official_avatar_path);const st=p.official_avatar_path?'ready':(p.avatar_status||'awaiting');
+    const p=m.publicityProfile||{};const av=avatar(p.official_avatar_path);const st=p.official_avatar_path?'ready':(p.avatar_status||'awaiting');
     const title=st==='ready'?'AVATAR PRONTO ✓':st==='in_production'?'SEU AVATAR ESTÁ EM PRODUÇÃO':'AVATAR AGUARDANDO PRODUÇÃO';const text=st==='ready'?'Esse é o seu avatar oficial para as produções do Surto.':st==='in_production'?'A equipe do Surto está preparando a sua versão para entrar na novelinha.':'Recebemos suas referências. Quando seu avatar estiver pronto, ele aparecerá aqui.';
     root.innerHTML=`<div class="sv4"><h1 class="sv4-title">Perfil de Divulgação</h1><div class="sv4-success"><span class="sv4-badge">MATERIAL ENVIADO ✓</span><h2>TUDO CERTO DO SEU LADO.</h2><p>Suas informações e referências já foram entregues para a produção. Esta área agora fica somente para visualização.</p></div>
       <div class="sv4-summary"><section class="sv4-card"><h2>PERFIL DE DIVULGAÇÃO</h2><div class="sv4-list"><div><span>Nome</span><b>${esc(p.display_name||'—')}</b></div><div><span>Rede social</span><b>${esc(netLabel(p.social_network))}</b></div><div><span>@</span><b>${esc(p.social_handle?'@'+String(p.social_handle).replace(/^@/,''):'—')}</b></div><div><span>Link</span><b>${p.social_url?`<a href="${esc(p.social_url)}" target="_blank" rel="noopener" style="color:#00E5FF">abrir perfil</a>`:'—'}</b></div><div><span>Notificações</span><b>${esc(p.notification_email||m.user?.email||'—')}</b></div></div></section>
-      <section class="sv4-card"><h2>REFERÊNCIAS ENVIADAS</h2><div class="sv4-refgrid"><div><div class="sv4-label">ROSTO</div>${frame(face,'Foto de rosto')}</div><div><div class="sv4-label">CORPO / LOOK</div>${frame(body,'Foto de corpo')}</div></div></section></div>
+      <section class="sv4-card"><h2>REFERÊNCIAS ENVIADAS</h2><div class="sv4-refgrid"><div><div class="sv4-label">ROSTO</div><div class="sv4-frame empty" id="sv4-sent-face"><span>Carregando imagem…</span></div></div><div><div class="sv4-label">CORPO / LOOK</div><div class="sv4-frame empty" id="sv4-sent-body"><span>Carregando imagem…</span></div></div></div></section></div>
       <section class="sv4-card sv4-avatar">${frame(av,'Avatar oficial')}<div><div class="sv4-kicker">SEU AVATAR</div><h2>${title}</h2><p>${text}</p></div></section></div>`;
+    Promise.all([signed(p.face_photo_path),signed(p.body_photo_path)]).then(([face,body])=>{hydrateFrame(root,'sv4-sent-face',face,'Foto de rosto');hydrateFrame(root,'sv4-sent-body',body,'Foto de corpo')});
   }
 
   function preview(kind,file){const box=document.querySelector(`#sv4-${kind}-preview`);if(!box)return;const u=URL.createObjectURL(file);box.innerHTML=frame(u,'Prévia da foto');const img=box.querySelector('img');if(img)img.onload=()=>URL.revokeObjectURL(u)}
@@ -110,7 +120,7 @@
     const back=document.createElement('div');back.className='sv4-modalback';back.innerHTML=`<div class="sv4-modal"><h3>CONCLUIR SEU ENVIO?</h3><p>Depois de concluir, as informações serão enviadas para a produção e ficarão disponíveis apenas para visualização.</p><div class="sv4-actions"><button class="sv4-btn ghost" id="sv4-review">VOLTAR E REVISAR</button><button class="sv4-btn" id="sv4-confirm">SIM, CONCLUIR</button></div><div class="sv4-msg" id="sv4-complete-msg"></div></div>`;document.body.appendChild(back);back.querySelector('#sv4-review').onclick=()=>back.remove();back.querySelector('#sv4-confirm').onclick=async()=>{const btn=back.querySelector('#sv4-confirm'),msg=back.querySelector('#sv4-complete-msg');btn.disabled=true;btn.textContent='CONCLUINDO…';const c=client();const {data,error}=await c.functions.invoke('supporter-profile-complete',{body:{}});if(error||!data?.ok){msg.textContent=data?.error||'Não foi possível concluir agora.';btn.disabled=false;btn.textContent='SIM, CONCLUIR';return}back.remove();model=await load(true);renderProfile(root,model)};
   }
 
-  async function renderProfile(root,m){if(!root||!m?.currentSupport||root.dataset.sv4Busy==='1')return;root.dataset.sv4Busy='1';try{if(m.publicityProfile?.submission_completed_at)await renderCompleted(root,m);else await renderEditable(root,m)}finally{root.dataset.sv4Busy='0'}}
+  async function renderProfile(root,m){if(!root||!m?.currentSupport||root.dataset.sv4Busy==='1')return;model=m;root.dataset.sv4Busy='1';try{if(m.publicityProfile?.submission_completed_at)await renderCompleted(root,m);else await renderEditable(root,m)}finally{root.dataset.sv4Busy='0'}}
 
   function progress(m){
     const p=m.publicityProfile||{},pay=!!m.currentSupport,prof=profileOk(p),pics=photosOk(p),av=!!p.official_avatar_path;
@@ -134,7 +144,9 @@
       if(root.querySelector('.sd-hero')){const old=root.querySelector('#sv4-progress');if(old)old.remove();const hero=root.querySelector('.sd-hero');hero.insertAdjacentHTML('afterend',progress(m));const go=root.querySelector('#sv4-go-profile');if(go)go.onclick=goProfile;if(profileOk(m.publicityProfile||{})){Array.from(root.querySelectorAll('.sd-card')).forEach(c=>{if(norm(c.textContent).includes('COMPLETE SEU PERFIL DE DIVULGAÇÃO'))c.remove()})}}
     }finally{busy=false}
   }
-  function schedule(){clearTimeout(timer);timer=setTimeout(enhance,0)}
-  const mo=new MutationObserver(()=>schedule());mo.observe(document.documentElement,{childList:true,subtree:true});
+  window.__surtoRenderSupporterProfile=async(root,m)=>{css();return renderProfile(root,m)};
+  window.addEventListener('surto:supporter-dashboard-rendered',()=>schedule());
+  function schedule(){clearTimeout(timer);timer=setTimeout(enhance,25)}
+  const mo=new MutationObserver(mutations=>{const root=document.querySelector('#surto-supporter-real-v2');if(mutations.some(m=>!root||!root.contains(m.target)))schedule()});mo.observe(document.documentElement,{childList:true,subtree:true});
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
 })();
