@@ -7,6 +7,7 @@
     document.head.appendChild(s);
   };
 
+  load('/surto-shared-supabase.js?v=20260827-1');
   load('/surto-payment-patch.js?v=20260827-2');
   load('/mobile-experience-v2.js?v=20260827-6');
   load('/supporter-dashboard-guard.js?v=20260827-2');

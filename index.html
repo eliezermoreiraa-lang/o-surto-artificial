@@ -9,9 +9,10 @@
 <x-dc>
 <helmet>
 <link rel="stylesheet" href="_ds/nocturne-544aa0bf-54a6-455a-aaa0-63789f8f4212/styles.css">
-<script src="_ds/nocturne-544aa0bf-54a6-455a-aaa0-63789f8f4212/_ds_bundle.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="surto-shared-supabase.js?v=20260827-1"></script>
+<script src="_ds/nocturne-544aa0bf-54a6-455a-aaa0-63789f8f4212/_ds_bundle.js?v=20260827-2"></script>
 <style>
 body{margin:0;background:#0B0D13;color:#e9e9ed;font-family:Inter,system-ui,sans-serif}
 @keyframes saMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
@@ -2339,12 +2340,16 @@ class Component extends DCLogic {
   async initAuth() {
     const sb = await this.sb();
     if (!sb) { this.setState({ sbReady: true, authErr: 'Não foi possível conectar ao servidor. Recarregue a página.' }); return; }
-    const { data } = await sb.auth.getSession();
-    this.applySession(data && data.session ? data.session : null, true);
     this._authSub = sb.auth.onAuthStateChange((evt, session) => {
       this.applySession(session || null, false);
       if (evt === 'SIGNED_OUT') this.nav('home');
     });
+    const { data, error } = await sb.auth.getSession();
+    if (error) {
+      this.setState({ sbReady: true, authErr: 'Não foi possível confirmar seu acesso. Recarregue a página.' });
+      return;
+    }
+    if (!this._session) this.applySession(data && data.session ? data.session : null, true);
   }
 
   applySession(session, first) {
@@ -2739,8 +2744,17 @@ class Component extends DCLogic {
      'admHome','admCalendario','admFila','admPendentes','admAvatares','admPublica','admPagamentos'].forEach(k => {
       go[k] = () => this.nav(k);
     });
-    const goEntrar = () => {
+    const goEntrar = async () => {
       if (this._session || s.session) { this.nav('appHome'); return; }
+      const sb = await this.sb();
+      if (sb) {
+        const { data } = await sb.auth.getSession();
+        if (data && data.session) {
+          this.applySession(data.session, false);
+          this.nav('appHome');
+          return;
+        }
+      }
       this.setState({ authMode: 'login', authErr: null, authMsg: null });
       this.nav('auth');
     };
