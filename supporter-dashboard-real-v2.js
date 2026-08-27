@@ -39,6 +39,7 @@
   let rendering = false;
   let timer = null;
   let upgradeData = null;
+  let upgradeTarget = null;
   let lastNav = null;
 
   const norm = v => String(v || '').replace(/\s+/g, ' ').trim().toUpperCase();
@@ -48,6 +49,7 @@
   const brl = v => Number(v || 0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
   const dateBR = v => {
     if (!v) return '—';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(String(v))) { const [y,m,d]=String(v).split('-'); return `${d}/${m}/${y}`; }
     const d = new Date(v);
     if (Number.isNaN(d.getTime())) return '—';
     return new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo'}).format(d);
@@ -146,7 +148,7 @@
       .sd-badges{display:flex;gap:9px;flex-wrap:wrap}.sd-badges span,.sd-status{display:inline-flex;border-radius:999px;padding:6px 11px;box-shadow:0 0 0 1px rgba(245,245,245,.14);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:rgba(245,245,245,.66)}
       .sd-badges .cyan,.sd-status.cyan{color:#00E5FF;box-shadow:0 0 0 1px rgba(0,229,255,.35);background:rgba(0,229,255,.07)}
       .sd-grid{display:grid;gap:16px;margin-bottom:16px}.sd-grid.two{grid-template-columns:minmax(0,1.7fr) minmax(280px,.9fr)}.sd-grid.cards{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
-      .sd-card{background:#111418;border-radius:12px;padding:22px;box-shadow:0 0 0 1px rgba(245,245,245,.10);min-width:0}.sd-card.accent{background:linear-gradient(125deg,rgba(0,229,255,.09),#111418);box-shadow:0 0 0 1px rgba(0,229,255,.38)}.sd-card.vip{background:linear-gradient(125deg,rgba(181,171,252,.12),#111418 55%,rgba(229,9,20,.09));box-shadow:0 0 0 1px rgba(181,171,252,.35)}
+      .sd-card{background:#111418;border-radius:12px;padding:22px;box-shadow:0 0 0 1px rgba(245,245,245,.10);min-width:0}.sd-card.accent{background:linear-gradient(125deg,rgba(245,189,79,.10),#111418);box-shadow:0 0 0 1px rgba(245,189,79,.42)}.sd-card.tone-green{background:linear-gradient(125deg,rgba(41,211,145,.13),#111418);box-shadow:0 0 0 1px rgba(41,211,145,.52)}.sd-card.tone-red{background:linear-gradient(125deg,rgba(229,9,20,.13),#111418);box-shadow:0 0 0 1px rgba(229,9,20,.48)}.sd-card.vip{background:linear-gradient(125deg,rgba(181,171,252,.12),#111418 55%,rgba(229,9,20,.09));box-shadow:0 0 0 1px rgba(181,171,252,.35)}
       .sd-card h2{font:400 clamp(34px,5vw,58px)/.95 'Bebas Neue',Inter,sans-serif;margin:12px 0}.sd-card h3{font:400 30px/1 'Bebas Neue',Inter,sans-serif;margin:8px 0}.sd-money{font:400 31px/1 'Bebas Neue',Inter,sans-serif;color:#00E5FF;margin:7px 0 18px}
       .sd-list{display:grid;gap:0;margin:12px 0 18px;border-top:1px solid rgba(245,245,245,.08)}.sd-list>div{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid rgba(245,245,245,.08);font-size:12px}.sd-list span{color:rgba(245,245,245,.45)}.sd-list b{font-weight:500;text-align:right}
       .sd-btn{border:0;border-radius:7px;background:#E50914;color:#fff;min-height:46px;padding:0 19px;font:600 11px Inter,sans-serif;letter-spacing:.12em;cursor:pointer}.sd-btn:disabled{opacity:.55;cursor:wait}.sd-btn.secondary{background:#00E5FF;color:#071015}.sd-btn.outline{background:transparent;box-shadow:inset 0 0 0 1px #E50914}.sd-btn.vipbtn{width:100%;margin-top:12px;background:linear-gradient(90deg,#E50914,#a90f82)}
@@ -155,8 +157,8 @@
       .sd-form{max-width:720px;display:grid;gap:15px}.sd-field{display:grid;gap:7px}.sd-field label,.sd-check{font-size:11px;color:rgba(245,245,245,.58)}.sd-field input,.sd-field select{width:100%;height:44px;border:0;border-radius:7px;padding:0 12px;background:#0B0D13;color:#F5F5F5;box-shadow:inset 0 0 0 1px rgba(245,245,245,.16);font:13px Inter,sans-serif}.sd-check{display:flex;align-items:flex-start;gap:9px;line-height:1.45}.sd-msg{font-size:12px;color:#ff7b82}.sd-msg.ok{color:#00E5FF}
       .sd-profile-loading{min-height:260px;display:grid;place-items:center;border-radius:12px;background:#111418;box-shadow:0 0 0 1px rgba(245,245,245,.10)}.sd-profile-loading>div{display:grid;justify-items:center;gap:12px;color:rgba(245,245,245,.5);font-size:11px;letter-spacing:.12em;text-transform:uppercase}.sd-profile-spinner{width:24px;height:24px;border-radius:50%;border:2px solid rgba(245,245,245,.12);border-top-color:#00E5FF;animation:sdSpin .7s linear infinite}@keyframes sdSpin{to{transform:rotate(360deg)}}
       .sd-credit{display:grid;grid-template-columns:1fr auto;gap:10px 18px;margin:20px 0;padding:16px;border-radius:9px;background:#0B0D13;box-shadow:inset 0 0 0 1px rgba(245,245,245,.10);font-size:12px}.sd-credit span{color:rgba(245,245,245,.5)}.sd-credit strong{font:400 27px/1 'Bebas Neue';color:#00E5FF}
-      .sd-pix{display:grid;grid-template-columns:160px 1fr;gap:18px;align-items:center}.sd-pix img{width:160px;height:160px;object-fit:contain;background:#fff;padding:7px;border-radius:8px}.sd-pix .sd-btn{display:block;width:100%;margin-top:9px}.sd-link{color:#00E5FF;text-decoration:none;font-size:11px;letter-spacing:.08em}
-      @media(max-width:820px){.sd-grid.two{grid-template-columns:1fr}.sd-pix{grid-template-columns:1fr}.sd-pix img{width:180px;height:180px}.sd-table{min-width:680px}}
+      .sd-pix{display:grid;grid-template-columns:160px 1fr;gap:18px;align-items:center}.sd-pix img{width:160px;height:160px;object-fit:contain;background:#fff;padding:7px;border-radius:8px}.sd-pix .sd-btn{display:block;width:100%;margin-top:9px}.sd-link{color:#00E5FF;text-decoration:none;font-size:11px;letter-spacing:.08em}.sd-episode-cover{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:9px;margin:14px 0 4px;box-shadow:0 0 0 1px rgba(245,245,245,.12)}.sd-upgrade-price{font:400 38px/1 'Bebas Neue';color:#00E5FF;margin:10px 0}.sd-mobile-nav{scroll-padding-inline:10px;padding:12px 2px 16px!important;min-height:64px}.sd-mobile-nav>div{min-height:44px!important;height:44px!important;padding-inline:16px!important}
+      @media(max-width:820px){.sd-grid.two{grid-template-columns:1fr}.sd-pix{grid-template-columns:1fr}.sd-pix img{width:180px;height:180px}.sd-table{min-width:680px}#surto-supporter-real-v2{padding-bottom:80px}.sd-btn{min-height:48px}.sd-mobile-nav{position:sticky;top:96px;z-index:12;background:#0B0D13;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none}.sd-mobile-nav::-webkit-scrollbar{display:none}}
     `;
     document.head.appendChild(style);
   }
@@ -176,11 +178,13 @@
     else {
       const ep = ap.episodes && ap.episodes.episode_number ? `EPISÓDIO ${ap.episodes.episode_number}` : ap.estimated_episode_number ? `EPISÓDIO ${ap.estimated_episode_number}` : 'EPISÓDIO A DEFINIR';
       const when = (ap.episodes && ap.episodes.scheduled_date) || ap.estimated_date;
-      appearance = `<span class="sd-status cyan">${esc(AP_STATUS[ap.status] || ap.status)}</span><h2>${esc(ep)}</h2><p>${when ? dateBR(when) : 'A produção ainda não definiu uma data.'}</p>`;
+      const cover = ap.episodes && ap.episodes.cover_image_url;
+      appearance = `<span class="sd-status cyan">${esc(AP_STATUS[ap.status] || ap.status)}</span><h2>${esc(ep)}</h2><p>${when ? dateBR(when) : 'A produção ainda não definiu uma data.'}</p>${ap.status==='published'&&cover?`<img class="sd-episode-cover" src="${esc(cover)}" alt="Capa do ${esc(ep)}">`:''}${ap.status==='published'&&ap.published_url?`<a class="sd-link" target="_blank" rel="noopener" href="${esc(ap.published_url)}">ASSISTIR AO EPISÓDIO →</a>`:''}`;
     }
     const hero = `<section class="sd-hero"><div class="sd-kicker red">CLUBE DO SURTO</div><div class="sd-muted">Bem-vindo de volta,</div><h1>${esc(name)}</h1><div class="sd-badges"><span>${esc(LABELS[s.tier] || s.label || s.tier)}</span><span>${s.billing_mode === 'recurring' ? 'ASSINATURA MENSAL' : 'APOIO AVULSO'}</span><span class="cyan">● CONTA ATIVA</span></div><p>Aqui aparecem somente informações reais vinculadas à sua conta.</p></section>`;
-    const plan = card('MEU PLANO',`<h3>${esc(LABELS[s.tier] || s.label || s.tier)}</h3><div class="sd-money">${brl(s.amount)}</div><div class="sd-list"><div><span>Situação</span><b>apoio confirmado</b></div><div><span>Modalidade</span><b>${s.billing_mode === 'recurring' ? 'mensal' : 'apoio avulso'}</b></div><div><span>Membro desde</span><b>${esc(monthYear(m.user && m.user.memberSince))}</b></div></div>${s.tier !== 'vip' ? '<button class="sd-btn outline" data-route="vip">FAZER UPGRADE</button>' : ''}`);
-    const next = card('SUA PRÓXIMA APARIÇÃO',appearance,'accent');
+    const plan = card('MEU PLANO',`<h3>${esc(LABELS[s.tier] || s.label || s.tier)}</h3><div class="sd-money">${brl(s.amount)}</div><div class="sd-list"><div><span>Situação</span><b>apoio confirmado</b></div><div><span>Modalidade</span><b>${s.billing_mode === 'recurring' ? 'mensal' : 'apoio avulso'}</b></div><div><span>Membro desde</span><b>${esc(monthYear(m.user && m.user.memberSince))}</b></div></div>${s.tier !== 'vip' ? '<button class="sd-btn outline" data-upgrade>VER OPÇÕES DE UPGRADE</button>' : ''}`);
+    const tone = ap && ap.status === 'published' ? 'tone-green' : profileMissing ? 'tone-red' : 'accent';
+    const next = card(ap && ap.status === 'published' ? 'SUA APARIÇÃO JÁ FOI PUBLICADA ✓' : 'SUA PRÓXIMA APARIÇÃO',appearance,tone);
     const profile = profileMissing ? card('PRÓXIMO PASSO','<h3>Complete seu perfil de divulgação</h3><p>Informe nome, rede social, @ e link. Depois disso a produção consegue avançar sua participação.</p><button class="sd-btn secondary" data-route="perfil">COMPLETAR PERFIL →</button>') : '';
     return hero + `<div class="sd-grid two">${next}${plan}</div>${profile}`;
   }
@@ -222,8 +226,19 @@
     if (!rows.length) return `<h1 class="sd-title">Meus Episódios</h1>${empty('Nenhum episódio publicado com sua participação','Quando uma aparição sua for publicada e vinculada a um episódio real, ela aparecerá aqui.')}`;
     return `<h1 class="sd-title">Meus Episódios</h1><div class="sd-grid cards">${rows.map(e => {
       const links = [e.instagramUrl && `<a class="sd-link" target="_blank" href="${esc(e.instagramUrl)}">Instagram</a>`,e.tiktokUrl && `<a class="sd-link" target="_blank" href="${esc(e.tiktokUrl)}">TikTok</a>`,e.youtubeUrl && `<a class="sd-link" target="_blank" href="${esc(e.youtubeUrl)}">YouTube</a>`].filter(Boolean).join(' · ');
-      return card('PUBLICADO',`<h3>EPISÓDIO ${esc(e.episodeNumber || '—')}</h3><p>${dateBR(e.date)}</p><div>${links || 'Sem link cadastrado.'}</div>`);
+      return card('PUBLICADO',`${e.coverImageUrl?`<img class="sd-episode-cover" src="${esc(e.coverImageUrl)}" alt="Capa do episódio ${esc(e.episodeNumber||'')}">`:''}<h3>EPISÓDIO ${esc(e.episodeNumber || '—')}</h3><p>${dateBR(e.date)}</p><div>${links || 'Sem link cadastrado.'}</div>`,'tone-green');
     }).join('')}</div>`;
+  }
+
+  function upgradeHtml(m){
+    const options=(m.upgrades||[]).filter(x=>x.available);
+    if(!m.currentSupport)return `<h1 class="sd-title">Escolha seu apoio</h1>${empty('Você ainda não possui apoio pago','Conheça as formas de fazer parte do Clube do Surto.','<button class="sd-btn" data-clube>VER FORMAS DE APOIO →</button>')}`;
+    if(!options.length)return `<h1 class="sd-title">Seu plano</h1>${card('CATEGORIA MÁXIMA','<h2>VOCÊ JÁ É APOIADOR VIP</h2><p>Seu plano já possui o maior nível de destaque e participação.</p>','vip')}`;
+    if(upgradeData&&upgradeTarget&&upgradeData.pix){
+      const target=options.find(x=>x.tier===upgradeTarget)||{label:LABELS[upgradeTarget],fullPrice:0,amountDue:upgradeData.amount};
+      return `<h1 class="sd-title">Upgrade para ${esc(target.label)}</h1><div class="sd-grid two">${card('RESUMO',`<h3>${esc(target.label)}</h3><div class="sd-list"><div><span>Valor da categoria</span><b>${brl(target.fullPrice)}</b></div><div><span>Crédito do apoio atual</span><b>− ${brl(m.currentCredit)}</b></div><div><span>Você paga agora</span><b style="color:#00E5FF">${brl(upgradeData.amount)}</b></div></div>`)}${card('PAGAMENTO PIX',`<div class="sd-pix"><img src="data:image/png;base64,${esc(upgradeData.pix.encodedImage)}" alt="QR Code Pix"><div><p>Escaneie ou copie o código Pix.</p><button class="sd-btn secondary" id="sd-copy-upgrade">COPIAR PIX</button><button class="sd-btn outline" id="sd-refresh-upgrade">JÁ PAGUEI · ATUALIZAR</button></div></div>`)}</div>`;
+    }
+    return `<h1 class="sd-title">Melhore seu destaque</h1><p class="sd-lead">Seu apoio atual vira crédito. Escolha qualquer categoria acima da sua — somente a diferença será cobrada.</p><div class="sd-grid cards">${options.map(x=>card('UPGRADE DISPONÍVEL',`<h3>${esc(x.label)}</h3><div class="sd-upgrade-price">${brl(x.amountDue)}</div><p>Valor da categoria: ${brl(x.fullPrice)}<br>Crédito do apoio atual: ${brl(m.currentCredit)}</p><button class="sd-btn" data-upgrade-tier="${esc(x.tier)}">ESCOLHER ${esc(x.label)} →</button>`,x.tier==='vip'?'vip':'')).join('')}</div>`;
   }
 
   function vipHtml(m){
@@ -243,6 +258,7 @@
     if (route === 'perfil') return profileHtml(m);
     if (route === 'assinatura') return assinaturaHtml(m);
     if (route === 'episodios') return episodiosHtml(m);
+    if (route === 'upgrade') return upgradeHtml(m);
     if (route === 'vip') return vipHtml(m);
     return homeHtml(m);
   }
@@ -262,6 +278,12 @@
       const link = Array.from(document.querySelectorAll('div')).find(x => norm(x.textContent)==='CLUBE DO SURTO');
       if (link) link.click();
     },{once:true}));
+    root.querySelectorAll('[data-upgrade]').forEach(el=>el.addEventListener('click',()=>{currentRoute='upgrade';upgradeData=null;upgradeTarget=null;window.scrollTo(0,0);schedule(false)},{once:true}));
+    root.querySelectorAll('[data-upgrade-tier]').forEach(el=>el.addEventListener('click',async()=>{
+      const tier=el.dataset.upgradeTier;el.disabled=true;el.textContent='GERANDO PIX…';
+      try{const sb=ensureClient();const {data,error}=await sb.functions.invoke('asaas-create-support-payment',{body:{tier,method:'pix',upgradeFromSupportId:dataModel.currentSupport.id}});if(error||!data?.ok)throw new Error('upgrade_failed');upgradeTarget=tier;upgradeData=data;if(data.alreadyCovered){await loadData(true);upgradeData=null;upgradeTarget=null;currentRoute='home'}schedule(false)}catch(e){el.disabled=false;el.textContent='TENTAR NOVAMENTE'}}));
+    const copyUpgrade=root.querySelector('#sd-copy-upgrade');if(copyUpgrade)copyUpgrade.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(upgradeData.pix.payload);copyUpgrade.textContent='PIX COPIADO ✓'}catch(e){}});
+    const refreshUpgrade=root.querySelector('#sd-refresh-upgrade');if(refreshUpgrade)refreshUpgrade.addEventListener('click',async()=>{refreshUpgrade.textContent='ATUALIZANDO…';await loadData(true);if(dataModel.currentTier===upgradeTarget){upgradeData=null;upgradeTarget=null;currentRoute='home'}schedule(false)});
 
     const save = root.querySelector('#sd-save-profile');
     if (save) save.addEventListener('click',async()=>{
@@ -310,6 +332,7 @@
     rendering=true;
     try {
       bindNav(nav);
+      nav.classList.add('sd-mobile-nav');
       if (!currentRoute) currentRoute=inferRoute(shell);
       ensureCss();
       let root=shell.querySelector('#surto-supporter-real-v2');
@@ -367,6 +390,8 @@
 
     checkStructure();
   }
+
+  window.__surtoOpenUpgrade=()=>{currentRoute='upgrade';upgradeData=null;upgradeTarget=null;window.scrollTo(0,0);schedule(false)};
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();

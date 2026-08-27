@@ -42,8 +42,8 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
 
 <div ref="{{ rootRef }}" style="min-height:100vh;background:#0f1119">
 
-<div style="position:sticky;top:0;z-index:50;background:color-mix(in srgb,#0B0D13 82%,transparent);backdrop-filter:blur(14px);box-shadow:0 1px 0 color-mix(in srgb,#e9e9ed 8%,transparent)">
-<div style="max-width:1220px;margin:0 auto;display:flex;align-items:center;gap:22px;padding:11px 18px">
+<div class="sa-site-header" style="position:sticky;top:0;z-index:50;background:color-mix(in srgb,#0B0D13 82%,transparent);backdrop-filter:blur(14px);box-shadow:0 1px 0 color-mix(in srgb,#e9e9ed 8%,transparent)">
+<div class="sa-header-main" style="max-width:1220px;margin:0 auto;display:flex;align-items:center;gap:22px;padding:11px 18px">
   <div onClick="{{ go.home }}" style="display:flex;align-items:center;cursor:pointer;flex:none;animation:saGlitch 11s infinite">
     <img src="assets-min/logo-surto.png" alt="O Surto Artificial" style="height:38px;width:auto;display:block;filter:drop-shadow(0 0 18px rgba(229,9,20,.28))">
   </div>
@@ -61,9 +61,17 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
   </sc-if>
 
   <sc-if value="{{ isMobile }}">
-    <div onClick="{{ toggleNav }}" class="btn btn-secondary" style="width:38px;height:38px;padding:0;font-size:17px">≡</div>
+    <div style="flex:1"></div>
+    <div onClick="{{ goEntrar }}" class="sa-account-button" style="height:42px;padding:0 15px;display:grid;place-items:center;border-radius:8px;font-size:10px;letter-spacing:.14em;color:#F5F5F5;background:rgba(245,245,245,.04);box-shadow:0 0 0 1px rgba(245,245,245,.16);cursor:pointer">MINHA ÁREA</div>
   </sc-if>
 </div>
+<sc-if value="{{ isMobile }}">
+  <nav class="sa-mobile-public-nav" aria-label="Navegação principal">
+    <sc-for list="{{ menu }}" as="m" hint-placeholder-count="6">
+      <div onClick="{{ m.open }}" data-mobile-route="{{ m.route }}" style="color:{{ m.color }}">{{ m.mobileLabel }}</div>
+    </sc-for>
+  </nav>
+</sc-if>
 <div style="height:1px;background:linear-gradient(90deg,transparent,#00E5FF 14%,#E50914 62%,transparent);opacity:.55"></div>
 </div>
 
@@ -94,16 +102,16 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
   <div style="position:absolute;left:0;right:0;height:120px;background:linear-gradient(180deg,transparent,rgba(0,229,255,.07),transparent);animation:saScan 11s linear infinite"></div>
   <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,229,255,.14),transparent 30%,rgba(229,9,20,.16));animation:saCrt 14s steps(1) infinite;pointer-events:none"></div>
 
-  <div style="position:relative;width:100%;max-width:1260px;margin:0 auto;padding:clamp(96px,12vh,140px) 20px clamp(64px,8vh,96px);display:grid;grid-template-columns:{{ heroCols }};gap:clamp(36px,5vw,64px);align-items:center">
-    <div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:clamp(20px,3vh,30px);animation:saUp .8s both">
+  <div class="sa-home-hero-grid" style="position:relative;width:100%;max-width:1260px;margin:0 auto;padding:clamp(96px,12vh,140px) 20px clamp(64px,8vh,96px);display:grid;grid-template-columns:{{ heroCols }};gap:clamp(36px,5vw,64px);align-items:center">
+    <div class="sa-hero-copy">
+      <div class="sa-hero-label" style="display:flex;align-items:center;gap:10px;margin-bottom:clamp(20px,3vh,30px);animation:saUp .8s both">
         <span style="width:8px;height:8px;border-radius:50%;background:#E50914;box-shadow:0 0 12px rgba(229,9,20,.9);animation:saPulse 1.7s infinite;flex:none"></span>
         <span style="font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:color-mix(in srgb,#F5F5F5 72%,transparent);line-height:1.5">Aguardando apoiadores · Lalinha do Bairro</span>
       </div>
-      <h1 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(50px,6.6vw,94px);line-height:.92;letter-spacing:.005em;margin:0;color:#F5F5F5;text-wrap:balance;animation:saUp .8s .06s both">O SURTO CONTINUA <span style="color:#E50914">COM VOCÊ.</span></h1>
-      <p style="max-width:48ch;font-size:clamp(15px,1.5vw,17.5px);line-height:1.6;color:color-mix(in srgb,#F5F5F5 70%,transparent);margin:clamp(20px,3vh,28px) 0 clamp(28px,4vh,36px);text-wrap:pretty;animation:saUp .8s .14s both">Entre para o Clube do Surto e ajude as próximas produções a entrarem no ar. Você ainda pode fazer parte das nossas novelinhas.</p>
-      <div onClick="{{ go.clube }}" style="display:inline-flex;align-items:center;gap:12px;cursor:pointer;height:60px;padding:0 32px;border-radius:8px;font-size:14px;letter-spacing:.14em;color:#F5F5F5;background:color-mix(in srgb,#E50914 18%,transparent);box-shadow:0 0 0 1px #E50914,0 0 38px rgba(229,9,20,.28);transition:background .22s,box-shadow .22s,transform .2s;animation:saUp .8s .2s both" style-hover="background:color-mix(in srgb,#E50914 40%,transparent);box-shadow:0 0 0 1px #E50914,0 0 54px rgba(229,9,20,.5);transform:translateY(-2px)">QUERO ENTRAR PARA O CLUBE <span style="font-size:16px">→</span></div>
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-top:clamp(20px,3vh,26px);animation:saUp .8s .26s both">
+      <h1 class="sa-hero-title" style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(50px,6.6vw,94px);line-height:.92;letter-spacing:.005em;margin:0;color:#F5F5F5;text-wrap:balance;animation:saUp .8s .06s both">O SURTO CONTINUA <span style="color:#E50914">COM VOCÊ.</span></h1>
+      <p class="sa-hero-copytext" style="max-width:48ch;font-size:clamp(15px,1.5vw,17.5px);line-height:1.6;color:color-mix(in srgb,#F5F5F5 70%,transparent);margin:clamp(20px,3vh,28px) 0 clamp(28px,4vh,36px);text-wrap:pretty;animation:saUp .8s .14s both">Entre para o Clube do Surto e ajude as próximas produções a entrarem no ar. Você ainda pode fazer parte das nossas novelinhas.</p>
+      <div class="sa-hero-cta" onClick="{{ go.clube }}" style="display:inline-flex;align-items:center;gap:12px;cursor:pointer;height:60px;padding:0 32px;border-radius:8px;font-size:14px;letter-spacing:.14em;color:#F5F5F5;background:color-mix(in srgb,#E50914 18%,transparent);box-shadow:0 0 0 1px #E50914,0 0 38px rgba(229,9,20,.28);transition:background .22s,box-shadow .22s,transform .2s;animation:saUp .8s .2s both" style-hover="background:color-mix(in srgb,#E50914 40%,transparent);box-shadow:0 0 0 1px #E50914,0 0 54px rgba(229,9,20,.5);transform:translateY(-2px)">QUERO ENTRAR PARA O CLUBE <span style="font-size:16px">→</span></div>
+      <div class="sa-hero-benefits" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-top:clamp(20px,3vh,26px);animation:saUp .8s .26s both">
         <sc-for list="{{ heroBenef }}" as="b" hint-placeholder-count="3">
           <div style="display:flex;align-items:center;gap:16px">
             <span style="font-size:12.5px;color:color-mix(in srgb,#F5F5F5 66%,transparent);white-space:nowrap"><span style="color:#00E5FF">✓</span> {{ b.t }}</span>
@@ -113,7 +121,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
       </div>
     </div>
 
-    <div style="position:relative;display:flex;justify-content:center;animation:saIn 1.2s .1s both">
+    <div class="sa-hero-poster" style="position:relative;display:flex;justify-content:center;animation:saIn 1.2s .1s both">
       <div style="position:absolute;inset:-14% -6%;background:radial-gradient(circle at 50% 45%,rgba(0,229,255,.28),transparent 62%);filter:blur(50px)"></div>
       <div style="position:relative;width:100%;max-width:clamp(280px,34vw,420px);animation:saFloat 12s ease-in-out infinite">
         <img src="assets-min/poster-la-linha-do-bairro.webp" alt="Lalinha do Bairro — próxima novelinha em produção" style="width:100%;display:block;border-radius:12px;box-shadow:0 40px 90px rgba(0,0,0,.68),0 0 0 1px rgba(0,229,255,.18)">
@@ -2739,7 +2747,7 @@ class Component extends DCLogic {
 
     const menuDef = [['Início','home'],['Em Exibição','exibicao'],['Clube do Surto','clube'],['Apoiadores','apoiadores'],['Sobre','sobre'],['Contrate O Surto','contrate']];
     const menu = menuDef.map(([label, route]) => ({
-      label, route, open: () => this.nav(route),
+      label, mobileLabel: label === 'Em Exibição' ? 'Exibição' : label === 'Clube do Surto' ? 'Clube' : label === 'Contrate O Surto' ? 'Contrate' : label, route, open: () => this.nav(route),
       color: r === route ? '#F5F5F5' : 'color-mix(in srgb,#F5F5F5 66%,transparent)',
       line: r === route ? '#E50914' : 'transparent'
     }));
@@ -2766,7 +2774,7 @@ class Component extends DCLogic {
         'Nome guardado no coração da produção'
       ],'APOIAR LIVREMENTE',null,false),
       mkPlan('apoiador','R$ 50','a partir de · por aparição',[
-        'Aparição em bloco com até 9 apoiadores',
+        'Aparição em bloco com até 6 apoiadores',
         'Avatar oficial produzido pelo Surto',
         '@ ou perfil escolhido na tela',
         'Divulgação na descrição do episódio',
@@ -3234,7 +3242,7 @@ class Component extends DCLogic {
         const valorLabel = { livre: 'Qualquer valor', apoiador: 'R$ 50', destaque: 'R$ 100', vip: 'R$ 300' };
         const badges = {
           livre: null,
-          apoiador: { text:'ATÉ 9 APOIADORES POR APARIÇÃO', color:'#00E5FF' },
+          apoiador: { text:'ATÉ 6 APOIADORES POR APARIÇÃO', color:'#00E5FF' },
           destaque: { text:'MÁXIMO 3 APOIADORES', color:'#E50914' },
           vip: { text:'APARIÇÃO INDIVIDUAL — SÓ VOCÊ', color:'#E50914' }
         };
@@ -3254,12 +3262,12 @@ class Component extends DCLogic {
       contrateCols: isMobile ? '1fr' : '1fr .9fr',
       planosEditorial: [
         { id:'livre', nome:'APOIO LIVRE', preco:'Qualquer valor', resumo:'Para quem simplesmente quer ajudar a produção a continuar. Pode ser anônimo, sem divulgação.', cta:'Apoiar livremente', demoLabel:'como aparece', avatares:[], demoNota:'Sem aparição — o apoio vira token, ferramenta e episódio.', gap:'12px', titleTone:'#e9e9ed', badge:null },
-        { id:'apoiador', nome:'APOIADOR', preco:'a partir de R$ 50', resumo:'Aparição em bloco com até 9 apoiadores, avatar oficial, @ na tela e presença no mural público.', cta:'Escolher Apoiador', demoLabel:'bloco de até 9', avatares:'AP', demoNota:'', gap:'8px', titleTone:'#e9e9ed', badge:null },
+        { id:'apoiador', nome:'APOIADOR', preco:'a partir de R$ 50', resumo:'Aparição em bloco com até 6 apoiadores, avatar oficial, @ na tela e presença no mural público.', cta:'Escolher Apoiador', demoLabel:'bloco de até 6', avatares:'AP', demoNota:'', gap:'8px', titleTone:'#e9e9ed', badge:null },
         { id:'destaque', nome:'APOIADOR DESTAQUE', preco:'a partir de R$ 100', resumo:'Bloco com até 3 apoiadores, tratamento visual maior e prioridade superior na fila.', cta:'Escolher Destaque', demoLabel:'bloco de até 3', avatares:'DE', demoNota:'', gap:'12px', titleTone:'#e9e9ed', badge:'MAIS ESCOLHIDO' },
         { id:'vip', nome:'APOIADOR VIP', preco:'a partir de R$ 300', resumo:'Encerramento dedicado só a você: cena personalizada, avatar exclusivo, briefing especial e prioridade máxima.', cta:'Escolher VIP', demoLabel:'encerramento exclusivo', avatares:'VI', demoNota:'Uma única presença ocupando o final do episódio.', gap:'14px', titleTone:'#d2cefd', badge:null }
       ].map(p => {
         const mk = (n, size, fs, ring, ink) => Array.from({ length: n }, (_, i) => ({ size, fs, ring, ink, ini: ['DU','CA','MA','ZE','LU','TI','OH','BR','PE'][i] || 'SA' }));
-        const av = p.avatares === 'AP' ? mk(9, '34px', '11px', '#3f424d', 'color-mix(in srgb,#e9e9ed 60%,transparent)')
+        const av = p.avatares === 'AP' ? mk(6, '42px', '12px', '#3f424d', 'color-mix(in srgb,#e9e9ed 60%,transparent)')
           : p.avatares === 'DE' ? mk(3, '58px', '17px', '#5d5294', '#b5abfc')
           : p.avatares === 'VI' ? mk(1, '96px', '28px', '#9184d9', '#d2cefd') : [];
         return { ...p, avatares: av, cols: isMobile ? '1fr' : '1fr 0.9fr',
@@ -3349,7 +3357,7 @@ class Component extends DCLogic {
       ],
       epsPublicos,
       regras: [
-        { k:'apoiador', v:'Até 9 apoiadores dividem um bloco de divulgação.' },
+        { k:'apoiador', v:'Até 6 apoiadores dividem um bloco de divulgação.' },
         { k:'destaque', v:'No máximo 3 por bloco, com prioridade superior ao Apoiador.' },
         { k:'vip', v:'Um único apoiador no encerramento, prioridade máxima. Até 30 oportunidades por temporada de ~50 episódios.' },
         { k:'mensais', v:'Assinantes têm capacidade reservada antes de novas vagas avulsas entrarem à venda.' },

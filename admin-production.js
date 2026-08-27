@@ -6,7 +6,7 @@
   const $ = (q, root = document) => root.querySelector(q);
   const e = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   const money = v => Number(v || 0).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
-  const date = v => v ? new Date(v).toLocaleDateString('pt-BR', { timeZone:'America/Sao_Paulo' }) : '—';
+  const date = v => { if(!v)return '—';const raw=String(v);if(/^\d{4}-\d{2}-\d{2}$/.test(raw)){const [y,m,d]=raw.split('-');return `${d}/${m}/${y}`}return new Date(v).toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}) };
   const dateTime = v => v ? new Date(v).toLocaleString('pt-BR', { timeZone:'America/Sao_Paulo' }) : '—';
   const labels = { free:'Apoio livre',supporter:'Apoiador',highlight:'Destaque',vip:'VIP',one_time:'Avulso',monthly:'Mensal',paid:'Pago',pending:'Pendente',checkout_created:'Aguardando pagamento',failed:'Falhou',refunded:'Estornado',cancelled:'Cancelado',waiting_profile:'Aguardando perfil',waiting_avatar:'Aguardando avatar',queued:'Na fila',estimated:'Programado',confirmed:'Confirmado',in_production:'Em produção',published:'Publicado',reprogrammed:'Reprogramado',ready:'Pronto',awaiting:'Aguardando',sent:'Enviado',sending:'Enviando'};
   const titleByView = {overview:'Visão geral',supporters:'Apoiadores',payments:'Pagamentos',queue:'Fila e avatares',episodes:'Episódios',emails:'E-mails'};
@@ -16,6 +16,7 @@
   let search = '';
   let paymentFilter = 'all';
   let loadPromise = null;
+  let episodeDraft = null;
 
   function toast(message, type = '') {
     const el = $('#toast'); el.textContent = message; el.className = `toast show ${type}`;
@@ -101,7 +102,16 @@
     return `<div class="section-head"><div><h2>Fila de produção</h2><p>Avatar, programação e publicação de cada apoiador</p></div></div><div class="panel table-wrap"><table class="table"><thead><tr><th>APOIADOR</th><th>PLANO</th><th>PERFIL</th><th>AVATAR</th><th>APARIÇÃO</th><th>EPISÓDIO</th><th></th></tr></thead><tbody>${items.length?items.map(s=>{const p=person(s,m),profile=m.publicity[s.user_id]||{},a=m.appearances[s.id]||{};return `<tr><td><div class="person"><div class="avatar">${e(p.initial)}</div><div><strong>${e(p.name)}</strong><small>${e(p.email)}</small></div></div></td><td>${badge(s.tier)}</td><td>${profile.submission_completed_at?badge('ready'):badge('awaiting')}</td><td>${badge(profile.avatar_status||'awaiting')}</td><td>${badge(a.status||'waiting_profile')}</td><td>${e(a.estimated_episode_number||a.episodes?.episode_number||'—')}</td><td>${manageButton(s)}</td></tr>`}).join(''):'<tr><td colspan="7" class="empty">A fila está vazia.</td></tr>'}</tbody></table></div>`;
   }
   function episodeView() {
-    return `<div class="section-head"><div><h2>Episódios</h2><p>Episódios criados ao programar as aparições</p></div></div><div class="panel table-wrap"><table class="table"><thead><tr><th>PRODUÇÃO</th><th>EPISÓDIO</th><th>DATA PREVISTA</th><th>PUBLICAÇÃO</th><th>LINKS</th></tr></thead><tbody>${data.episodes.length?data.episodes.map(x=>`<tr><td>${e(x.productions?.title||'Produção')}</td><td><strong>EP ${e(x.episode_number)}</strong></td><td>${date(x.scheduled_date)}</td><td>${x.published_at?badge('published'):badge('pending')}</td><td>${[x.instagram_url,x.tiktok_url,x.youtube_url].filter(Boolean).map((u,i)=>`<a href="${e(u)}" target="_blank" rel="noopener" style="color:var(--cyan)">link ${i+1}</a>`).join(' · ')||'—'}</td></tr>`).join(''):'<tr><td colspan="5" class="empty">Nenhum episódio cadastrado ainda. Ele será criado quando você programar uma aparição.</td></tr>'}</tbody></table></div>`;
+    const rank={supporter:1,highlight:2,vip:3};
+    const currentByUser=new Map();
+    data.supports.filter(s=>s.payment_status==='paid'&&rank[s.tier]).forEach(s=>{const old=currentByUser.get(s.user_id);if(!old||rank[s.tier]>rank[old.tier]||new Date(s.created_at)>new Date(old.created_at))currentByUser.set(s.user_id,s)});
+    const candidates=[...currentByUser.values()];
+    const editing=episodeDraft&&data.episodes.find(x=>x.id===episodeDraft.id);
+    const selected=new Set(editing?data.appearances.filter(a=>a.episode_id===editing.id).map(a=>a.support_id):[]);
+    const form={production_id:editing?.production_id||data.productions.find(p=>p.is_current)?.id||data.productions[0]?.id||'',episode_number:editing?.episode_number||'',scheduled_date:editing?.scheduled_date||'',status:editing?.published_at?'published':'confirmed',published_url:editing?.instagram_url||'',cover_image_url:editing?.cover_image_url||''};
+    const m=maps();
+    const group=(tier,title,limit)=>{const rows=candidates.filter(s=>s.tier===tier);return `<section class="episode-group"><div class="episode-group-head"><div><span>${e(title)}</span><small>máximo ${limit}</small></div><strong data-count="${tier}">0/${limit}</strong></div><div class="episode-people">${rows.length?rows.map(s=>{const p=person(s,m);return `<label class="episode-person"><input type="checkbox" data-episode-support="${e(s.id)}" data-tier="${e(tier)}" ${selected.has(s.id)?'checked':''}><span class="avatar">${e(p.initial)}</span><span><b>${e(p.name)}</b><small>${e(p.email)}</small></span><i></i></label>`}).join(''):'<div class="episode-none">Nenhum apoiador disponível nesta categoria.</div>'}</div></section>`};
+    return `<div class="section-head"><div><h2>Montar episódio</h2><p>Preencha uma vez e atualize todos os apoiadores escolhidos.</p></div>${editing?'<button class="btn secondary small" id="newEpisode">NOVO EPISÓDIO</button>':''}</div><div class="episode-builder"><section class="panel panel-pad episode-form"><span class="eyebrow">DADOS DO EPISÓDIO</span><div class="form-grid" style="margin-top:16px"><label>Produção<select id="batchProduction">${data.productions.map(p=>`<option value="${e(p.id)}" ${p.id===form.production_id?'selected':''}>${e(p.title)}</option>`).join('')}</select></label><label>Número do episódio<input id="batchNumber" type="number" min="1" value="${e(form.episode_number)}" placeholder="Ex.: 2"></label><label>Data prevista<input id="batchDate" type="date" value="${e(form.scheduled_date)}"></label><label>Etapa<select id="batchStatus"><option value="estimated" ${form.status==='estimated'?'selected':''}>Programado</option><option value="confirmed" ${form.status==='confirmed'?'selected':''}>Confirmado</option><option value="in_production" ${form.status==='in_production'?'selected':''}>Em produção</option><option value="published" ${form.status==='published'?'selected':''}>Publicado</option></select></label><label class="full">Link para assistir<input id="batchUrl" type="url" value="${e(form.published_url)}" placeholder="https://instagram.com/..."></label><label class="full">Capa do episódio<input id="batchCover" type="file" accept="image/jpeg,image/png,image/webp"><input id="batchCoverUrl" type="hidden" value="${e(form.cover_image_url)}"></label>${form.cover_image_url?`<img class="episode-cover-preview" src="${e(form.cover_image_url)}" alt="Capa atual do episódio">`:''}</div><div id="episodeCapacity" class="capacity-ok">Selecione os participantes dentro dos limites.</div><button id="saveEpisodeBatch" class="btn primary">${editing?'ATUALIZAR EPISÓDIO E APOIADORES':'CRIAR EPISÓDIO E ATUALIZAR APOIADORES'}</button></section><div class="episode-groups">${group('supporter','APOIADORES',6)}${group('highlight','APOIADORES DESTAQUE',3)}${group('vip','APOIADOR VIP',1)}</div></div><div class="section-head" style="margin-top:34px"><div><h2>Episódios cadastrados</h2><p>${data.episodes.length} episódio(s)</p></div></div><div class="panel table-wrap"><table class="table"><thead><tr><th>PRODUÇÃO</th><th>EPISÓDIO</th><th>DATA</th><th>STATUS</th><th>PARTICIPANTES</th><th></th></tr></thead><tbody>${data.episodes.length?data.episodes.map(x=>`<tr><td>${e(x.productions?.title||'Produção')}</td><td><strong>EP ${e(x.episode_number)}</strong></td><td>${date(x.scheduled_date)}</td><td>${x.published_at?badge('published'):badge('confirmed')}</td><td>${data.appearances.filter(a=>a.episode_id===x.id).length}</td><td><button class="btn secondary small" data-edit-episode="${e(x.id)}">ABRIR</button></td></tr>`).join(''):'<tr><td colspan="6" class="empty">Nenhum episódio cadastrado ainda.</td></tr>'}</tbody></table></div>`;
   }
   function emailsView() {
     return `<div class="section-head"><div><h2>Histórico de e-mails</h2><p>Agradecimentos, pedidos de informação e lembretes</p></div></div><div class="panel table-wrap"><table class="table"><thead><tr><th>DESTINATÁRIO</th><th>ASSUNTO</th><th>TIPO</th><th>STATUS</th><th>TENTATIVAS</th><th>DATA</th></tr></thead><tbody>${data.emails.length?data.emails.map(x=>`<tr><td>${e(x.recipient_email)}</td><td>${e(x.subject)}</td><td>${e(labels[x.event_type]||x.event_type)}</td><td>${badge(x.status)}</td><td>${e(x.attempts)}</td><td>${dateTime(x.sent_at||x.created_at)}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">Nenhum e-mail registrado.</td></tr>'}</tbody></table></div>`;
@@ -118,6 +128,29 @@
     $('#search')?.addEventListener('input',ev=>{search=ev.target.value;render()});
     if ($('#paymentFilter')) { $('#paymentFilter').value=paymentFilter; $('#paymentFilter').addEventListener('change',ev=>{paymentFilter=ev.target.value;render()}); }
     $('#reminderToggle')?.addEventListener('click', async ev=>{const btn=ev.currentTarget;btn.disabled=true;try{const enabled=!data.reminders.enabled;const out=await invoke('set_reminders',{enabled,days:Number(data.reminders.days||30)});data.reminders=out.reminders;toast(enabled?'Lembretes automáticos ativados.':'Lembretes automáticos desativados.','success');render()}catch(err){toast(err.message,'error')}finally{btn.disabled=false}});
+    document.querySelectorAll('[data-edit-episode]').forEach(b=>b.addEventListener('click',()=>{episodeDraft={id:b.dataset.editEpisode};render();scrollTo({top:0,behavior:'smooth'})}));
+    $('#newEpisode')?.addEventListener('click',()=>{episodeDraft=null;render()});
+    document.querySelectorAll('[data-episode-support]').forEach(x=>x.addEventListener('change',updateEpisodeCapacity));
+    $('#saveEpisodeBatch')?.addEventListener('click',saveEpisodeBatch);
+    updateEpisodeCapacity();
+  }
+
+  function updateEpisodeCapacity(){
+    const limits={supporter:6,highlight:3,vip:1};let valid=true,total=0;
+    Object.entries(limits).forEach(([tier,limit])=>{const count=document.querySelectorAll(`[data-episode-support][data-tier="${tier}"]:checked`).length;total+=count;const el=document.querySelector(`[data-count="${tier}"]`);if(el){el.textContent=`${count}/${limit}`;el.classList.toggle('over',count>limit)}if(count>limit)valid=false});
+    const msg=$('#episodeCapacity');if(msg){msg.className=valid&&total?'capacity-ok':'capacity-warn';msg.textContent=!valid?'Reduza a seleção para respeitar os limites de cada categoria.':total?`${total} participante(s) selecionado(s).`:'Escolha pelo menos um apoiador.'}
+    const save=$('#saveEpisodeBatch');if(save)save.disabled=!valid||!total;
+  }
+
+  async function saveEpisodeBatch(){
+    const btn=$('#saveEpisodeBatch');if(!btn)return;btn.disabled=true;btn.textContent='SALVANDO…';
+    try{
+      let coverUrl=$('#batchCoverUrl')?.value||'';const file=$('#batchCover')?.files?.[0];
+      if(file){if(file.size>10*1024*1024)throw new Error('A capa deve ter no máximo 10 MB.');const ext=(file.name.split('.').pop()||'webp').replace(/[^a-z0-9]/gi,'').toLowerCase();const path=`episode-${$('#batchNumber').value}-${Date.now()}.${ext}`;const uploaded=await sb.storage.from('episode-covers').upload(path,file,{upsert:true,contentType:file.type});if(uploaded.error)throw uploaded.error;coverUrl=sb.storage.from('episode-covers').getPublicUrl(path).data.publicUrl}
+      const supportIds=Array.from(document.querySelectorAll('[data-episode-support]:checked')).map(x=>x.dataset.episodeSupport);
+      const out=await invoke('save_episode_batch',{production_id:$('#batchProduction').value,episode_number:$('#batchNumber').value,scheduled_date:$('#batchDate').value||null,status:$('#batchStatus').value,published_url:$('#batchUrl').value.trim(),cover_image_url:coverUrl,support_ids:supportIds});
+      toast(`Episódio salvo para ${out.assigned} apoiador(es).`,'success');data=await invoke('dashboard');episodeDraft={id:out.episode.id};render();
+    }catch(err){toast(err.message,'error');btn.disabled=false;btn.textContent='TENTAR NOVAMENTE'}
   }
   async function openSupporter(userId, supportId) {
     $('#modal').classList.remove('hidden'); $('#modalContent').innerHTML='<div class="loading-view" style="min-height:320px"><div class="spinner"></div><p>Carregando apoiador…</p></div>';

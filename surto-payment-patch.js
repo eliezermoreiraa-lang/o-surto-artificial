@@ -112,6 +112,15 @@ const __ds_scope = {};
     try {
       const sb = await this.sb();
       if (!sb) throw new Error('client');
+      if (tier !== 'free') {
+        const status = await sb.functions.invoke('supporter-dashboard-data', { body: {} });
+        if (status.data && status.data.ok && status.data.currentSupport) {
+          this.setState({ payBusy: false, payErrMsg: null, authReturn: null });
+          this.nav('appHome');
+          setTimeout(() => window.__surtoOpenUpgrade && window.__surtoOpenUpgrade(), 280);
+          return;
+        }
+      }
       const r = await sb.functions.invoke('asaas-create-support-payment', {
         body: { tier, amount, method }
       });
@@ -167,7 +176,11 @@ const __ds_scope = {};
             this.setState(next);
             if (this._session || s.session) {
               this.setState({ authReturn: null });
-              this.nav('modalidade');
+              const paid = Array.isArray(s.supports) && s.supports.some(x => x && x.payment_status === 'paid' && ['supporter','highlight','vip'].includes(x.tier));
+              if (paid && sel !== 'livre') {
+                this.nav('appHome');
+                setTimeout(() => window.__surtoOpenUpgrade && window.__surtoOpenUpgrade(), 280);
+              } else this.nav('modalidade');
               return;
             }
             try {
@@ -242,13 +255,11 @@ const __ds_scope = {};
     if (src.includes(entrarOld)) { src = src.replace(entrarOld, entrarNew); changed = true; }
 
     const flowMarker = "    const isFlow = ['caminho','planos','modalidade','previsao','auth','confirmaEmail','checkout','pago','perfil','confirmar'].includes(r);";
-    const flowReplacement = `    if (r === 'appHome') {
+    const flowReplacement = `    const hasActiveSupport = Array.isArray(s.supports) && s.supports.some(x => x && x.payment_status === 'paid' && ['supporter','highlight','vip'].includes(x.tier));
+    if ((this._session || s.session) && hasActiveSupport) {
       go.clube = () => {
-        this.nav('clube');
-        setTimeout(() => {
-          const alvo = document.getElementById('planos-clube');
-          if (alvo) alvo.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 140);
+        this.nav('appHome');
+        setTimeout(() => window.__surtoOpenUpgrade && window.__surtoOpenUpgrade(), 280);
       };
     }
     const isFlow = ['caminho','planos','modalidade','previsao','auth','confirmaEmail','checkout','pago','perfil','confirmar'].includes(r);`;

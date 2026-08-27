@@ -115,8 +115,8 @@ async function dashboard() {
     admin.from("supports").select("id,user_id,production_id,tier,billing_mode,amount,payment_status,paid_at,created_at,provider_payment_id,provider_checkout_id,productions(title,slug)").order("created_at", { ascending: false }),
     admin.from("subscriptions").select("id,user_id,tier,amount,status,next_due_date,started_at,created_at").order("created_at", { ascending: false }),
     admin.from("publicity_profiles").select("user_id,display_name,social_network,social_handle,social_url,notification_email,face_photo_path,body_photo_path,official_avatar_path,submission_completed_at,avatar_status,updated_at"),
-    admin.from("appearances").select("id,support_id,episode_id,status,queue_priority,estimated_episode_number,estimated_date,confirmed_at,published_at,published_url,admin_notes,created_at,episodes(episode_number,scheduled_date,published_at,instagram_url,tiktok_url,youtube_url)").order("queue_priority", { ascending: false }).order("created_at"),
-    admin.from("episodes").select("id,production_id,episode_number,scheduled_date,published_at,instagram_url,tiktok_url,youtube_url,is_locked,productions(title,slug)").order("episode_number", { ascending: false }),
+    admin.from("appearances").select("id,support_id,episode_id,status,queue_priority,estimated_episode_number,estimated_date,confirmed_at,published_at,published_url,admin_notes,created_at,episodes(episode_number,scheduled_date,published_at,instagram_url,tiktok_url,youtube_url,cover_image_url)").order("queue_priority", { ascending: false }).order("created_at"),
+    admin.from("episodes").select("id,production_id,episode_number,scheduled_date,published_at,instagram_url,tiktok_url,youtube_url,cover_image_url,is_locked,productions(title,slug)").order("episode_number", { ascending: false }),
     admin.from("productions").select("id,slug,title,status,current_episode,is_current").order("created_at", { ascending: false }),
     admin.from("supporter_email_events").select("id,user_id,support_id,event_type,recipient_email,subject,status,attempts,last_error,sent_at,created_at").order("created_at", { ascending: false }).limit(100),
     admin.from("app_settings").select("key,value,updated_at").eq("key", "renewal_reminders").maybeSingle(),
@@ -209,6 +209,89 @@ Deno.serve(async (req: Request) => {
       if (episodeId && status === "published") await admin.from("episodes").update({ published_at: now }).eq("id", episodeId);
       await admin.from("notifications").insert({ user_id: support.user_id, type: status === "published" ? "appearance" : "info", title: status === "published" ? "Seu episódio foi publicado!" : "Sua aparição foi atualizada", body: episodeNumber ? `Episódio ${episodeNumber}` : "A produção atualizou sua jornada.", action_url: status === "published" ? (payload.published_url || null) : null });
       return json(req, { ok: true, appearance: result.data });
+    }
+
+    if (action === "save_episode_batch") {
+      const productionId = cleanText(body.production_id, 80);
+      const episodeNumber = Math.max(1, Math.floor(Number(body.episode_number || 0)));
+      const selectedIds = [...new Set(Array.isArray(body.support_ids) ? body.support_ids.map((id: unknown) => cleanText(id, 80)).filter(Boolean) : [])];
+      const allowedStatuses = ["estimated", "confirmed", "in_production", "published"];
+      const status = allowedStatuses.includes(body.status) ? body.status : "confirmed";
+      if (!productionId || !episodeNumber) return json(req, { error: "Informe a produção e o número do episódio" }, 400);
+      if (!selectedIds.length) return json(req, { error: "Escolha pelo menos um apoiador para o episódio" }, 400);
+
+      const { data: selectedSupports, error: selectedError } = await admin
+        .from("supports")
+        .select("id,user_id,tier,production_id,payment_status")
+        .in("id", selectedIds)
+        .eq("payment_status", "paid");
+      if (selectedError) throw selectedError;
+      if ((selectedSupports || []).length !== selectedIds.length) return json(req, { error: "Há um apoio inválido ou ainda não pago na seleção" }, 400);
+
+      const counts = { supporter: 0, highlight: 0, vip: 0 };
+      for (const support of selectedSupports || []) {
+        if (!(support.tier in counts)) return json(req, { error: "Apoio livre não ocupa vaga de aparição" }, 400);
+        counts[support.tier as keyof typeof counts] += 1;
+      }
+      if (counts.supporter > 6) return json(req, { error: "O episódio aceita no máximo 6 apoiadores" }, 400);
+      if (counts.highlight > 3) return json(req, { error: "O episódio aceita no máximo 3 apoiadores destaque" }, 400);
+      if (counts.vip > 1) return json(req, { error: "O episódio aceita somente 1 apoiador VIP" }, 400);
+
+      const now = new Date().toISOString();
+      const scheduledDate = cleanText(body.scheduled_date, 20) || null;
+      const publishedUrl = cleanText(body.published_url, 1000) || null;
+      const coverImageUrl = cleanText(body.cover_image_url, 1200) || null;
+      const episodePayload: any = {
+        production_id: productionId,
+        episode_number: episodeNumber,
+        scheduled_date: scheduledDate,
+        published_at: status === "published" ? now : null,
+        instagram_url: publishedUrl,
+        cover_image_url: coverImageUrl,
+        updated_at: now,
+      };
+      const { data: episode, error: episodeError } = await admin
+        .from("episodes")
+        .upsert(episodePayload, { onConflict: "production_id,episode_number" })
+        .select()
+        .single();
+      if (episodeError) throw episodeError;
+
+      const { data: previouslyAssigned } = await admin.from("appearances").select("id,support_id,status").eq("episode_id", episode.id);
+      const toRelease = (previouslyAssigned || []).filter((a: any) => !selectedIds.includes(a.support_id) && a.status !== "published").map((a: any) => a.id);
+      if (toRelease.length) {
+        const { error } = await admin.from("appearances").update({ episode_id: null, estimated_episode_number: null, estimated_date: null, status: "queued", updated_at: now }).in("id", toRelease);
+        if (error) throw error;
+      }
+
+      for (const support of selectedSupports || []) {
+        const appearancePayload: any = {
+          support_id: support.id,
+          episode_id: episode.id,
+          status,
+          estimated_episode_number: episodeNumber,
+          estimated_date: scheduledDate,
+          published_url: publishedUrl,
+          confirmed_at: ["confirmed", "in_production", "published"].includes(status) ? now : null,
+          published_at: status === "published" ? now : null,
+          updated_at: now,
+        };
+        const { data: existing } = await admin.from("appearances").select("id").eq("support_id", support.id).maybeSingle();
+        const result = existing
+          ? await admin.from("appearances").update(appearancePayload).eq("id", existing.id)
+          : await admin.from("appearances").insert(appearancePayload);
+        if (result.error) throw result.error;
+        if (support.user_id) {
+          await admin.from("notifications").insert({
+            user_id: support.user_id,
+            type: status === "published" ? "appearance" : "info",
+            title: status === "published" ? "Sua aparição já foi publicada!" : "Sua aparição foi programada",
+            body: `Episódio ${episodeNumber}`,
+            action_url: status === "published" ? publishedUrl : null,
+          });
+        }
+      }
+      return json(req, { ok: true, episode, counts, assigned: selectedIds.length });
     }
 
     if (action === "set_reminders") {
