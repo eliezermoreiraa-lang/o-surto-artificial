@@ -40,6 +40,8 @@
   let timer = null;
   let upgradeData = null;
   let upgradeTarget = null;
+  let checkoutData = null;
+  let checkoutTier = null;
   let lastNav = null;
 
   const norm = v => String(v || '').replace(/\s+/g, ' ').trim().toUpperCase();
@@ -158,7 +160,9 @@
       .sd-profile-loading{min-height:260px;display:grid;place-items:center;border-radius:12px;background:#111418;box-shadow:0 0 0 1px rgba(245,245,245,.10)}.sd-profile-loading>div{display:grid;justify-items:center;gap:12px;color:rgba(245,245,245,.5);font-size:11px;letter-spacing:.12em;text-transform:uppercase}.sd-profile-spinner{width:24px;height:24px;border-radius:50%;border:2px solid rgba(245,245,245,.12);border-top-color:#00E5FF;animation:sdSpin .7s linear infinite}@keyframes sdSpin{to{transform:rotate(360deg)}}
       .sd-credit{display:grid;grid-template-columns:1fr auto;gap:10px 18px;margin:20px 0;padding:16px;border-radius:9px;background:#0B0D13;box-shadow:inset 0 0 0 1px rgba(245,245,245,.10);font-size:12px}.sd-credit span{color:rgba(245,245,245,.5)}.sd-credit strong{font:400 27px/1 'Bebas Neue';color:#00E5FF}
       .sd-pix{display:grid;grid-template-columns:160px 1fr;gap:18px;align-items:center}.sd-pix img{width:160px;height:160px;object-fit:contain;background:#fff;padding:7px;border-radius:8px}.sd-pix .sd-btn{display:block;width:100%;margin-top:9px}.sd-link{color:#00E5FF;text-decoration:none;font-size:11px;letter-spacing:.08em}.sd-episode-cover{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:9px;margin:14px 0 4px;box-shadow:0 0 0 1px rgba(245,245,245,.12)}.sd-upgrade-price{font:400 38px/1 'Bebas Neue';color:#00E5FF;margin:10px 0}.sd-mobile-nav{scroll-padding-inline:10px;padding:12px 2px 16px!important;min-height:64px}.sd-mobile-nav>div{min-height:44px!important;height:44px!important;padding-inline:16px!important}
+      .sd-locked{max-width:760px;background:linear-gradient(125deg,rgba(229,9,20,.11),#111418 58%);box-shadow:0 0 0 1px rgba(229,9,20,.42)}.sd-locked-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:50%;margin-bottom:18px;background:rgba(229,9,20,.14);box-shadow:0 0 0 1px rgba(229,9,20,.38);font-size:20px}.sd-checkout-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}.sd-plan-card{display:flex;flex-direction:column;min-height:250px}.sd-plan-card .sd-btn{width:100%;margin-top:auto}.sd-plan-price{font:400 38px/1 'Bebas Neue';color:#00E5FF;margin:8px 0 13px}.sd-checkout-form{display:grid;gap:14px}.sd-checkout-form .sd-btn{width:100%}.sd-checkout-note{font-size:11px;color:rgba(245,245,245,.48);line-height:1.5}.sd-checkout-actions{display:flex;gap:10px;flex-wrap:wrap}.sd-checkout-actions .sd-btn{flex:1 1 190px}
       @media(max-width:820px){.sd-grid.two{grid-template-columns:1fr}.sd-pix{grid-template-columns:1fr}.sd-pix img{width:180px;height:180px}.sd-table{min-width:680px}#surto-supporter-real-v2{padding-bottom:80px}.sd-btn{min-height:48px}.sd-mobile-nav{position:sticky;top:96px;z-index:12;background:#0B0D13;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none}.sd-mobile-nav::-webkit-scrollbar{display:none}}
+      @media(max-width:900px){.sd-checkout-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.sd-checkout-grid{grid-template-columns:1fr}.sd-plan-card{min-height:0}.sd-locked{padding:24px}}
     `;
     document.head.appendChild(style);
   }
@@ -168,7 +172,7 @@
 
   function homeHtml(m){
     const s = m.currentSupport;
-    if (!s) return empty('Você ainda não possui nenhum apoio pago','Escolha uma forma de apoio para liberar os recursos da sua Área do Apoiador.','<button class="sd-btn" data-clube>CONHECER AS FORMAS DE APOIO →</button>');
+    if (!s) return empty('Você ainda não possui nenhum apoio pago','Escolha uma forma de apoio para liberar os recursos da sua Área do Apoiador.','<button class="sd-btn" data-join>CONHECER AS FORMAS DE APOIO →</button>');
     const p = m.publicityProfile;
     const name = (p && p.display_name) || (m.user && m.user.displayName) || 'APOIADOR';
     const ap = (m.appearances || []).find(x => x.status !== 'cancelled');
@@ -215,6 +219,30 @@
     return `<h1 class="sd-title">Perfil de Divulgação</h1><div class="sd-profile-loading" aria-live="polite" aria-busy="true"><div><span class="sd-profile-spinner" aria-hidden="true"></span><span>Carregando seu perfil</span></div></div>`;
   }
 
+  function lockedHtml(route){
+    const names={apoios:'Meus Apoios',aparicoes:'Minhas Aparições',perfil:'Perfil de Divulgação',assinatura:'Minha Assinatura',episodios:'Meus Episódios',vip:'Área VIP'};
+    return `<h1 class="sd-title">${esc(names[route]||'Área do Apoiador')}</h1><section class="sd-card sd-locked"><div class="sd-locked-icon" aria-hidden="true">🔒</div><div class="sd-kicker red">RECURSO BLOQUEADO</div><h2>CONFIRME SEU APOIO PARA LIBERAR</h2><p>Esta área fica disponível somente depois que o pagamento for identificado. Escolha sua forma de apoio e conclua o pagamento para liberar todos os recursos.</p><button class="sd-btn" data-join>ESCOLHER MEU APOIO →</button></section>`;
+  }
+
+  function joinHtml(m){
+    if(m.currentSupport){currentRoute='upgrade';return upgradeHtml(m)}
+    const plans=[
+      {tier:'free',label:'APOIO LIVRE',price:'VOCÊ ESCOLHE',text:'Contribua com qualquer valor a partir de R$ 1.'},
+      {tier:'supporter',label:'APOIADOR',price:brl(50),text:'Faça parte das aparições coletivas do Surto.'},
+      {tier:'highlight',label:'APOIADOR DESTAQUE',price:brl(100),text:'Ganhe mais destaque nas aparições e divulgações.'},
+      {tier:'vip',label:'APOIADOR VIP',price:brl(300),text:'Tenha uma aparição individual e experiência exclusiva.'}
+    ];
+    const selected=plans.find(x=>x.tier===checkoutTier);
+    if(checkoutData?.pix&&selected){
+      return `<h1 class="sd-title">Pagamento do seu apoio</h1><p class="sd-lead">Seu acesso será liberado automaticamente quando o pagamento for confirmado.</p><div class="sd-grid two">${card('APOIO ESCOLHIDO',`<h3>${esc(selected.label)}</h3><div class="sd-money">${brl(checkoutData.amount)}</div><p>Após a confirmação, o Perfil de Divulgação e os demais recursos serão liberados.</p>`)}${card('PAGAMENTO PIX',`<div class="sd-pix"><img src="data:image/png;base64,${esc(checkoutData.pix.encodedImage)}" alt="QR Code Pix"><div><p>Escaneie o QR Code ou copie o código Pix.</p><button class="sd-btn secondary" id="sd-copy-join">COPIAR PIX</button><button class="sd-btn outline" id="sd-refresh-join">JÁ PAGUEI · VERIFICAR</button><div class="sd-msg" id="sd-join-status"></div></div></div>`)}</div>`;
+    }
+    if(selected){
+      const fixed={supporter:50,highlight:100,vip:300}[selected.tier];
+      return `<h1 class="sd-title">Concluir seu apoio</h1><p class="sd-lead">Você já está conectado. Preencha os dados abaixo para gerar o pagamento dentro da sua Área do Apoiador.</p><div class="sd-grid two">${card('APOIO ESCOLHIDO',`<h3>${esc(selected.label)}</h3><div class="sd-plan-price">${esc(selected.price)}</div><p>${esc(selected.text)}</p><button class="sd-btn outline" data-change-plan>ESCOLHER OUTRA OPÇÃO</button>`,selected.tier==='vip'?'vip':'')}${card('DADOS PARA PAGAMENTO',`<div class="sd-checkout-form"><div class="sd-field"><label>Nome completo</label><input id="sd-join-name" autocomplete="name" value="${esc(m.user?.displayName||'')}"></div><div class="sd-field"><label>CPF</label><input id="sd-join-cpf" inputmode="numeric" autocomplete="off" placeholder="000.000.000-00" maxlength="14"></div>${selected.tier==='free'?'<div class="sd-field"><label>Valor do apoio livre</label><input id="sd-join-amount" type="number" min="1" step="1" value="10"></div>':`<input id="sd-join-amount" type="hidden" value="${fixed}">`}<div class="sd-msg" id="sd-join-msg"></div><button class="sd-btn" id="sd-create-join">GERAR PAGAMENTO PIX →</button><div class="sd-checkout-note">O acesso aos recursos será liberado somente após a confirmação do pagamento.</div></div>`)}</div>`;
+    }
+    return `<h1 class="sd-title">Escolha sua forma de apoio</h1><p class="sd-lead">Depois de escolher, você continuará direto para o pagamento sem sair da sua área logada.</p><div class="sd-checkout-grid">${plans.map(x=>card('CLUBE DO SURTO',`<div class="sd-plan-card"><h3>${esc(x.label)}</h3><div class="sd-plan-price">${esc(x.price)}</div><p>${esc(x.text)}</p><button class="sd-btn" data-join-tier="${esc(x.tier)}">ESCOLHER →</button></div>`,x.tier==='vip'?'vip':'')).join('')}</div>`;
+  }
+
   function assinaturaHtml(m){
     const s = m.subscription;
     if (!s) return `<h1 class="sd-title">Minha Assinatura</h1>${empty('Você não possui assinatura ativa','Seu apoio atual é avulso. Não existe renovação automática nem próxima cobrança mensal para esta conta.')}`;
@@ -232,7 +260,7 @@
 
   function upgradeHtml(m){
     const options=(m.upgrades||[]).filter(x=>x.available);
-    if(!m.currentSupport)return `<h1 class="sd-title">Escolha seu apoio</h1>${empty('Você ainda não possui apoio pago','Conheça as formas de fazer parte do Clube do Surto.','<button class="sd-btn" data-clube>VER FORMAS DE APOIO →</button>')}`;
+    if(!m.currentSupport)return joinHtml(m);
     if(!options.length)return `<h1 class="sd-title">Seu plano</h1>${card('CATEGORIA MÁXIMA','<h2>VOCÊ JÁ É APOIADOR VIP</h2><p>Seu plano já possui o maior nível de destaque e participação.</p>','vip')}`;
     if(upgradeData&&upgradeTarget&&upgradeData.pix){
       const target=options.find(x=>x.tier===upgradeTarget)||{label:LABELS[upgradeTarget],fullPrice:0,amountDue:upgradeData.amount};
@@ -253,6 +281,8 @@
   }
 
   function htmlFor(route,m){
+    if (!m.currentSupport && route !== 'home' && route !== 'join' && route !== 'upgrade') return lockedHtml(route);
+    if (route === 'join') return joinHtml(m);
     if (route === 'apoios') return apoiosHtml(m);
     if (route === 'aparicoes') return aparicoesHtml(m);
     if (route === 'perfil') return profileHtml(m);
@@ -274,10 +304,18 @@
 
   function bindRoot(root){
     root.querySelectorAll('[data-route]').forEach(el => el.addEventListener('click',()=>gotoOriginalRoute(el.dataset.route),{once:true}));
-    root.querySelectorAll('[data-clube]').forEach(el => el.addEventListener('click',()=>{
-      const link = Array.from(document.querySelectorAll('div')).find(x => norm(x.textContent)==='CLUBE DO SURTO');
-      if (link) link.click();
-    },{once:true}));
+    root.querySelectorAll('[data-join]').forEach(el=>el.addEventListener('click',()=>{currentRoute='join';checkoutData=null;checkoutTier=null;window.scrollTo(0,0);schedule(false)},{once:true}));
+    root.querySelectorAll('[data-change-plan]').forEach(el=>el.addEventListener('click',()=>{checkoutData=null;checkoutTier=null;schedule(false)},{once:true}));
+    root.querySelectorAll('[data-join-tier]').forEach(el=>el.addEventListener('click',()=>{checkoutTier=el.dataset.joinTier;checkoutData=null;window.scrollTo(0,0);schedule(false)},{once:true}));
+    const createJoin=root.querySelector('#sd-create-join');
+    if(createJoin)createJoin.addEventListener('click',async()=>{
+      const msg=root.querySelector('#sd-join-msg');const fullName=root.querySelector('#sd-join-name')?.value.trim()||'';const cpfCnpj=(root.querySelector('#sd-join-cpf')?.value||'').replace(/\D/g,'');const amount=Number(root.querySelector('#sd-join-amount')?.value||0);
+      if(!fullName){msg.textContent='Informe seu nome completo.';return}if(cpfCnpj.length!==11){msg.textContent='Informe um CPF válido com 11 números.';return}if(!Number.isFinite(amount)||amount<1){msg.textContent='O apoio livre deve ser de pelo menos R$ 1,00.';return}
+      createJoin.disabled=true;createJoin.textContent='GERANDO PIX…';msg.textContent='';
+      try{const sb=ensureClient();const {data,error}=await sb.functions.invoke('asaas-create-support-payment',{body:{tier:checkoutTier,method:'pix',amount,cpfCnpj,fullName}});if(error||!data?.ok||!data.pix)throw new Error(data?.error||'payment_failed');checkoutData=data;schedule(false)}catch(e){msg.textContent='Não foi possível gerar o pagamento agora. Confira os dados e tente novamente.';createJoin.disabled=false;createJoin.textContent='GERAR PAGAMENTO PIX →'}
+    });
+    const copyJoin=root.querySelector('#sd-copy-join');if(copyJoin)copyJoin.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(checkoutData.pix.payload);copyJoin.textContent='PIX COPIADO ✓'}catch(e){}});
+    const refreshJoin=root.querySelector('#sd-refresh-join');if(refreshJoin)refreshJoin.addEventListener('click',async()=>{const msg=root.querySelector('#sd-join-status');refreshJoin.disabled=true;refreshJoin.textContent='VERIFICANDO…';await loadData(true);if(dataModel.currentSupport){checkoutData=null;checkoutTier=null;currentRoute='home';schedule(false);return}if(msg)msg.textContent='O pagamento ainda não foi identificado. Aguarde alguns instantes e tente novamente.';refreshJoin.disabled=false;refreshJoin.textContent='JÁ PAGUEI · VERIFICAR'});
     root.querySelectorAll('[data-upgrade]').forEach(el=>el.addEventListener('click',()=>{currentRoute='upgrade';upgradeData=null;upgradeTarget=null;window.scrollTo(0,0);schedule(false)},{once:true}));
     root.querySelectorAll('[data-upgrade-tier]').forEach(el=>el.addEventListener('click',async()=>{
       const tier=el.dataset.upgradeTier;el.disabled=true;el.textContent='GERANDO PIX…';
@@ -392,6 +430,7 @@
   }
 
   window.__surtoOpenUpgrade=()=>{currentRoute='upgrade';upgradeData=null;upgradeTarget=null;window.scrollTo(0,0);schedule(false)};
+  window.__surtoOpenSupporterHome=()=>{currentRoute='home';upgradeData=null;upgradeTarget=null;checkoutData=null;checkoutTier=null;window.scrollTo(0,0);schedule(true)};
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();

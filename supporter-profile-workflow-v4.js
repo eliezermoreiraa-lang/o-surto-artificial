@@ -110,7 +110,7 @@
     const back=document.createElement('div');back.className='sv4-modalback';back.innerHTML=`<div class="sv4-modal"><h3>CONCLUIR SEU ENVIO?</h3><p>Depois de concluir, as informações serão enviadas para a produção e ficarão disponíveis apenas para visualização.</p><div class="sv4-actions"><button class="sv4-btn ghost" id="sv4-review">VOLTAR E REVISAR</button><button class="sv4-btn" id="sv4-confirm">SIM, CONCLUIR</button></div><div class="sv4-msg" id="sv4-complete-msg"></div></div>`;document.body.appendChild(back);back.querySelector('#sv4-review').onclick=()=>back.remove();back.querySelector('#sv4-confirm').onclick=async()=>{const btn=back.querySelector('#sv4-confirm'),msg=back.querySelector('#sv4-complete-msg');btn.disabled=true;btn.textContent='CONCLUINDO…';const c=client();const {data,error}=await c.functions.invoke('supporter-profile-complete',{body:{}});if(error||!data?.ok){msg.textContent=data?.error||'Não foi possível concluir agora.';btn.disabled=false;btn.textContent='SIM, CONCLUIR';return}back.remove();model=await load(true);renderProfile(root,model)};
   }
 
-  async function renderProfile(root,m){if(!root||root.dataset.sv4Busy==='1')return;root.dataset.sv4Busy='1';try{if(m.publicityProfile?.submission_completed_at)await renderCompleted(root,m);else await renderEditable(root,m)}finally{root.dataset.sv4Busy='0'}}
+  async function renderProfile(root,m){if(!root||!m?.currentSupport||root.dataset.sv4Busy==='1')return;root.dataset.sv4Busy='1';try{if(m.publicityProfile?.submission_completed_at)await renderCompleted(root,m);else await renderEditable(root,m)}finally{root.dataset.sv4Busy='0'}}
 
   function progress(m){
     const p=m.publicityProfile||{},pay=!!m.currentSupport,prof=profileOk(p),pics=photosOk(p),av=!!p.official_avatar_path;
@@ -129,7 +129,7 @@
   }
 
   async function enhance(){
-    if(busy)return;busy=true;try{css();const root=document.querySelector('#surto-supporter-real-v2');if(!root)return;const m=await load(false);if(!m)return;const h=norm(root.querySelector('h1')?.textContent);
+    if(busy)return;busy=true;try{css();const root=document.querySelector('#surto-supporter-real-v2');if(!root)return;const m=await load(false);if(!m||!m.currentSupport)return;const h=norm(root.querySelector('h1')?.textContent);
       if(h==='PERFIL DE DIVULGAÇÃO'&&!root.querySelector('.sv4')){await renderProfile(root,m);return}
       if(root.querySelector('.sd-hero')){const old=root.querySelector('#sv4-progress');if(old)old.remove();const hero=root.querySelector('.sd-hero');hero.insertAdjacentHTML('afterend',progress(m));const go=root.querySelector('#sv4-go-profile');if(go)go.onclick=goProfile;if(profileOk(m.publicityProfile||{})){Array.from(root.querySelectorAll('.sd-card')).forEach(c=>{if(norm(c.textContent).includes('COMPLETE SEU PERFIL DE DIVULGAÇÃO'))c.remove()})}}
     }finally{busy=false}

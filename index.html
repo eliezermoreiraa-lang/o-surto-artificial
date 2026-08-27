@@ -36,6 +36,11 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
 @media (prefers-reduced-motion:no-preference){@supports (animation-timeline:view()){
 [data-reveal]{animation:saUp .8s linear both;animation-timeline:view();animation-range:entry 2% cover 24%}
 }}
+.sa-home-hero{min-height:min(780px,calc(100vh - 76px))!important}.sa-home-story{padding-top:clamp(56px,7vw,88px)!important}
+@media(max-width:1079px){
+  .sa-home-hero{min-height:0!important;align-items:flex-start!important}.sa-home-story{padding:44px 18px 0!important}.sa-home-hero-grid{grid-template-columns:minmax(0,1fr) 158px!important;gap:16px!important;padding:34px 18px 46px!important;align-items:start!important;align-self:flex-start!important}.sa-hero-copy{display:contents}.sa-hero-label,.sa-hero-title{grid-column:1/-1}.sa-hero-label{margin-bottom:2px!important}.sa-hero-title{font-size:clamp(48px,15vw,64px)!important}.sa-hero-copytext{grid-column:1;align-self:start;margin:0!important;font-size:14px!important;line-height:1.55!important}.sa-hero-cta{grid-column:1;width:100%;min-height:56px!important;height:auto!important;padding:12px 14px!important;justify-content:space-between;line-height:1.35;box-sizing:border-box;font-size:11px!important}.sa-hero-benefits{grid-column:1/-1;margin-top:4px!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px 12px!important}.sa-hero-benefits>div>span:nth-child(2){display:none}.sa-hero-poster{grid-column:2;grid-row:3 / span 2;align-self:start}.sa-hero-poster>div:last-child{max-width:158px!important;animation-duration:8s!important}.sa-hero-poster>div:first-child{inset:-10%!important;filter:blur(24px)!important}.sa-hero-poster img{border-radius:9px!important}.sa-poster-badges{position:static!important;display:grid!important;grid-template-columns:1fr!important;gap:6px!important;margin-top:8px!important}.sa-poster-badges span{display:flex!important;justify-content:center!important;padding:6px 5px!important;font-size:7.5px!important;line-height:1.2!important;letter-spacing:.1em!important}.sa-home-story h2{font-size:clamp(44px,13vw,58px)!important}
+}
+@media(max-width:370px){.sa-home-hero-grid{grid-template-columns:minmax(0,1fr) 142px!important;gap:14px 12px!important;padding-inline:14px!important}.sa-hero-poster>div:last-child{max-width:142px!important}.sa-hero-title{font-size:46px!important}.sa-hero-cta{font-size:10px!important;padding-inline:11px!important}.sa-home-story{padding-inline:14px!important}}
 ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#3f424d;border-radius:99px}
 </style>
 </helmet>
@@ -93,7 +98,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
 <sc-if value="{{ atHome }}" hint-placeholder-val="{{ true }}">
 <div style="background:#0B0D13">
 
-<div style="position:relative;overflow:hidden;min-height:clamp(640px,94vh,960px);display:flex;align-items:center">
+<div class="sa-home-hero" style="position:relative;overflow:hidden;min-height:clamp(640px,94vh,960px);display:flex;align-items:center">
   <img src="assets-min/atmosfera.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:0% 50%;transform-origin:0% 50%;opacity:.42;animation:saDriftL 40s ease-in-out infinite alternate">
   <div style="position:absolute;top:-16%;right:4%;width:46vw;height:46vw;border-radius:50%;background:radial-gradient(circle,rgba(229,9,20,.5),transparent 66%);filter:blur(70px);animation:saGlow 16s ease-in-out infinite"></div>
   <div style="position:absolute;bottom:-22%;left:-8%;width:44vw;height:44vw;border-radius:50%;background:radial-gradient(circle,rgba(0,229,255,.34),transparent 66%);filter:blur(80px);animation:saGlowB 21s ease-in-out infinite"></div>
@@ -126,7 +131,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
       <div style="position:relative;width:100%;max-width:clamp(280px,34vw,420px);animation:saFloat 12s ease-in-out infinite">
         <img src="assets-min/poster-la-linha-do-bairro.webp" alt="Lalinha do Bairro — próxima novelinha em produção" style="width:100%;display:block;border-radius:12px;box-shadow:0 40px 90px rgba(0,0,0,.68),0 0 0 1px rgba(0,229,255,.18)">
         <div style="position:absolute;inset:0;border-radius:12px;background:repeating-linear-gradient(180deg,rgba(0,0,0,.14) 0 1px,transparent 1px 3px);mix-blend-mode:multiply;opacity:.42;pointer-events:none"></div>
-        <div style="position:absolute;left:5%;right:5%;top:4%;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div class="sa-poster-badges" style="position:absolute;left:5%;right:5%;top:4%;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <span style="display:inline-flex;padding:7px 10px;border-radius:99px;background:rgba(11,13,19,.82);box-shadow:inset 0 0 0 1px rgba(229,9,20,.65);backdrop-filter:blur(8px);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:#F5F5F5">Em produção</span>
           <span style="display:inline-flex;padding:7px 10px;border-radius:99px;background:rgba(11,13,19,.82);box-shadow:inset 0 0 0 1px rgba(0,229,255,.55);backdrop-filter:blur(8px);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:#00E5FF">Aguardando apoio</span>
         </div>
@@ -135,7 +140,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
   </div>
 </div>
 
-<div data-reveal style="max-width:1260px;margin:0 auto;padding:clamp(96px,13vw,168px) 20px 0">
+<div class="sa-home-story" data-reveal style="max-width:1260px;margin:0 auto;padding:clamp(96px,13vw,168px) 20px 0">
   <h2 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(42px,6.4vw,88px);line-height:.92;margin:0;color:#F5F5F5">NÃO É SÓ ASSISTIR.<br><span style="color:#E50914">É FAZER PARTE.</span></h2>
   <p style="max-width:52ch;font-size:clamp(15px,1.6vw,18px);line-height:1.55;color:color-mix(in srgb,#F5F5F5 66%,transparent);margin:clamp(20px,3vw,28px) 0 clamp(44px,6vw,72px)">O Clube do Surto reúne quem ajuda nossas histórias a continuarem acontecendo.</p>
 
@@ -2753,7 +2758,7 @@ class Component extends DCLogic {
     }));
 
     const vagasCards = [
-      { cat:'Apoiador', bloco:'9', livres:'2', label:'vagas livres', pct:'78%', tone:'#9184d9', hint:'7 de 9 já ocupadas neste bloco' },
+      { cat:'Apoiador', bloco:'6', livres:'2', label:'vagas livres', pct:'67%', tone:'#9184d9', hint:'4 de 6 já ocupadas neste bloco' },
       { cat:'Destaque', bloco:'3', livres:'1', label:'vaga livre', pct:'67%', tone:'#b5abfc', hint:'2 de 3 ocupadas · fila com prioridade' },
       { cat:'VIP', bloco:'1', livres:'1', label:'encerramento livre', pct:'0%', tone:'#d2cefd', hint:'nenhum VIP reservado para o EP 18' }
     ];

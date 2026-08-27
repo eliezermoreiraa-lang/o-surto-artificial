@@ -8,13 +8,13 @@
   };
 
   load('/surto-payment-patch.js?v=20260827-2');
-  load('/mobile-experience-v2.js?v=20260827-4');
+  load('/mobile-experience-v2.js?v=20260827-5');
   load('/supporter-dashboard-guard.js?v=20260826-1');
 
   const startDashboard = () => {
     if (window.supabase && window.supabase.createClient) {
-      load('/supporter-dashboard-real-v2.js?v=20260827-2');
-      load('/supporter-profile-workflow-v4.js?v=20260827-1');
+      load('/supporter-dashboard-real-v2.js?v=20260827-3');
+      load('/supporter-profile-workflow-v4.js?v=20260827-2');
       return;
     }
     setTimeout(startDashboard, 50);
