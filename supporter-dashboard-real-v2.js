@@ -67,7 +67,7 @@
   function ensureClient(){
     if (client) return client;
     if (!window.supabase || !window.supabase.createClient) return null;
-    client = window.supabase.createClient(SB_URL, SB_KEY, {
+    client = window.getSurtoSupabaseClient(SB_URL, SB_KEY, {
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'surto-auth' }
     });
     return client;

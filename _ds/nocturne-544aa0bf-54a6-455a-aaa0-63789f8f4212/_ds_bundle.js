@@ -1,5 +1,7 @@
 /* O Surto Artificial — production loader */
 (() => {
+  if (window.__surtoProductionLoaderStarted) return;
+  window.__surtoProductionLoaderStarted = true;
   const load = (src) => {
     const s = document.createElement('script');
     s.src = src;
@@ -7,7 +9,6 @@
     document.head.appendChild(s);
   };
 
-  load('/surto-shared-supabase.js?v=20260827-1');
   load('/surto-payment-patch.js?v=20260827-2');
   load('/mobile-experience-v2.js?v=20260827-6');
   load('/supporter-dashboard-guard.js?v=20260827-2');

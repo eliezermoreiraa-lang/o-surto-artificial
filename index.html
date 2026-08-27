@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="./surto-shared-supabase.js?v=20260827-2"></script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -10,9 +12,7 @@
 <helmet>
 <link rel="stylesheet" href="_ds/nocturne-544aa0bf-54a6-455a-aaa0-63789f8f4212/styles.css">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="surto-shared-supabase.js?v=20260827-1"></script>
-<script src="_ds/nocturne-544aa0bf-54a6-455a-aaa0-63789f8f4212/_ds_bundle.js?v=20260827-2"></script>
+<script src="_ds/nocturne-544aa0bf-54a6-455a-aaa0-63789f8f4212/_ds_bundle.js?v=20260827-3"></script>
 <style>
 body{margin:0;background:#0B0D13;color:#e9e9ed;font-family:Inter,system-ui,sans-serif}
 @keyframes saMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
@@ -2329,7 +2329,7 @@ class Component extends DCLogic {
       await new Promise(r => setTimeout(r, 50));
     }
     if (!(window.supabase && window.supabase.createClient)) return null;
-    this._sb = window.supabase.createClient(
+    this._sb = window.getSurtoSupabaseClient(
       'https://ndfchglutpnbckpcrppy.supabase.co',
       'sb_publishable_RQVP_F6Ix1ZxHhu9HzO9bA_yy9wfb8C',
       { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'surto-auth' } }
