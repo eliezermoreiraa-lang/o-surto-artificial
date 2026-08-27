@@ -222,23 +222,29 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
   <div style="max-width:1260px;margin:0 auto;padding:0 20px">
     <h2 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(38px,5.6vw,76px);line-height:.94;margin:0 0 clamp(30px,4vw,48px);color:#F5F5F5">QUEM FAZ O SURTO ACONTECER</h2>
   </div>
-  <div style="position:relative">
-    <div style="display:flex;gap:clamp(20px,3vw,38px);width:max-content;animation:saMarquee 46s linear infinite">
+  <sc-if value="{{ wallHasEntries }}">
+  <div style="max-width:1260px;margin:0 auto;padding:0 20px">
+    <div style="display:flex;flex-wrap:wrap;gap:clamp(20px,3vw,38px)">
       <sc-for list="{{ marquee }}" as="a" hint-placeholder-count="16">
-        <div style="display:grid;justify-items:center;gap:11px;width:clamp(74px,8vw,104px);flex:none">
+        <a href="{{ a.socialLink }}" target="_blank" rel="noopener noreferrer" style="cursor:pointer;text-decoration:none;display:grid;justify-items:center;gap:11px;width:clamp(74px,8vw,104px);flex:none;color:color-mix(in srgb,#F5F5F5 62%,transparent);transition:transform .3s,color .3s" style-hover="transform:translateY(-6px);color:#F5F5F5">
           <div style="width:100%;aspect-ratio:1;border-radius:50%;position:relative;overflow:hidden;background:radial-gradient(circle at 32% 26%,#2a2f3d,#111418);box-shadow:0 0 0 1px {{ a.ring }}{{ a.glow }};display:grid;place-items:center;transition:transform .3s" style-hover="transform:translateY(-6px)">
+            <img src="{{ a.img }}" alt="{{ a.alt }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 15%;filter:saturate(.9) contrast(1.04)">
             <div style="position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(0,0,0,.24) 0 1px,transparent 1px 3px)"></div>
-            <span style="position:relative;font-family:'Bebas Neue',Inter,sans-serif;font-size:clamp(20px,2.4vw,28px);color:{{ a.ink }}">{{ a.ini }}</span>
           </div>
-          <div style="font-size:11px;color:color-mix(in srgb,#F5F5F5 62%,transparent);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ a.h }}</div>
-        </div>
+          <div style="font-size:11px;color:inherit;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ a.h }}</div>
+        </a>
       </sc-for>
     </div>
-    <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#0B0D13,transparent 12%,transparent 88%,#0B0D13)"></div>
   </div>
   <div style="max-width:1260px;margin:0 auto;padding:0 20px">
     <div onClick="{{ go.apoiadores }}" style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;margin-top:clamp(30px,4vw,44px);height:52px;padding:0 26px;border-radius:8px;font-size:12.5px;letter-spacing:.16em;color:#F5F5F5;box-shadow:0 0 0 1px color-mix(in srgb,#F5F5F5 24%,transparent);transition:box-shadow .22s,background .22s" style-hover="box-shadow:0 0 0 1px #00E5FF;background:color-mix(in srgb,#00E5FF 8%,transparent)">VER APOIADORES <span>→</span></div>
   </div>
+  </sc-if>
+  <sc-if value="{{ wallNoEntries }}">
+    <div style="max-width:1260px;margin:0 auto;padding:0 20px">
+      <div style="padding:24px;border-radius:10px;background:color-mix(in srgb,#F5F5F5 4%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,#F5F5F5 10%,transparent);font-size:14px;line-height:1.6;color:color-mix(in srgb,#F5F5F5 62%,transparent)">Os primeiros avatares do Clube do Surto aparecerão aqui assim que forem finalizados pela produção.</div>
+    </div>
+  </sc-if>
 </div>
 
 <div data-reveal style="max-width:1260px;margin:0 auto;padding:clamp(96px,13vw,168px) 20px 0">
@@ -540,8 +546,9 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
       </div>
       <div style="height:1px;background:linear-gradient(90deg,{{ mo.rule }},color-mix(in srgb,#F5F5F5 10%,transparent) 34%,transparent);margin-bottom:clamp(26px,3.6vw,44px)"></div>
       <div style="display:flex;flex-wrap:wrap;gap:clamp(20px,3vw,40px) clamp(16px,2.4vw,32px);align-items:flex-start">
+        <sc-if value="{{ mo.empty }}"><div style="width:100%;padding:22px;border-radius:10px;background:color-mix(in srgb,#F5F5F5 4%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,#F5F5F5 10%,transparent);font-size:14px;line-height:1.6;color:color-mix(in srgb,#F5F5F5 56%,transparent)">Nenhum avatar finalizado neste mês.</div></sc-if>
         <sc-for list="{{ mo.list }}" as="a" hint-placeholder-count="8">
-          <div onClick="{{ a.open }}" style="cursor:pointer;width:{{ a.card }};text-align:center;color:color-mix(in srgb,#F5F5F5 72%,transparent);transition:transform .32s cubic-bezier(.4,0,.2,1),color .3s" style-hover="transform:translateY(-6px);color:#F5F5F5">
+          <a href="{{ a.socialLink }}" target="_blank" rel="noopener noreferrer" style="cursor:pointer;text-decoration:none;width:{{ a.card }};text-align:center;color:color-mix(in srgb,#F5F5F5 72%,transparent);transition:transform .32s cubic-bezier(.4,0,.2,1),color .3s" style-hover="transform:translateY(-6px);color:#F5F5F5">
             <div style="position:relative;width:{{ a.size }};height:{{ a.size }};margin:0 auto;border-radius:50%;overflow:hidden;background:#11141B;box-shadow:0 0 0 1px {{ a.ring }}{{ a.glow }};transition:box-shadow .3s,transform .3s" style-hover="box-shadow:{{ a.hoverGlow }};transform:scale(1.04)">
               <img src="{{ a.img }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 15%;filter:saturate(.9) contrast(1.04)">
               <div style="position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(0,0,0,.2) 0 1px,transparent 1px 3px)"></div>
@@ -549,8 +556,8 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
             </div>
             <div style="font-size:12.5px;margin-top:12px;color:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ a.h }}</div>
             <sc-if value="{{ a.catLabel }}"><div style="font-size:9px;letter-spacing:.18em;color:{{ a.ink }};margin-top:5px">{{ a.catLabel }}</div></sc-if>
-            <div style="font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:inherit;opacity:.5;margin-top:5px">↗ instagram</div>
-          </div>
+            <div style="font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:inherit;opacity:.5;margin-top:5px">↗ {{ a.network }}</div>
+          </a>
         </sc-for>
       </div>
     </div>
@@ -574,8 +581,9 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
     <h2 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(32px,4.8vw,72px);line-height:.94;margin:0 0 12px;color:#F5F5F5;max-width:24ch">QUEM MAIS FEZ PARTE DA HISTÓRIA DO SURTO</h2>
     <p style="font-size:14.5px;color:color-mix(in srgb,#F5F5F5 54%,transparent);margin:0 0 clamp(26px,3.6vw,44px)">Alguns surtos simplesmente viram história.</p>
     <div style="display:grid;gap:0">
+      <sc-if value="{{ hallEmpty }}"><div style="padding:22px;border-radius:10px;background:color-mix(in srgb,#F5F5F5 4%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,#F5F5F5 10%,transparent);font-size:14px;line-height:1.6;color:color-mix(in srgb,#F5F5F5 56%,transparent)">O hall será preenchido automaticamente conforme as aparições forem publicadas.</div></sc-if>
       <sc-for list="{{ hall }}" as="h" hint-placeholder-count="5">
-        <div onClick="{{ h.open }}" style="cursor:pointer;display:grid;grid-template-columns:{{ hallCols }};align-items:center;gap:clamp(12px,2.4vw,28px);padding:clamp(16px,2.4vw,26px) 0;border-top:1px solid color-mix(in srgb,#F5F5F5 12%,transparent);transition:padding-left .3s,background .3s" style-hover="padding-left:14px;background:color-mix(in srgb,#F5F5F5 4%,transparent)">
+        <a href="{{ h.socialLink }}" target="_blank" rel="noopener noreferrer" style="cursor:pointer;text-decoration:none;display:grid;grid-template-columns:{{ hallCols }};align-items:center;gap:clamp(12px,2.4vw,28px);padding:clamp(16px,2.4vw,26px) 0;border-top:1px solid color-mix(in srgb,#F5F5F5 12%,transparent);transition:padding-left .3s,background .3s" style-hover="padding-left:14px;background:color-mix(in srgb,#F5F5F5 4%,transparent)">
           <div style="font-family:'Bebas Neue',Inter,sans-serif;font-size:clamp(32px,5vw,64px);line-height:.86;color:{{ h.ink }};font-variant-numeric:tabular-nums">{{ h.pos }}</div>
           <div style="position:relative;width:clamp(48px,6vw,74px);height:clamp(48px,6vw,74px);border-radius:50%;overflow:hidden;background:#11141B;box-shadow:0 0 0 1px {{ h.ring }}">
             <img src="{{ h.img }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 15%;filter:saturate(.86) contrast(1.04)">
@@ -586,7 +594,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
             <span style="font-family:'Bebas Neue',Inter,sans-serif;font-size:clamp(20px,2.4vw,32px);line-height:1;color:#F5F5F5">{{ h.n }}</span>
             <span style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:color-mix(in srgb,#F5F5F5 42%,transparent)">aparições</span>
           </div>
-        </div>
+        </a>
       </sc-for>
       <div style="border-top:1px solid color-mix(in srgb,#F5F5F5 12%,transparent)"></div>
     </div>
@@ -613,39 +621,14 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
       </div>
       <div style="position:relative;animation:saIn 1.1s .1s both">
         <div style="font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:#E50914;margin-bottom:10px;display:flex;align-items:center;gap:8px"><span style="width:5px;height:5px;border-radius:50%;background:#E50914;animation:saPulse 1.8s infinite;flex:none"></span>APOIADORES</div>
-        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:3px;border-radius:10px;overflow:hidden">
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap01.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap02.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap03.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 18%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap04.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap05.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap06.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap07.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap08.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap09.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap10.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap11.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap12.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap13.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap14.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap15.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap16.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap17.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap18.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap19.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap20.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap21.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap22.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap23.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap24.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap25.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap26.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap27.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap28.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap29.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
-          <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="assets-min/ap30.jpeg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></div>
+        <sc-if value="{{ wallHasEntries }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:3px;border-radius:10px;overflow:hidden">
+          <sc-for list="{{ clubeFaces }}" as="a" hint-placeholder-count="12">
+            <a href="{{ a.socialLink }}" target="_blank" rel="noopener noreferrer" style="cursor:pointer;position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="{{ a.img }}" alt="{{ a.alt }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 15%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></a>
+          </sc-for>
         </div>
-        <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(11,13,19,.9) 0%,transparent 18%),linear-gradient(180deg,transparent 70%,rgba(11,13,19,.7));border-radius:10px"></div>
+        </sc-if>
+        <sc-if value="{{ wallNoEntries }}"><div style="min-height:260px;display:grid;place-items:center;padding:28px;text-align:center;border-radius:10px;background:linear-gradient(135deg,rgba(229,9,20,.12),rgba(0,229,255,.08));box-shadow:0 0 0 1px color-mix(in srgb,#F5F5F5 10%,transparent);font-size:14px;line-height:1.6;color:color-mix(in srgb,#F5F5F5 62%,transparent)">Os avatares reais aparecem aqui depois que a produção finaliza cada apoiador.</div></sc-if>
       </div>
     </div>
   </div>
@@ -2321,6 +2304,7 @@ class Component extends DCLogic {
     /* auth real (Supabase) */
     sbReady: false, session: null, user: null, profile: null,
     supports: null, supportsLoaded: false,
+    wallEntries: [], wallLoaded: false,
     fEmail: '', fSenha: '', fSenha2: '', authBusy: false, authErr: null, authMsg: null, pendingEmail: ''
   };
 
@@ -2396,6 +2380,36 @@ class Component extends DCLogic {
       } catch (e) { /* tenta a próxima coluna */ }
     }
     this.setState({ supports: rows || [], supportsLoaded: true });
+  }
+
+  async loadPublicWall() {
+    const sb = await this.sb();
+    if (!sb) {
+      this.setState({ wallEntries: [], wallLoaded: true });
+      return;
+    }
+    try {
+      const { data, error } = await sb
+        .from('wall_entries')
+        .select('id,user_id,tier,display_name,social_handle,social_url,avatar_url,wall_month,published_at,published_appearances')
+        .eq('is_visible', true)
+        .order('wall_month', { ascending: false })
+        .order('published_at', { ascending: false })
+        .limit(500);
+      if (error) throw error;
+      this.setState({ wallEntries: data || [], wallLoaded: true });
+    } catch (e) {
+      this.setState({ wallEntries: [], wallLoaded: true });
+    }
+  }
+
+  openSocial(url) {
+    try {
+      const safe = new URL(url, window.location.origin);
+      if (safe.protocol !== 'http:' && safe.protocol !== 'https:') return;
+      const opened = window.open(safe.href, '_blank', 'noopener,noreferrer');
+      if (opened) opened.opener = null;
+    } catch (e) { /* link inválido: não abre */ }
   }
 
   authFriendly(msg, fallback) {
@@ -2584,6 +2598,8 @@ class Component extends DCLogic {
   componentDidMount() {
     if (this.state.route === 'exibicao') setTimeout(() => this._initCastDrag(), 100);
     this.initAuth();
+    this.loadPublicWall();
+    this._wallPollId = setInterval(() => this.loadPublicWall(), 60000);
     const p = this.props || {};
     const patch = {};
     if (p.telaInicial && p.telaInicial !== 'home' && !p.telaInicial.startsWith('app')) patch.route = p.telaInicial;
@@ -2676,6 +2692,7 @@ class Component extends DCLogic {
     if (this._win) { this._win.removeEventListener('scroll', this._tick); this._win.removeEventListener('resize', this._tick); }
     if (this._castRaf) cancelAnimationFrame(this._castRaf);
     clearInterval(this._pollId);
+    clearInterval(this._wallPollId);
   }
 
   nav(route) {
@@ -2785,22 +2802,8 @@ class Component extends DCLogic {
       { n:'4', t:'Apareça no Surto', d:'Avatar na tela, @ na descrição e o print pra postar.' }
     ];
 
-    const A = (h, cat) => ({
-      h, cat,
-      ini: h.replace('@','').slice(0,2).toUpperCase(),
-      ring: cat === 'VIP' ? '#9184d9' : cat === 'Destaque' ? '#5d5294' : '#3f424d',
-      ink: cat === 'VIP' ? '#d2cefd' : cat === 'Destaque' ? '#b5abfc' : 'color-mix(in srgb,#e9e9ed 45%,transparent)'
-    });
-    const ago = ['@duda.surtada:VIP','@caiofalso:Destaque','@mari.novelinha:Destaque','@zetorres:Apoiador','@lulaboratorio:Apoiador','@tia.cleo:Apoiador','@ohnoju:Apoiador','@bruxa_do_71:Apoiador','@pedrin.edita:Apoiador','@vovo.dollra:VIP','@sr.antena:Apoiador','@val.chorou:Destaque'];
-    const jul = ['@rei.dotoken:VIP','@nanda.plot:Destaque','@gugavaza:Apoiador','@sol.deplantao:Apoiador','@tonho.rec:Apoiador','@lele.reprise:Apoiador','@ju.surtou:Destaque','@carlaobeta:Apoiador'];
-    const parse = arr => arr.map(x => A(x.split(':')[0], x.split(':')[1]));
-    const meses = [
-      { mes:'Agosto 2026', tag:'mês atual', list: parse(ago) },
-      { mes:'Julho 2026', tag:'mês anterior', list: parse(jul) }
-    ];
-
     return {
-      ...this.extra({ s, r, go, isMobile, planos, meses, isFlow, isApp, isAdm }),
+      ...this.extra({ s, r, go, isMobile, planos, isFlow, isApp, isAdm }),
       goEntrar,
       isMobile, deskNav: !isMobile, navOpen: s.navOpen,
       toggleNav: () => this.setState({ navOpen: !s.navOpen }),
@@ -2816,8 +2819,6 @@ class Component extends DCLogic {
         { v:'4', k:'vagas no EP 18', tone:'#9184d9' }
       ],
       vagasCards, planos, mensais, etapas,
-      destaqueApoiadores: parse(ago).slice(0, 8),
-      meses,
       pickPath: {
         livre: () => { this.setState({ caminho:'livre', tier:'livre', valor:25 }); this.nav('auth'); },
         aparecer: () => { this.setState({ caminho:'aparecer', tier: s.tier !== 'livre' ? s.tier : 'apoiador', valor: s.tier !== 'livre' ? s.valor : 50 }); this.nav('auth'); }
@@ -2837,6 +2838,92 @@ class Component extends DCLogic {
     const cupomOk = s.cupomOk;
     const desconto = cupomOk ? 0.9 : 1;
     const brl = n => 'R$ ' + Number(n).toLocaleString('pt-BR');
+
+    /* ── mural público real ── */
+    const wallRows = Array.isArray(s.wallEntries) ? s.wallEntries : [];
+    const tierRank = { free: 0, supporter: 1, highlight: 2, vip: 3 };
+    const monthKey = value => String(value || '').slice(0, 7);
+    const safeSocialNetwork = value => {
+      try {
+        const host = new URL(value).hostname.toLowerCase();
+        if (host.includes('instagram')) return 'instagram';
+        if (host.includes('tiktok')) return 'tiktok';
+        if (host.includes('youtube') || host.includes('youtu.be')) return 'youtube';
+        if (host.includes('facebook')) return 'facebook';
+        if (host.includes('x.com') || host.includes('twitter')) return 'x';
+      } catch (e) { /* usa o rótulo genérico */ }
+      return 'rede social';
+    };
+    const supporterLabel = row => {
+      const handleValue = String(row.social_handle || '').trim();
+      if (handleValue) return handleValue.startsWith('@') ? handleValue : '@' + handleValue;
+      return String(row.display_name || 'Apoiador').trim();
+    };
+    const tierVisual = (tier, index) => {
+      if (tier === 'vip') return { catLabel:'VIP', ring:'#E50914', glow:',0 0 34px rgba(229,9,20,.32)', hoverGlow:'0 0 0 2px #E50914,0 0 46px rgba(229,9,20,.5)', ink:'#E50914' };
+      if (tier === 'highlight') return { catLabel:'DESTAQUE', ring:'#00E5FF', glow:',0 0 24px rgba(0,229,255,.18)', hoverGlow:'0 0 0 2px #00E5FF,0 0 36px rgba(0,229,255,.32)', ink:'#00E5FF' };
+      return { catLabel:'', ring:'color-mix(in srgb,#F5F5F5 16%,transparent)', glow:'', hoverGlow:'0 0 0 2px color-mix(in srgb,#F5F5F5 40%,transparent),0 0 26px rgba(245,245,245,.12)', ink: index === 0 ? '#E50914' : '#00E5FF' };
+    };
+    const wallCard = (row, index = 0) => {
+      const visual = tierVisual(row.tier, index);
+      const label = supporterLabel(row);
+      const card = row.tier === 'vip' ? (isMobile ? '116px' : '142px') : row.tier === 'highlight' ? (isMobile ? '112px' : '128px') : (isMobile ? '108px' : '120px');
+      const size = row.tier === 'vip' ? (isMobile ? '104px' : '132px') : row.tier === 'highlight' ? (isMobile ? '84px' : '102px') : (isMobile ? '66px' : '78px');
+      return { ...visual, h:label, alt:'Avatar de ' + label, img:row.avatar_url, socialLink:row.social_url, card, size,
+        network:safeSocialNetwork(row.social_url), open:() => this.openSocial(row.social_url) };
+    };
+    const uniqueMonthlyRows = [];
+    const monthlyKeys = new Map();
+    wallRows.forEach(row => {
+      const key = String(row.user_id || row.id) + '|' + monthKey(row.wall_month);
+      const priorIndex = monthlyKeys.get(key);
+      if (priorIndex === undefined) {
+        monthlyKeys.set(key, uniqueMonthlyRows.length);
+        uniqueMonthlyRows.push(row);
+      } else if ((tierRank[row.tier] || 0) > (tierRank[uniqueMonthlyRows[priorIndex].tier] || 0)) {
+        uniqueMonthlyRows[priorIndex] = row;
+      }
+    });
+    const now = new Date();
+    const muralReal = [0, 1].map(offset => {
+      const d = new Date(now.getFullYear(), now.getMonth() - offset, 1);
+      const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      const people = uniqueMonthlyRows.filter(row => monthKey(row.wall_month) === key);
+      return {
+        key,
+        mes: d.toLocaleDateString('pt-BR', { month:'long', year:'numeric' }).toUpperCase(),
+        tag: offset === 0 ? 'mês atual' : 'mês anterior',
+        tagInk: offset === 0 ? '#E50914' : 'color-mix(in srgb,#F5F5F5 40%,transparent)',
+        dot: offset === 0 ? '#E50914' : 'color-mix(in srgb,#F5F5F5 30%,transparent)',
+        rule: offset === 0 ? '#E50914' : 'color-mix(in srgb,#F5F5F5 22%,transparent)',
+        empty: people.length === 0,
+        list: people.sort((a, b) => (tierRank[b.tier] || 0) - (tierRank[a.tier] || 0)).map((row, index) => wallCard(row, index))
+      };
+    });
+    const recentMonthKeys = new Set(muralReal.map(m => m.key));
+    const recentRows = uniqueMonthlyRows.filter(row => recentMonthKeys.has(monthKey(row.wall_month)));
+    const historyByUser = new Map();
+    wallRows.forEach(row => {
+      const key = String(row.user_id || row.id);
+      const current = historyByUser.get(key);
+      if (!current) historyByUser.set(key, { ...row, support_count:1 });
+      else {
+        current.support_count += 1;
+        current.published_appearances = Math.max(Number(current.published_appearances || 0), Number(row.published_appearances || 0));
+        if ((tierRank[row.tier] || 0) > (tierRank[current.tier] || 0)) current.tier = row.tier;
+        if (String(row.wall_month) > String(current.wall_month)) Object.assign(current, { display_name:row.display_name, social_handle:row.social_handle, social_url:row.social_url, avatar_url:row.avatar_url, wall_month:row.wall_month });
+      }
+    });
+    const hallReal = [...historyByUser.values()]
+      .filter(row => Number(row.published_appearances || 0) > 0)
+      .sort((a, b) => Number(b.published_appearances || 0) - Number(a.published_appearances || 0) || Number(b.support_count || 0) - Number(a.support_count || 0) || String(b.wall_month).localeCompare(String(a.wall_month)))
+      .slice(0, 12)
+      .map((row, index) => ({
+        pos:String(index + 1).padStart(2, '0'), h:supporterLabel(row), n:String(Number(row.published_appearances || 0)), img:row.avatar_url, socialLink:row.social_url,
+        ink:index === 0 ? '#E50914' : index === 1 ? '#00E5FF' : 'color-mix(in srgb,#F5F5F5 24%,transparent)',
+        ring:index === 0 ? '#E50914' : index === 1 ? '#00E5FF' : 'color-mix(in srgb,#F5F5F5 18%,transparent)',
+        open:() => this.openSocial(row.social_url)
+      }));
 
     /* ── fluxo ── */
     const flowOrder = ['caminho','planos','modalidade','previsao','auth','checkout','perfil','confirmar'];
@@ -3060,9 +3147,8 @@ class Component extends DCLogic {
       eliPhotoOrder: isMobile ? '2' : '1',
       eliTextOrder: isMobile ? '1' : '2',
       eliRatio: isMobile ? '4/3' : '4/5',
-      heroFacesCols: isMobile ? 'repeat(4,1fr)' : 'repeat(6,1fr)',
-      heroFaces: ['ap01','ap04','ap07','ap02','ap09','ap12','ap05','ap15','ap18','ap11','ap20','ap03']
-        .map(f => ({ src: this.apSrc(f) })),
+      heroFacesCols: 'repeat(auto-fit,minmax(' + (isMobile ? '120px' : '180px') + ',1fr))',
+      heroFaces: recentRows.slice(0, 12).map(row => ({ src: row.avatar_url })),
       ctaMuralCols: isMobile ? '1fr' : '1fr auto',
       hallCols: isMobile ? '42px 52px 1fr auto' : '92px 74px 1fr auto',
       processoCols: isMobile ? 'repeat(2,1fr)' : 'repeat(7,1fr)',
@@ -3098,20 +3184,10 @@ class Component extends DCLogic {
       fluxoCols: isMobile ? '1fr 1fr' : 'repeat(4,1fr)',
       fluxoArrowDesk: !isMobile,
       trailerRatio: isMobile ? '4/3' : '16/7',
-      marquee: (() => {
-        const base = [
-          ['@duda.surtada','VIP'],['@rei.dotoken','VIP'],['@caiofalso','Destaque'],['@mari.novelinha','Destaque'],
-          ['@val.chorou','Destaque'],['@zetorres','Apoiador'],['@tia.cleo','Apoiador'],['@ohnoju','Apoiador'],
-          ['@bruxa_do_71','Apoiador'],['@pedrin.edita','Apoiador'],['@sr.antena','Apoiador'],['@lulaboratorio','Apoiador'],
-          ['@nanda.plot','Destaque'],['@gugavaza','Apoiador'],['@sol.deplantao','Apoiador'],['@tonho.rec','Apoiador']
-        ];
-        return [...base, ...base].map(([h, cat]) => ({
-          h, ini: h.replace('@', '').slice(0, 2).toUpperCase(),
-          ring: cat === 'VIP' ? '#E50914' : cat === 'Destaque' ? 'color-mix(in srgb,#00E5FF 45%,transparent)' : 'color-mix(in srgb,#F5F5F5 16%,transparent)',
-          glow: cat === 'VIP' ? ',0 0 26px rgba(229,9,20,.3)' : cat === 'Destaque' ? ',0 0 18px rgba(0,229,255,.16)' : '',
-          ink: cat === 'VIP' ? '#F5F5F5' : cat === 'Destaque' ? '#9be9ff' : 'color-mix(in srgb,#F5F5F5 60%,transparent)'
-        }));
-      })(),
+      wallHasEntries: s.wallLoaded && recentRows.length > 0,
+      wallNoEntries: s.wallLoaded && recentRows.length === 0,
+      marquee: recentRows.slice(0, 24).map((row, index) => wallCard(row, index)),
+      clubeFaces: recentRows.slice(0, 18).map((row, index) => wallCard(row, index)),
       depCols: isMobile ? '1fr' : 'repeat(3,1fr)',
       clubeHeroCols: isMobile ? '1fr' : '1fr .72fr',
       clubePassosCols: isMobile ? '1fr 1fr' : 'repeat(4,1fr)',
@@ -3206,18 +3282,6 @@ class Component extends DCLogic {
         markPos: isMobile ? 'left:-5px;top:26px' : 'left:0;top:-5px',
         dot: i === 0 ? '#9184d9' : 'color-mix(in srgb,#9184d9 45%,transparent)',
         glow: i === 0 ? 'rgba(145,132,217,.7)' : 'transparent' })),
-      muralPreview: [
-        ['@duda.surtada','VIP'],['@rei.dotoken','VIP'],['@caiofalso','Destaque'],['@mari.novelinha','Destaque'],
-        ['@val.chorou','Destaque'],['@zetorres','Apoiador'],['@tia.cleo','Apoiador'],['@ohnoju','Apoiador'],
-        ['@bruxa_do_71','Apoiador'],['@pedrin.edita','Apoiador'],['@sr.antena','Apoiador']
-      ].map(([h, cat]) => ({
-        h, ini: h.replace('@', '').slice(0, 2).toUpperCase(),
-        size: cat === 'VIP' ? '104px' : cat === 'Destaque' ? '78px' : '56px',
-        fs: cat === 'VIP' ? '30px' : cat === 'Destaque' ? '22px' : '16px',
-        ring: cat === 'VIP' ? '#9184d9' : cat === 'Destaque' ? '#5d5294' : '#3f424d',
-        glow: cat === 'VIP' ? ',0 0 26px rgba(145,132,217,.3)' : '',
-        ink: cat === 'VIP' ? '#d2cefd' : cat === 'Destaque' ? '#b5abfc' : 'color-mix(in srgb,#e9e9ed 55%,transparent)'
-      })),
       processo: ['IDEIA','ROTEIRO','PERSONAGENS','VOZ','VÍDEO','EDIÇÃO','EPISÓDIO'].map((k, i, arr) => ({
         k, n: String(i + 1).padStart(2, '0'), arrow: i < arr.length - 1,
         ink: i === arr.length - 1 ? '#F5F5F5' : 'color-mix(in srgb,#F5F5F5 74%,transparent)',
@@ -3237,33 +3301,7 @@ class Component extends DCLogic {
       footerNav: [['Em Exibição','exibicao'],['Clube do Surto','clube'],['Apoiadores','apoiadores'],['Sobre','sobre'],['Contrate o Surto','contrate']]
         .map(([label, route]) => ({ label, open: () => this.nav(route) })),
       footerRedes: ['Instagram','YouTube','TikTok'].map(label => ({ label, open: () => this.flash('Abrindo ' + label + '…') })),
-      mural: [
-        { mes:'AGOSTO 2026', tag:'mês atual', atual:true, gente:[
-          ['@duda.surtada','VIP','ap01'],['@vovo.dollra','VIP','ap02'],
-          ['@caiofalso','Destaque','ap03'],['@mari.novelinha','Destaque','ap04'],['@val.chorou','Destaque','ap05'],
-          ['@zetorres','Apoiador','ap06'],['@tia.cleo','Apoiador','ap07'],['@ohnoju','Apoiador','ap08'],
-          ['@bruxa_do_71','Apoiador','ap09'],['@pedrin.edita','Apoiador','ap10'],['@sr.antena','Apoiador','ap11'],['@lulaboratorio','Apoiador','ap12']] },
-        { mes:'JULHO 2026', tag:'mês anterior', atual:false, gente:[
-          ['@rei.dotoken','VIP','ap13'],['@nanda.plot','Destaque','ap14'],['@ju.surtou','Destaque','ap15'],
-          ['@gugavaza','Apoiador','ap16'],['@sol.deplantao','Apoiador','ap17'],['@tonho.rec','Apoiador','ap18'],
-          ['@lele.reprise','Apoiador','ap19'],['@carlaobeta','Apoiador','ap20']] }
-      ].map(m => ({
-        mes: m.mes, tag: m.tag,
-        tagInk: m.atual ? '#E50914' : 'color-mix(in srgb,#F5F5F5 40%,transparent)',
-        dot: m.atual ? '#E50914' : 'color-mix(in srgb,#F5F5F5 30%,transparent)',
-        rule: m.atual ? '#E50914' : 'color-mix(in srgb,#F5F5F5 22%,transparent)',
-        list: m.gente.map(([h, cat, img]) => ({
-          h, img: this.apSrc(img),
-          catLabel: cat === 'Apoiador' ? '' : cat.toUpperCase(),
-          card: cat === 'VIP' ? (isMobile ? '116px' : '142px') : cat === 'Destaque' ? (isMobile ? '112px' : '128px') : (isMobile ? '108px' : '120px'),
-          size: cat === 'VIP' ? (isMobile ? '104px' : '132px') : cat === 'Destaque' ? (isMobile ? '84px' : '102px') : (isMobile ? '66px' : '78px'),
-          ring: cat === 'VIP' ? '#E50914' : cat === 'Destaque' ? '#00E5FF' : 'color-mix(in srgb,#F5F5F5 16%,transparent)',
-          glow: cat === 'VIP' ? ',0 0 34px rgba(229,9,20,.32)' : cat === 'Destaque' ? ',0 0 24px rgba(0,229,255,.18)' : '',
-          hoverGlow: cat === 'VIP' ? '0 0 0 2px #E50914,0 0 46px rgba(229,9,20,.5)' : cat === 'Destaque' ? '0 0 0 2px #00E5FF,0 0 36px rgba(0,229,255,.32)' : '0 0 0 2px color-mix(in srgb,#F5F5F5 40%,transparent),0 0 26px rgba(245,245,245,.12)',
-          ink: cat === 'VIP' ? '#E50914' : '#00E5FF',
-          open: () => this.flash('Abrindo ' + h + ' no Instagram…')
-        }))
-      })),
+      mural: muralReal,
       servicos: [
         ['Vídeos publicitários com IA','Produções e campanhas audiovisuais para marcas e projetos.'],
         ['Personagens virtuais','Criação e continuidade visual de personagens.'],
@@ -3318,12 +3356,8 @@ class Component extends DCLogic {
         { k:'flexibilidade', v:'Se uma oportunidade VIP não for usada e o episódio estiver próximo, a capacidade é liberada para outras categorias.' },
         { k:'calendário', v:'A previsão considera apenas episódios publicados de segunda a sexta.' }
       ],
-      hall: [
-        ['@rei.dotoken','12','ap13'],['@duda.surtada','9','ap01'],['@tia.cleo','7','ap07'],['@caiofalso','6','ap03'],['@zetorres','5','ap06']
-      ].map((x, i) => ({ pos: String(i + 1).padStart(2, '0'), h: x[0], n: x[1], img: this.apSrc(x[2]),
-        ink: i === 0 ? '#E50914' : i === 1 ? '#00E5FF' : 'color-mix(in srgb,#F5F5F5 24%,transparent)',
-        ring: i === 0 ? '#E50914' : i === 1 ? '#00E5FF' : 'color-mix(in srgb,#F5F5F5 18%,transparent)',
-        open: () => this.flash('Abrindo ' + x[0] + ' no Instagram…') })),
+      hall: hallReal,
+      hallEmpty: s.wallLoaded && hallReal.length === 0,
 
       /* fluxo */
       steps,
