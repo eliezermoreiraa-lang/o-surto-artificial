@@ -61,7 +61,7 @@
     const text=(el.textContent||'').replace(/\s+/g,' ').trim().toUpperCase();
     if(!upgradeTexts.includes(text))return;
     event.preventDefault();event.stopImmediatePropagation();
-    const account=document.querySelector('.sa-account-button');
+    const account=document.querySelector('.sa-account-button')||Array.from(document.querySelectorAll('div')).find(x=>x.children.length===0&&(x.textContent||'').trim()==='ENTRAR');
     if(account)account.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
     setTimeout(()=>window.__surtoOpenUpgrade&&window.__surtoOpenUpgrade(),420);
   },true);
