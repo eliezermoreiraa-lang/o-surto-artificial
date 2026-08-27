@@ -115,7 +115,7 @@ async function dashboard() {
     admin.from("supports").select("id,user_id,production_id,tier,billing_mode,amount,payment_status,paid_at,created_at,provider_payment_id,provider_checkout_id,productions(title,slug)").order("created_at", { ascending: false }),
     admin.from("subscriptions").select("id,user_id,tier,amount,status,next_due_date,started_at,created_at").order("created_at", { ascending: false }),
     admin.from("publicity_profiles").select("user_id,display_name,social_network,social_handle,social_url,notification_email,face_photo_path,body_photo_path,official_avatar_path,submission_completed_at,avatar_status,updated_at"),
-    admin.from("vip_briefings").select("id,user_id,support_id,promotion_goal,scene_idea,product_or_material,additional_notes,status,submitted_at,updated_at"),
+    admin.from("vip_briefings").select("id,user_id,support_id,promotion_goal,scene_idea,reference_image_paths,status,submitted_at,updated_at"),
     admin.from("appearances").select("id,support_id,episode_id,status,queue_priority,estimated_episode_number,estimated_date,confirmed_at,published_at,published_url,admin_notes,created_at,episodes(episode_number,scheduled_date,published_at,instagram_url,tiktok_url,youtube_url,cover_image_url)").order("queue_priority", { ascending: false }).order("created_at"),
     admin.from("episodes").select("id,production_id,episode_number,scheduled_date,published_at,instagram_url,tiktok_url,youtube_url,cover_image_url,is_locked,productions(title,slug)").order("episode_number", { ascending: false }),
     admin.from("productions").select("id,slug,title,status,current_episode,is_current").order("created_at", { ascending: false }),
@@ -156,13 +156,21 @@ Deno.serve(async (req: Request) => {
         admin.from("vip_briefings").select("*").eq("user_id", userId).order("updated_at", { ascending: false }),
         admin.from("appearances").select("*,episodes(*)").in("support_id", (await admin.from("supports").select("id").eq("user_id", userId)).data?.map((x: any) => x.id) || ["00000000-0000-0000-0000-000000000000"]),
       ]);
-      const signed: Record<string, string | null> = { face: null, body: null };
+      const signed: { face: string | null; body: string | null; vipReferences: Array<{ path: string; url: string; downloadUrl: string }> } = { face: null, body: null, vipReferences: [] };
       for (const [key, path] of [["face", publicity?.face_photo_path], ["body", publicity?.body_photo_path]] as const) {
         if (path) {
           const { data } = await admin.storage.from("supporter-photos").createSignedUrl(path, 600, { download: true });
           signed[key] = data?.signedUrl || null;
         }
       }
+      const referencePaths = (vipBriefings || []).flatMap((briefing: any) => briefing.reference_image_paths || []).slice(0, 3);
+      signed.vipReferences = (await Promise.all(referencePaths.map(async (path: string) => {
+        const [{ data: view }, { data: download }] = await Promise.all([
+          admin.storage.from("vip-briefing-images").createSignedUrl(path, 600),
+          admin.storage.from("vip-briefing-images").createSignedUrl(path, 600, { download: true }),
+        ]);
+        return view?.signedUrl && download?.signedUrl ? { path, url: view.signedUrl, downloadUrl: download.signedUrl } : null;
+      }))).filter(Boolean) as Array<{ path: string; url: string; downloadUrl: string }>;
       return json(req, { ok: true, user: { id: userId, email: authUser.user?.email }, profile, supports: supports || [], publicity, vipBriefings: vipBriefings || [], appearances: appearances || [], signed });
     }
 

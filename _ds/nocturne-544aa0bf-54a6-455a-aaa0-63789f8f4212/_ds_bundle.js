@@ -13,7 +13,7 @@
 
   const startDashboard = () => {
     if (window.supabase && window.supabase.createClient) {
-      load('/supporter-dashboard-real-v2.js?v=20260827-5');
+      load('/supporter-dashboard-real-v2.js?v=20260827-6');
       load('/supporter-profile-workflow-v4.js?v=20260827-4');
       return;
     }

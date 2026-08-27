@@ -40,21 +40,37 @@ Deno.serve(async (req: Request) => {
   const body = await req.json().catch(() => ({}));
   const promotionGoal = clean(body.promotionGoal, 1000);
   const sceneIdea = clean(body.sceneIdea, 4000);
-  const productOrMaterial = clean(body.productOrMaterial, 1000) || null;
-  const additionalNotes = clean(body.additionalNotes, 2000) || null;
   const termsAccepted = body.termsAccepted === true;
+  const imagePaths = Array.isArray(body.referenceImagePaths)
+    ? [...new Set(body.referenceImagePaths.map((path: unknown) => clean(path, 600)).filter(Boolean))]
+    : [];
   if (promotionGoal.length < 3) return json(req, { error: "Conte o que você deseja divulgar" }, 400);
   if (sceneIdea.length < 20) return json(req, { error: "Descreva um pouco mais como você imagina sua cena" }, 400);
   if (!termsAccepted) return json(req, { error: "Confirme que entendeu o formato da participação VIP" }, 400);
+  if (imagePaths.length > 3) return json(req, { error: "Envie no máximo três imagens de referência" }, 400);
+
+  const imageFolder = `${user.id}/${vipSupport.id}`;
+  if (imagePaths.some((path) => !path.startsWith(`${imageFolder}/`) || path.slice(imageFolder.length + 1).includes("/"))) {
+    return json(req, { error: "Uma das imagens enviadas é inválida" }, 400);
+  }
+  if (imagePaths.length) {
+    const { data: stored, error: listError } = await admin.storage.from("vip-briefing-images").list(imageFolder, { limit: 100 });
+    const storedNames = new Set((stored || []).map((file) => file.name));
+    if (listError || imagePaths.some((path) => !storedNames.has(path.slice(imageFolder.length + 1)))) {
+      return json(req, { error: "Não foi possível confirmar todas as imagens enviadas" }, 400);
+    }
+  }
 
   const now = new Date().toISOString();
+  const { data: previous } = await admin.from("vip_briefings").select("reference_image_paths").eq("support_id", vipSupport.id).maybeSingle();
   const { data, error } = await admin.from("vip_briefings").upsert({
     user_id: user.id,
     support_id: vipSupport.id,
     promotion_goal: promotionGoal,
     scene_idea: sceneIdea,
-    product_or_material: productOrMaterial,
-    additional_notes: additionalNotes,
+    product_or_material: null,
+    additional_notes: null,
+    reference_image_paths: imagePaths,
     terms_accepted: true,
     status: "submitted",
     submitted_at: now,
@@ -64,5 +80,7 @@ Deno.serve(async (req: Request) => {
     console.error("vip-briefing-save", error);
     return json(req, { error: "Não foi possível salvar o briefing agora" }, 500);
   }
+  const stalePaths = (previous?.reference_image_paths || []).filter((path: string) => !imagePaths.includes(path));
+  if (stalePaths.length) await admin.storage.from("vip-briefing-images").remove(stalePaths);
   return json(req, { ok: true, briefing: data });
 });
