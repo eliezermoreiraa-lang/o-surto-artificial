@@ -8,7 +8,7 @@
   };
 
   load('/surto-payment-patch.js?v=20260827-2');
-  load('/mobile-experience-v2.js?v=20260827-3');
+  load('/mobile-experience-v2.js?v=20260827-4');
   load('/supporter-dashboard-guard.js?v=20260826-1');
 
   const startDashboard = () => {
