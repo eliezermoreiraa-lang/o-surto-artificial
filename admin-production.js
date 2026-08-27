@@ -15,6 +15,7 @@
   let session = null;
   let search = '';
   let paymentFilter = 'all';
+  let loadPromise = null;
 
   function toast(message, type = '') {
     const el = $('#toast'); el.textContent = message; el.className = `toast show ${type}`;
@@ -25,25 +26,35 @@
     $('#loadingView').classList.toggle('hidden', name !== 'loading');
     $('#appView').classList.toggle('hidden', name !== 'app');
   }
-  async function invoke(action, payload = {}) {
+  async function invoke(action, payload = {}, attempt = 0) {
     const { data: out, error } = await sb.functions.invoke('admin-production', { body: { action, ...payload } });
     if (error) {
       let message = error.message || 'Não foi possível concluir a ação';
       try { const body = await error.context?.json(); if (body?.error) message = body.error; } catch (_) {}
+      if (attempt < 2 && /Failed to send|fetch|network/i.test(message)) {
+        await new Promise(resolve => setTimeout(resolve, 500 * (attempt + 1)));
+        return invoke(action, payload, attempt + 1);
+      }
       throw new Error(message);
     }
     if (!out?.ok) throw new Error(out?.error || 'Não foi possível concluir a ação');
     return out;
   }
   async function load() {
-    show('loading');
-    try {
-      data = await invoke('dashboard');
-      $('#adminEmail').textContent = session?.user?.email || '';
-      show('app'); render();
-    } catch (err) {
-      console.error(err); await sb.auth.signOut(); show('login'); toast(err.message === 'Acesso exclusivo da produção' ? 'Esta conta não tem acesso ao painel da produção.' : err.message, 'error');
-    }
+    if (loadPromise) return loadPromise;
+    loadPromise = (async () => {
+      show('loading');
+      try {
+        data = await invoke('dashboard');
+        $('#adminEmail').textContent = session?.user?.email || '';
+        show('app'); render();
+      } catch (err) {
+        console.error(err);
+        if (/Acesso exclusivo/.test(err.message)) await sb.auth.signOut();
+        show('login'); toast(/Acesso exclusivo/.test(err.message) ? 'Esta conta não tem acesso ao painel da produção.' : err.message, 'error');
+      }
+    })();
+    try { await loadPromise; } finally { loadPromise = null; }
   }
   function maps() {
     return {
