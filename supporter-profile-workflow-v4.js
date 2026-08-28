@@ -16,7 +16,7 @@
   function client(){
     if(sb)return sb;
     if(!(window.supabase&&window.supabase.createClient))return null;
-    sb=window.getSurtoSupabaseClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce',storageKey:'surto-auth'}});
+    sb=window.getSurtoSupabaseClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'implicit',storageKey:'surto-auth'}});
     return sb;
   }
 

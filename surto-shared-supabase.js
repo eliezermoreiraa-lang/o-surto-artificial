@@ -24,36 +24,47 @@
     const client = sharedClient(
       'https://ndfchglutpnbckpcrppy.supabase.co',
       'sb_publishable_RQVP_F6Ix1ZxHhu9HzO9bA_yy9wfb8C',
-      { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, flowType: 'pkce', storageKey: 'surto-auth' } }
+      { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, flowType: 'implicit', storageKey: 'surto-auth' } }
     );
 
     const callbackUrl = new URL(window.location.href);
-    const authCode = callbackUrl.searchParams.get('code');
-    if (!authCode) {
+    const callbackHash = new URLSearchParams(callbackUrl.hash.replace(/^#/, ''));
+    const accessToken = callbackHash.get('access_token');
+    const refreshToken = callbackHash.get('refresh_token');
+    const callbackError = callbackHash.get('error') || callbackHash.get('error_code');
+    if (!accessToken && !refreshToken && !callbackError) {
       window.__surtoOAuthReady = Promise.resolve({ ok: true, callback: false });
       return;
     }
 
     document.documentElement.dataset.surtoAuthCallback = 'processing';
-    window.__surtoOAuthReady = client.auth.exchangeCodeForSession(authCode).then(({ data, error }) => {
+    const finishUrl = (ok) => {
+      callbackUrl.hash = '';
       callbackUrl.searchParams.delete('code');
       callbackUrl.searchParams.delete('state');
+      callbackUrl.searchParams.delete('oauth_error');
+      callbackUrl.searchParams.set(ok ? 'oauth' : 'oauth_error', ok ? 'success' : '1');
+      window.history.replaceState({}, document.title, callbackUrl.pathname + callbackUrl.search);
+    };
+    if (callbackError || !accessToken || !refreshToken) {
+      finishUrl(false);
+      document.documentElement.dataset.surtoAuthCallback = 'error';
+      window.__surtoOAuthReady = Promise.resolve({ ok: false, callback: true, error: new Error(callbackError || 'Credenciais incompletas') });
+      return;
+    }
+
+    window.__surtoOAuthReady = client.auth.setSession({ access_token: accessToken, refresh_token: refreshToken }).then(({ data, error }) => {
       if (error || !data || !data.session) {
-        callbackUrl.searchParams.set('oauth_error', '1');
-        window.history.replaceState({}, document.title, callbackUrl.pathname + callbackUrl.search);
+        finishUrl(false);
         document.documentElement.dataset.surtoAuthCallback = 'error';
         return { ok: false, callback: true, error: error || new Error('Sessão não recebida') };
       }
-      callbackUrl.searchParams.delete('oauth_error');
-      callbackUrl.searchParams.set('oauth', 'success');
-      window.history.replaceState({}, document.title, callbackUrl.pathname + callbackUrl.search);
+      finishUrl(true);
       window.__surtoOAuthCompleted = true;
       document.documentElement.dataset.surtoAuthCallback = 'success';
       return { ok: true, callback: true, session: data.session };
     }).catch(error => {
-      callbackUrl.searchParams.delete('code');
-      callbackUrl.searchParams.set('oauth_error', '1');
-      window.history.replaceState({}, document.title, callbackUrl.pathname + callbackUrl.search);
+      finishUrl(false);
       document.documentElement.dataset.surtoAuthCallback = 'error';
       return { ok: false, callback: true, error };
     });
