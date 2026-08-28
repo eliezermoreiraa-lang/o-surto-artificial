@@ -13,7 +13,7 @@
 <helmet>
 <link rel="stylesheet" href="_ds/nocturne-544aa0bf-54a6-455a-aaa0-63789f8f4212/styles.css">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="_ds/nocturne-544aa0bf-54a6-455a-aaa0-63789f8f4212/_ds_bundle.js?v=20260828-1"></script>
+<script src="_ds/nocturne-544aa0bf-54a6-455a-aaa0-63789f8f4212/_ds_bundle.js?v=20260828-2"></script>
 <style>
 body{margin:0;background:#0B0D13;color:#e9e9ed;font-family:Inter,system-ui,sans-serif}
 html[data-surto-auth-callback="processing"] body::before{content:'CONCLUINDO SEU ACESSO…';position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;background:#0B0D13;color:#00E5FF;font:600 13px/1.4 Inter,system-ui,sans-serif;letter-spacing:.18em}
@@ -117,7 +117,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
         <span style="font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:color-mix(in srgb,#F5F5F5 72%,transparent);line-height:1.5">Aguardando apoiadores · Lalinha do Bairro</span>
       </div>
       <h1 class="sa-hero-title" style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(50px,6.6vw,94px);line-height:.92;letter-spacing:.005em;margin:0;color:#F5F5F5;text-wrap:balance;animation:saUp .8s .06s both">O SURTO CONTINUA <span style="color:#E50914">COM VOCÊ.</span></h1>
-      <p class="sa-hero-copytext" style="max-width:48ch;font-size:clamp(15px,1.5vw,17.5px);line-height:1.6;color:color-mix(in srgb,#F5F5F5 70%,transparent);margin:clamp(20px,3vh,28px) 0 clamp(28px,4vh,36px);text-wrap:pretty;animation:saUp .8s .14s both">Entre para o Clube do Surto e ajude as próximas produções a entrarem no ar. Você ainda pode fazer parte das nossas novelinhas.</p>
+      <p class="sa-hero-copytext" style="max-width:48ch;font-size:clamp(15px,1.5vw,17.5px);line-height:1.6;color:color-mix(in srgb,#F5F5F5 70%,transparent);margin:clamp(20px,3vh,28px) 0 clamp(28px,4vh,36px);text-wrap:pretty;animation:saUp .8s .14s both">Entre para o Clube do Surto e ajude as próximas produções a entrarem no ar. Você pode ter seu perfil, trabalho ou marca divulgado nas nossas novelinhas.</p>
       <div class="sa-hero-cta" onClick="{{ go.clube }}" style="display:inline-flex;align-items:center;gap:12px;cursor:pointer;height:60px;padding:0 32px;border-radius:8px;font-size:14px;letter-spacing:.14em;color:#F5F5F5;background:color-mix(in srgb,#E50914 18%,transparent);box-shadow:0 0 0 1px #E50914,0 0 38px rgba(229,9,20,.28);transition:background .22s,box-shadow .22s,transform .2s;animation:saUp .8s .2s both" style-hover="background:color-mix(in srgb,#E50914 40%,transparent);box-shadow:0 0 0 1px #E50914,0 0 54px rgba(229,9,20,.5);transform:translateY(-2px)">QUERO ENTRAR PARA O CLUBE <span style="font-size:16px">→</span></div>
       <div class="sa-hero-benefits" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-top:clamp(20px,3vh,26px);animation:saUp .8s .26s both">
         <sc-for list="{{ heroBenef }}" as="b" hint-placeholder-count="3">
@@ -144,8 +144,8 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
 </div>
 
 <div class="sa-home-story" data-reveal style="max-width:1260px;margin:0 auto;padding:clamp(96px,13vw,168px) 20px 0">
-  <h2 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(42px,6.4vw,88px);line-height:.92;margin:0;color:#F5F5F5">NÃO É SÓ ASSISTIR.<br><span style="color:#E50914">É FAZER PARTE.</span></h2>
-  <p style="max-width:52ch;font-size:clamp(15px,1.6vw,18px);line-height:1.55;color:color-mix(in srgb,#F5F5F5 66%,transparent);margin:clamp(20px,3vw,28px) 0 clamp(44px,6vw,72px)">O Clube do Surto reúne quem ajuda nossas histórias a continuarem acontecendo.</p>
+  <h2 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(42px,6.4vw,88px);line-height:.92;margin:0;color:#F5F5F5">NÃO É SÓ ASSISTIR.<br><span style="color:#E50914">É APOIAR E SER DIVULGADO.</span></h2>
+  <p style="max-width:52ch;font-size:clamp(15px,1.6vw,18px);line-height:1.55;color:color-mix(in srgb,#F5F5F5 66%,transparent);margin:clamp(20px,3vw,28px) 0 clamp(44px,6vw,72px)">O Clube do Surto reúne quem ajuda nossas histórias a continuarem e, nas categorias com divulgação, ganha espaço promocional nas novelinhas.</p>
 
   <div style="display:grid;grid-template-columns:{{ fluxoCols }};gap:clamp(20px,3vw,10px);align-items:end">
     <div style="display:flex;align-items:flex-end;gap:clamp(12px,2vw,20px)">
@@ -498,7 +498,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
     <div style="position:relative;max-width:1260px;margin:0 auto;padding:clamp(72px,10vw,128px) 20px;text-align:center">
       <div style="font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:#E50914;margin-bottom:16px">Clube do Surto</div>
       <h2 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(40px,6.4vw,90px);line-height:.92;margin:0 0 12px;color:#F5F5F5">GOSTOU DO SURTO?</h2>
-      <div style="font-size:clamp(18px,2.2vw,26px);color:color-mix(in srgb,#F5F5F5 72%,transparent);margin-bottom:clamp(28px,4vw,40px)">Você também pode fazer parte dele.</div>
+      <div style="font-size:clamp(18px,2.2vw,26px);color:color-mix(in srgb,#F5F5F5 72%,transparent);margin-bottom:clamp(28px,4vw,40px)">Você também pode apoiar e ter sua divulgação nele.</div>
       <div onClick="{{ go.clube }}" style="display:inline-flex;align-items:center;gap:12px;cursor:pointer;height:62px;padding:0 36px;border-radius:8px;font-size:13.5px;letter-spacing:.16em;color:#F5F5F5;background:color-mix(in srgb,#E50914 16%,transparent);box-shadow:0 0 0 1px #E50914,0 0 40px rgba(229,9,20,.28);transition:background .22s,box-shadow .22s,transform .2s" style-hover="background:color-mix(in srgb,#E50914 40%,transparent);box-shadow:0 0 0 1px #E50914,0 0 56px rgba(229,9,20,.5);transform:translateY(-2px)">ENTRAR PARA O CLUBE DO SURTO <span>→</span></div>
     </div>
   </div>
@@ -584,7 +584,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
     <div style="position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(0,0,0,.2) 0 1px,transparent 1px 3px);mix-blend-mode:multiply;opacity:.5"></div>
     <div style="position:relative;display:grid;grid-template-columns:{{ ctaMuralCols }};gap:clamp(22px,4vw,52px);align-items:center;padding:clamp(26px,4vw,48px)">
       <div>
-        <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#00E5FF;margin-bottom:13px">Quer fazer parte?</div>
+        <div style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#00E5FF;margin-bottom:13px">Quer apoiar e ser divulgado?</div>
         <h3 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(24px,3.2vw,42px);line-height:1.02;margin:0 0 13px;color:#F5F5F5;max-width:26ch">TODO MÊS NOVOS APOIADORES ENTRAM PARA O MURAL.</h3>
         <p style="font-size:14px;line-height:1.6;color:color-mix(in srgb,#F5F5F5 64%,transparent);margin:0;max-width:46ch;text-wrap:pretty">Entre para o Clube do Surto e faça parte de quem mantém nossas histórias acontecendo.</p>
       </div>
@@ -632,7 +632,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
       <div>
         <div style="font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:#E50914;margin-bottom:clamp(18px,2.5vh,26px);animation:saUp .8s both">Clube do Surto</div>
         <h1 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(46px,6.4vw,94px);line-height:.92;margin:0;color:#F5F5F5;animation:saUp .8s .06s both;text-wrap:balance">FAÇA PARTE DE QUEM MANTÉM O <span style="color:#E50914">SURTO</span> ACONTECENDO.</h1>
-        <p style="font-size:clamp(15px,1.6vw,18px);line-height:1.6;color:color-mix(in srgb,#F5F5F5 72%,transparent);max-width:46ch;margin:clamp(18px,2.5vh,26px) 0 clamp(26px,3.5vh,36px);text-wrap:pretty;animation:saUp .8s .12s both">Escolha como quer apoiar, acompanhe sua participação e, dependendo da categoria, faça parte das nossas produções.</p>
+        <p style="font-size:clamp(15px,1.6vw,18px);line-height:1.6;color:color-mix(in srgb,#F5F5F5 72%,transparent);max-width:46ch;margin:clamp(18px,2.5vh,26px) 0 clamp(26px,3.5vh,36px);text-wrap:pretty;animation:saUp .8s .12s both">Escolha como quer apoiar e, nas categorias Apoiador, Destaque ou VIP, acompanhe sua divulgação na novelinha. Você não entra como personagem da história.</p>
         <a href="#planos-clube" style="display:inline-flex;align-items:center;gap:12px;cursor:pointer;height:62px;padding:0 34px;border-radius:8px;font-size:13.5px;letter-spacing:.16em;text-decoration:none;color:#F5F5F5;background:#E50914;box-shadow:0 8px 32px rgba(229,9,20,.38);transition:background .22s,transform .2s,box-shadow .22s;animation:saUp .8s .18s both" style-hover="background:color-mix(in srgb,#E50914 82%,#ff3322);transform:translateY(-2px);box-shadow:0 12px 42px rgba(229,9,20,.52)">ESCOLHER MEU APOIO <span>→</span></a>
       </div>
       <div style="position:relative;animation:saIn 1.1s .1s both">
@@ -676,7 +676,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
   </div>
 
   <div id="planos-clube" data-reveal style="max-width:1260px;margin:0 auto;padding:clamp(80px,11vw,140px) 20px 0">
-    <h2 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(36px,5.2vw,72px);line-height:.94;margin:0 0 clamp(28px,3.5vw,40px);color:#F5F5F5">ESCOLHA COMO QUER FAZER PARTE</h2>
+    <h2 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(36px,5.2vw,72px);line-height:.94;margin:0 0 clamp(28px,3.5vw,40px);color:#F5F5F5">ESCOLHA COMO QUER APOIAR</h2>
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:clamp(28px,3.5vw,44px)">
       <sc-for list="{{ catTabs }}" as="t" hint-placeholder-count="4">
         <div onClick="{{ t.sel }}" style="cursor:pointer;padding:13px 24px;border-radius:8px;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;transition:background .22s,box-shadow .22s;background:{{ t.bg }};box-shadow:{{ t.shadow }};color:{{ t.ink }}">{{ t.nome }}</div>
@@ -727,7 +727,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
           <div style="font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:#00E5FF;margin-bottom:16px">Clube Mensal</div>
           <h2 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(38px,5.2vw,72px);line-height:.92;margin:0 0 14px;color:#F5F5F5">FAÇA PARTE TODO MÊS.</h2>
           <div style="font-size:clamp(17px,2vw,22px);color:#F5F5F5;margin-bottom:12px">Seu lugar no Surto, mês após mês.</div>
-          <p style="font-size:14.5px;line-height:1.6;color:color-mix(in srgb,#F5F5F5 64%,transparent);margin:0 0 clamp(20px,3vw,30px);max-width:46ch">Mantenha sua assinatura ativa e tenha uma nova participação reservada todos os meses de acordo com sua categoria.</p>
+          <p style="font-size:14.5px;line-height:1.6;color:color-mix(in srgb,#F5F5F5 64%,transparent);margin:0 0 clamp(20px,3vw,30px);max-width:46ch">Mantenha sua assinatura ativa e tenha uma nova divulgação reservada todos os meses de acordo com sua categoria.</p>
           <div style="display:flex;align-items:center;gap:clamp(10px,1.8vw,18px)">
             <div style="display:grid;justify-items:center;gap:8px"><div style="width:clamp(52px,6vw,72px);height:clamp(52px,6vw,72px);border-radius:50%;display:grid;place-items:center;font-size:clamp(16px,2vw,22px);color:#F5F5F5;background:color-mix(in srgb,#E50914 16%,transparent);box-shadow:0 0 0 1px #E50914">✓</div><div style="font-family:'Bebas Neue',Inter,sans-serif;font-size:clamp(14px,1.6vw,18px);letter-spacing:.06em;color:#F5F5F5">AGO</div></div>
             <span style="color:#E50914">→</span>
@@ -1028,7 +1028,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
   <sc-if value="{{ atCaminho }}">
   <div style="animation:saUp .4s both">
     <div style="font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:#E50914;margin-bottom:14px">Clube do Surto</div>
-    <h1 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(38px,5.4vw,72px);line-height:.92;margin:0 0 clamp(20px,3vh,30px);color:#F5F5F5">COMO VOCÊ QUER FAZER PARTE?</h1>
+    <h1 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(38px,5.4vw,72px);line-height:.92;margin:0 0 clamp(20px,3vh,30px);color:#F5F5F5">COMO VOCÊ QUER APOIAR?</h1>
     <p style="font-size:15px;color:color-mix(in srgb,#F5F5F5 62%,transparent);margin-bottom:clamp(24px,4vh,36px);max-width:52ch">Você pode apoiar sem aparecer ou entrar pra valer, com avatar e @ na produção.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
       <div onClick="{{ pickPath.livre }}" style="cursor:pointer;background:color-mix(in srgb,#F5F5F5 4%,transparent);border-radius:12px;padding:clamp(22px,3vw,32px);box-shadow:0 0 0 1px color-mix(in srgb,#F5F5F5 12%,transparent);transition:background .22s,box-shadow .22s" style-hover="background:color-mix(in srgb,#F5F5F5 7%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,#F5F5F5 22%,transparent)">
@@ -1079,12 +1079,12 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
       <div onClick="{{ setModo.avulso }}" style="cursor:pointer;border-radius:12px;padding:clamp(18px,2.5vw,28px);box-shadow:{{ ringAvulso }};background:{{ bgAvulso }};transition:background .22s,box-shadow .22s">
         <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:color-mix(in srgb,#F5F5F5 52%,transparent);margin-bottom:10px">Uma vez</div>
         <div style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(20px,2.4vw,28px);line-height:1;color:#F5F5F5;margin-bottom:8px">APOIO AVULSO</div>
-        <p style="font-size:13px;line-height:1.5;color:color-mix(in srgb,#F5F5F5 62%,transparent);margin:0">Uma participação, um episódio, zero compromisso.</p>
+        <p style="font-size:13px;line-height:1.5;color:color-mix(in srgb,#F5F5F5 62%,transparent);margin:0">Uma divulgação, um episódio, zero compromisso.</p>
       </div>
       <div onClick="{{ setModo.mensal }}" style="cursor:pointer;border-radius:12px;padding:clamp(18px,2.5vw,28px);box-shadow:{{ ringMensal }};background:{{ bgMensal }};transition:background .22s,box-shadow .22s">
         <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#00E5FF;margin-bottom:10px">Todo mês</div>
         <div style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(20px,2.4vw,28px);line-height:1;color:#F5F5F5;margin-bottom:8px">CLUBE MENSAL</div>
-        <p style="font-size:13px;line-height:1.5;color:color-mix(in srgb,#F5F5F5 62%,transparent);margin:0">Nova participação por mês com vaga reservada antes das avulsas.</p>
+        <p style="font-size:13px;line-height:1.5;color:color-mix(in srgb,#F5F5F5 62%,transparent);margin:0">Nova divulgação por mês com vaga reservada antes das avulsas.</p>
       </div>
     </div>
 
@@ -1141,7 +1141,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
   <div style="animation:saUp .4s both;max-width:500px">
     <div style="font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:#E50914;margin-bottom:14px">Clube do Surto</div>
     <h1 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(36px,5vw,66px);line-height:.92;margin:0 0 10px;color:#F5F5F5">ENTRE PARA O CLUBE DO SURTO</h1>
-    <p style="font-size:14.5px;line-height:1.6;color:color-mix(in srgb,#F5F5F5 62%,transparent);margin:0 0 clamp(22px,3.5vh,32px);max-width:50ch">Crie seu acesso para acompanhar sua participação e acessar sua Área do Apoiador.</p>
+    <p style="font-size:14.5px;line-height:1.6;color:color-mix(in srgb,#F5F5F5 62%,transparent);margin:0 0 clamp(22px,3.5vh,32px);max-width:50ch">Crie seu acesso para acompanhar sua divulgação e acessar sua Área do Apoiador.</p>
 
     <div style="display:flex;gap:0;margin-bottom:22px;border-radius:8px;overflow:hidden;box-shadow:0 0 0 1px color-mix(in srgb,#F5F5F5 12%,transparent)">
       <div onClick="{{ authTab.cadastro }}" style="flex:1;padding:13px;text-align:center;font-size:12.5px;letter-spacing:.1em;cursor:pointer;transition:background .22s;background:{{ authIsCadastro }};color:{{ authCadastroInk }}">CRIAR CONTA</div>
@@ -1395,7 +1395,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
           <h1 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(38px,5.6vw,72px);line-height:.9;letter-spacing:.015em;margin:0 0 16px;color:#F5F5F5;animation:saGlitch 13s infinite">BEM-VINDO AO CLUBE DO SURTO</h1>
           <div style="height:1px;max-width:360px;background:linear-gradient(90deg,#E50914,color-mix(in srgb,#00E5FF 50%,transparent) 55%,transparent);margin-bottom:22px;animation:saWipe .9s .2s both"></div>
           <div style="font-size:clamp(16px,1.9vw,21px);font-weight:500;color:#F5F5F5;margin-bottom:12px">Você ainda não possui nenhum apoio ativo.</div>
-          <p style="font-size:14.5px;line-height:1.65;color:color-mix(in srgb,#F5F5F5 62%,transparent);margin:0 0 clamp(26px,3.6vh,36px);text-wrap:pretty">Escolha uma forma de apoiar para fazer parte das produções e liberar todos os recursos da sua Área do Apoiador.</p>
+          <p style="font-size:14.5px;line-height:1.65;color:color-mix(in srgb,#F5F5F5 62%,transparent);margin:0 0 clamp(26px,3.6vh,36px);text-wrap:pretty">Escolha Apoiador, Destaque ou VIP para liberar os recursos de divulgação. O Apoio Livre ajuda a produção, mas não inclui divulgação.</p>
           <div onClick="{{ go.clube }}" style="display:inline-flex;align-items:center;gap:12px;cursor:pointer;height:58px;padding:0 30px;border-radius:8px;font-size:13px;letter-spacing:.16em;color:#F5F5F5;background:#E50914;box-shadow:0 8px 30px rgba(229,9,20,.34);transition:background .22s,transform .18s" style-hover="background:color-mix(in srgb,#E50914 82%,#ff3322);transform:translateY(-1px)">CONHECER AS FORMAS DE APOIO →</div>
         </div>
       </div>
@@ -2803,7 +2803,7 @@ class Component extends DCLogic {
         'Sem promessa de divulgação',
         'Nome guardado no coração da produção'
       ],'APOIAR LIVREMENTE',null,false),
-      mkPlan('apoiador','R$ 50','a partir de · por aparição',[
+      mkPlan('apoiador','R$ 50','a partir de · por divulgação',[
         'Aparição em bloco com até 6 apoiadores',
         'Avatar oficial produzido pelo Surto',
         '@ ou perfil escolhido na tela',
@@ -2811,13 +2811,13 @@ class Component extends DCLogic {
         'Página pública de apoiadores + link da sua rede',
         'Acompanhamento da previsão de aparição'
       ],'ESCOLHER APOIADOR',null,false),
-      mkPlan('destaque','R$ 100','a partir de · por aparição',[
+      mkPlan('destaque','R$ 100','a partir de · por divulgação',[
         'Tudo do Apoiador',
         'Bloco com no máximo 3 apoiadores',
         'Destaque visual maior na tela',
         'Prioridade superior na fila'
       ],'ESCOLHER DESTAQUE','MAIS ESCOLHIDO',true),
-      mkPlan('vip','R$ 300','a partir de · por aparição',[
+      mkPlan('vip','R$ 300','a partir de · por divulgação',[
         'Encerramento dedicado só a você',
         'Cena de apoiador personalizada',
         'Avatar personalizado exclusivo',
@@ -2828,7 +2828,7 @@ class Component extends DCLogic {
     ];
 
     const mensais = [
-      { nome:'Apoiador Mensal', sub:'uma aparição por mês', preco:'R$ 50/mês', id:'apoiador' },
+      { nome:'Apoiador Mensal', sub:'uma divulgação por mês', preco:'R$ 50/mês', id:'apoiador' },
       { nome:'Destaque Mensal', sub:'bloco de 3, todo mês', preco:'R$ 100/mês', id:'destaque' },
       { nome:'VIP Mensal', sub:'um encerramento seu por mês', preco:'R$ 300/mês', id:'vip' }
     ].map(m => ({ ...m, choose: () => { this.setState({ tier:m.id, modo:'mensal', caminho:'aparecer', valor: m.id==='vip'?300:m.id==='destaque'?100:50 }); this.nav('previsao'); } }));
@@ -3232,7 +3232,7 @@ class Component extends DCLogic {
       mensaisClube: [
         { id:'apoiador_m', nome:'Apoiador Mensal', preco:'R$ 50', freq:'/mês', desc:'Participação mensal garantida junto de outros apoiadores.', choose: () => { this.setState({ tier:'apoiador', modo:'mensal', valor:50, caminho:'aparecer' }); this.nav('modalidade'); } },
         { id:'destaque_m', nome:'Destaque Mensal', preco:'R$ 100', freq:'/mês', desc:'Prioridade máxima e destaque todos os meses.', choose: () => { this.setState({ tier:'destaque', modo:'mensal', valor:100, caminho:'aparecer' }); this.nav('modalidade'); } },
-        { id:'vip_m', nome:'VIP Mensal', preco:'R$ 300', freq:'/mês', desc:'Uma aparição exclusiva reservada para você todo mês.', choose: () => { this.setState({ tier:'vip', modo:'mensal', valor:300, caminho:'aparecer' }); this.nav('modalidade'); } }
+        { id:'vip_m', nome:'VIP Mensal', preco:'R$ 300', freq:'/mês', desc:'Uma cena promocional exclusiva reservada para você todo mês.', choose: () => { this.setState({ tier:'vip', modo:'mensal', valor:300, caminho:'aparecer' }); this.nav('modalidade'); } }
       ],
       catDetailCols: isMobile ? '1fr' : '1fr 1fr',
       catTabs: (() => {
@@ -3254,20 +3254,20 @@ class Component extends DCLogic {
       catBenefits: (() => {
         const sel = this.state.selectedCat || 'apoiador';
         const b = {
-          livre: ['Apoio direto aos tokens e ferramentas','Contribuição para as produções','Reconhecimento no Clube do Surto'],
+          livre: ['Apoio direto aos tokens e ferramentas','Contribuição para as produções','Pode ser totalmente anônimo','Sem divulgação ou aparição','O carinho da equipe do Surto'],
           apoiador: ['Apoio direto aos tokens e ferramentas','Divulgação na novelinha','Avatar + @','Área exclusiva do apoiador','Acompanhamento da aparição'],
           destaque: ['Apoio direto aos tokens e ferramentas','Divulgação com destaque na novelinha','Avatar + @ em posição de destaque','Área exclusiva do apoiador','Prioridade na fila de aparições','Acompanhamento especial'],
-          vip: ['Apoio direto aos tokens e ferramentas','Participação VIP exclusiva na novelinha','Avatar + @ em posição VIP','Área exclusiva do apoiador','Aparição individual e destacada','Acompanhamento personalizado']
+          vip: ['Apoio direto aos tokens e ferramentas','Divulgação VIP exclusiva ao final da novelinha','Avatar + @ em posição VIP','Área exclusiva do apoiador','Cena promocional individual','Acompanhamento personalizado']
         };
         return b[sel];
       })(),
       catActive: (() => {
         const sel = this.state.selectedCat || 'apoiador';
         const info = {
-          livre: { nome:'APOIO LIVRE', preco:'Qualquer valor', desc:'Só quero ajudar a manter as produções no ar.' },
-          apoiador: { nome:'APOIADOR', preco:'A partir de R$ 50', desc:'Faça parte das nossas produções e apareça junto de outros apoiadores.' },
-          destaque: { nome:'DESTAQUE', preco:'A partir de R$ 100', desc:'Mais destaque, mais presença. Prioridade na fila de aparições.' },
-          vip: { nome:'VIP', preco:'A partir de R$ 300', desc:'Uma participação exclusiva só para você, com acompanhamento personalizado.' }
+          livre: { nome:'APOIO LIVRE', preco:'Qualquer valor', desc:'Apoio anônimo e sem divulgação: sua contribuição ajuda tokens, ferramentas e produções.' },
+          apoiador: { nome:'APOIADOR', preco:'A partir de R$ 50', desc:'Divulgação coletiva com até 6 apoiadores. Você não entra como personagem da novela.' },
+          destaque: { nome:'DESTAQUE', preco:'A partir de R$ 100', desc:'Divulgação com maior destaque e até 3 apoiadores. Você não entra como personagem.' },
+          vip: { nome:'VIP', preco:'A partir de R$ 300', desc:'Cena promocional individual ao final do episódio. Você não entra como personagem da história.' }
         };
         const valorLabel = { livre: 'Qualquer valor', apoiador: 'R$ 50', destaque: 'R$ 100', vip: 'R$ 300' };
         const badges = {
@@ -3292,9 +3292,9 @@ class Component extends DCLogic {
       contrateCols: isMobile ? '1fr' : '1fr .9fr',
       planosEditorial: [
         { id:'livre', nome:'APOIO LIVRE', preco:'Qualquer valor', resumo:'Para quem simplesmente quer ajudar a produção a continuar. Pode ser anônimo, sem divulgação.', cta:'Apoiar livremente', demoLabel:'como aparece', avatares:[], demoNota:'Sem aparição — o apoio vira token, ferramenta e episódio.', gap:'12px', titleTone:'#e9e9ed', badge:null },
-        { id:'apoiador', nome:'APOIADOR', preco:'a partir de R$ 50', resumo:'Aparição em bloco com até 6 apoiadores, avatar oficial, @ na tela e presença no mural público.', cta:'Escolher Apoiador', demoLabel:'bloco de até 6', avatares:'AP', demoNota:'', gap:'8px', titleTone:'#e9e9ed', badge:null },
-        { id:'destaque', nome:'APOIADOR DESTAQUE', preco:'a partir de R$ 100', resumo:'Bloco com até 3 apoiadores, tratamento visual maior e prioridade superior na fila.', cta:'Escolher Destaque', demoLabel:'bloco de até 3', avatares:'DE', demoNota:'', gap:'12px', titleTone:'#e9e9ed', badge:'MAIS ESCOLHIDO' },
-        { id:'vip', nome:'APOIADOR VIP', preco:'a partir de R$ 300', resumo:'Encerramento dedicado só a você: cena personalizada, avatar exclusivo, briefing especial e prioridade máxima.', cta:'Escolher VIP', demoLabel:'encerramento exclusivo', avatares:'VI', demoNota:'Uma única presença ocupando o final do episódio.', gap:'14px', titleTone:'#d2cefd', badge:null }
+        { id:'apoiador', nome:'APOIADOR', preco:'a partir de R$ 50', resumo:'Divulgação em bloco com até 6 apoiadores, avatar oficial, @ na tela e presença no mural público. Não é participação como personagem.', cta:'Escolher Apoiador', demoLabel:'bloco de até 6', avatares:'AP', demoNota:'', gap:'8px', titleTone:'#e9e9ed', badge:null },
+        { id:'destaque', nome:'APOIADOR DESTAQUE', preco:'a partir de R$ 100', resumo:'Divulgação com até 3 apoiadores, tratamento visual maior e prioridade superior. Não é participação como personagem.', cta:'Escolher Destaque', demoLabel:'bloco de até 3', avatares:'DE', demoNota:'', gap:'12px', titleTone:'#e9e9ed', badge:'MAIS ESCOLHIDO' },
+        { id:'vip', nome:'APOIADOR VIP', preco:'a partir de R$ 300', resumo:'Cena promocional ao final do episódio, dedicada só a você, com briefing especial. Não é um personagem da história.', cta:'Escolher VIP', demoLabel:'encerramento exclusivo', avatares:'VI', demoNota:'Uma única divulgação ocupando o final do episódio.', gap:'14px', titleTone:'#d2cefd', badge:null }
       ].map(p => {
         const mk = (n, size, fs, ring, ink) => Array.from({ length: n }, (_, i) => ({ size, fs, ring, ink, ini: ['DU','CA','MA','ZE','LU','TI','OH','BR','PE'][i] || 'SA' }));
         const av = p.avatares === 'AP' ? mk(6, '42px', '12px', '#3f424d', 'color-mix(in srgb,#e9e9ed 60%,transparent)')
@@ -3313,7 +3313,7 @@ class Component extends DCLogic {
         { n:'1', t:'Escolha seu apoio', d:'Livre, Apoiador, Destaque ou VIP — uma vez ou todo mês.' },
         { n:'2', t:'Entre para o Clube', d:'Conta criada, pagamento confirmado, perfil de divulgação completo.' },
         { n:'3', t:'Acompanhe sua aparição', d:'A fila mostra a previsão de episódio e a data confirmada.' },
-        { n:'4', t:'Faça parte do episódio', d:'Seu avatar entra no ar e o link vai para a descrição.' }
+        { n:'4', t:'Veja sua divulgação no episódio', d:'Seu avatar entra no ar e o link vai para a descrição.' }
       ].map((j, i) => ({ ...j,
         pad: isMobile ? '22px 0 22px 22px' : '0 26px 0 0',
         side: isMobile ? 'left' : (i === 0 ? 'top' : 'top'),

@@ -49,6 +49,7 @@
   new MutationObserver(schedule).observe(document.documentElement,{childList:true,subtree:true});
 
   let hasPaidSupport=false;
+  let isSignedIn=false;
   let supportCheckReady=false;
   async function sharedDashboardData(sb){
     for(let attempt=0;attempt<20;attempt+=1){
@@ -61,7 +62,7 @@
   async function refreshSupportState(){
     if(!(window.supabase&&window.supabase.createClient))return setTimeout(refreshSupportState,100);
     const sb=window.getSurtoSupabaseClient('https://ndfchglutpnbckpcrppy.supabase.co','sb_publishable_RQVP_F6Ix1ZxHhu9HzO9bA_yy9wfb8C',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'implicit',storageKey:'surto-auth'}});
-    const check=async()=>{supportCheckReady=false;try{const {data:s}=await sb.auth.getSession();if(!s?.session){hasPaidSupport=false;document.documentElement.dataset.surtoPaidGuard='signed-out';return}const data=await sharedDashboardData(sb);hasPaidSupport=!!data?.currentSupport;document.documentElement.dataset.surtoPaidGuard=hasPaidSupport?'paid':'no-support'}catch{hasPaidSupport=false;document.documentElement.dataset.surtoPaidGuard='error'}finally{supportCheckReady=true}};
+    const check=async()=>{supportCheckReady=false;try{const {data:s}=await sb.auth.getSession();isSignedIn=!!s?.session;if(!isSignedIn){hasPaidSupport=false;document.documentElement.dataset.surtoPaidGuard='signed-out';return}const data=await sharedDashboardData(sb);hasPaidSupport=!!data?.currentSupport;document.documentElement.dataset.surtoPaidGuard=hasPaidSupport?'paid':'no-support'}catch{isSignedIn=false;hasPaidSupport=false;document.documentElement.dataset.surtoPaidGuard='error'}finally{supportCheckReady=true}};
     await check();sb.auth.onAuthStateChange(()=>setTimeout(check,0));
   }
   const areaTexts=['CLUBE','CLUBE DO SURTO','MINHA ÁREA'];
@@ -76,6 +77,11 @@
     if(account)account.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
     setTimeout(()=>window.__surtoOpenUpgrade&&window.__surtoOpenUpgrade(),420);
   }
+  function openJoin(){
+    const account=document.querySelector('.sa-account-button')||Array.from(document.querySelectorAll('div')).find(x=>x.children.length===0&&['ENTRAR','MINHA ÁREA'].includes((x.textContent||'').trim().toUpperCase()));
+    if(account)account.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
+    setTimeout(()=>window.__surtoOpenSupportJoin&&window.__surtoOpenSupportJoin(),420);
+  }
   document.addEventListener('click',event=>{
     const el=event.target?.closest?.('a,button,div');if(!el||el.closest('#surto-supporter-real-v2'))return;
     const text=(el.textContent||'').replace(/\s+/g,' ').trim().toUpperCase();
@@ -87,10 +93,10 @@
     }
     if(!upgradeTexts.includes(text))return;
     if(el.dataset.surtoReplay==='1'){delete el.dataset.surtoReplay;return}
-    if(!supportCheckReady){event.preventDefault();event.stopImmediatePropagation();setTimeout(()=>{if(hasPaidSupport)openUpgrade();else{el.dataset.surtoReplay='1';el.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))}},900);return}
-    if(!hasPaidSupport)return;
+    if(!supportCheckReady){event.preventDefault();event.stopImmediatePropagation();setTimeout(()=>{if(isSignedIn){if(hasPaidSupport)openUpgrade();else openJoin()}else{el.dataset.surtoReplay='1';el.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))}},900);return}
+    if(!isSignedIn)return;
     event.preventDefault();event.stopImmediatePropagation();
-    openUpgrade();
+    if(hasPaidSupport)openUpgrade();else openJoin();
   },true);
   refreshSupportState();
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();

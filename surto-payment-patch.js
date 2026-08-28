@@ -258,10 +258,13 @@ const __ds_scope = {};
 
     const flowMarker = "    const isFlow = ['caminho','planos','modalidade','previsao','auth','confirmaEmail','checkout','pago','perfil','confirmar'].includes(r);";
     const flowReplacement = `    const hasActiveSupport = Array.isArray(s.supports) && s.supports.some(x => x && x.payment_status === 'paid' && ['supporter','highlight','vip'].includes(x.tier));
-    if ((this._session || s.session) && hasActiveSupport) {
+    if (this._session || s.session) {
       go.clube = () => {
         this.nav('appHome');
-        setTimeout(() => window.__surtoOpenUpgrade && window.__surtoOpenUpgrade(), 280);
+        setTimeout(() => {
+          if (hasActiveSupport) window.__surtoOpenUpgrade && window.__surtoOpenUpgrade();
+          else window.__surtoOpenSupportJoin && window.__surtoOpenSupportJoin();
+        }, 280);
       };
     }
     const isFlow = ['caminho','planos','modalidade','previsao','auth','confirmaEmail','checkout','pago','perfil','confirmar'].includes(r);`;

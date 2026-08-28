@@ -8,6 +8,7 @@
   const APP_LABELS = ['INÍCIO','MEUS APOIOS','MINHAS APARIÇÕES','PERFIL DE DIVULGAÇÃO','MINHA ASSINATURA','MEUS EPISÓDIOS','ÁREA VIP'];
   let sb = null;
   let hasPaidSupport = null;
+  let isSignedIn = null;
   let checking = false;
 
   async function sharedDashboardData(){
@@ -98,10 +99,12 @@
     checking = true;
     try {
       const {data:sess} = await c.auth.getSession();
-      if (!sess?.session?.user) { hasPaidSupport = false; return; }
+      if (!sess?.session?.user) { isSignedIn = false; hasPaidSupport = false; return; }
+      isSignedIn = true;
       const data = await sharedDashboardData();
       if (data?.ok) hasPaidSupport = !!data.currentSupport;
     } catch (_) {
+      isSignedIn = null;
       hasPaidSupport = null;
     } finally {
       checking = false;
@@ -110,7 +113,7 @@
 
   function clickAccountEntry(){
     const nodes = Array.from(document.querySelectorAll('div,button,a'));
-    const exact = nodes.filter(el => norm(el.textContent) === 'ENTRAR' && !el.closest('.surto-dashboard-shell'));
+    const exact = nodes.filter(el => ['ENTRAR','MINHA ÁREA'].includes(norm(el.textContent)) && !el.closest('.surto-dashboard-shell'));
     const target = exact.find(el => {
       const r = el.getBoundingClientRect();
       return r.width > 0 && r.height > 0;
@@ -118,15 +121,23 @@
     if (target) target.click();
   }
 
+  function openLoggedClub(){
+    clickAccountEntry();
+    setTimeout(()=>{
+      if(hasPaidSupport) window.__surtoOpenUpgrade?.();
+      else window.__surtoOpenSupportJoin?.();
+    },420);
+  }
+
   document.addEventListener('click', ev => {
-    if (!hasPaidSupport) return;
+    if (!isSignedIn) return;
     const el = ev.target && ev.target.closest ? ev.target.closest('div,button,a') : null;
     if (!el || el.closest('.surto-dashboard-shell')) return;
     const t = norm(el.textContent);
     if (t !== 'ENTRAR PARA O CLUBE' && t !== 'QUERO ENTRAR PARA O CLUBE' && !t.startsWith('ENTRAR PARA O CLUBE ')) return;
     ev.preventDefault();
     ev.stopImmediatePropagation();
-    clickAccountEntry();
+    openLoggedClub();
   }, true);
 
   const mo = new MutationObserver(()=>protectDashboard());
