@@ -146,14 +146,16 @@ const __ds_scope = {};
       if (!win) { try { window.top.location.href = url; } catch (err) { window.location.href = url; } }
     } catch (e) {
       this.setState({ payBusy: false,
-        payErrMsg: 'Não conseguimos gerar o Pix agora. Tente novamente em alguns instantes.' });
+        payErrMsg: method === 'pix'
+          ? 'Não conseguimos gerar o Pix agora. Tente novamente em alguns instantes.'
+          : 'Não conseguimos abrir o pagamento seguro com cartão agora. Tente novamente em alguns instantes.' });
     }
   }
 
 `;
 
       const renderOld = "      pagarLabel: metodo === 'pix' ? 'GERAR PIX' : (s.modo === 'mensal' ? 'ASSINAR ' + brl(totalNum) + '/MÊS' : 'PAGAR ' + brl(totalNum)),\n      pagar: () => { if (metodo === 'pix') { this.setState({ pay:'aguardando' }); } else { this.setState({ pay:'aprovado' }); this.nav('pago'); } },";
-      const renderNew = "      pagarLabel: s.payBusy ? 'PROCESSANDO…' : (s.pixPayload ? 'PIX GERADO ✓' : (metodo === 'pix' ? 'GERAR PIX' : (s.modo === 'mensal' ? 'ASSINAR ' + brl(totalNum) + '/MÊS' : 'PAGAR ' + brl(totalNum)))),\n      pagarOpacity: (s.payBusy || !!s.pixPayload) ? .68 : 1,\n      pagarPE: (s.payBusy || !!s.pixPayload) ? 'none' : 'auto',\n      payErrMsg: s.payErrMsg,\n      payReal: !!s.payReal, payUrl: s.payUrl || '#',\n      pagar: () => {\n        if (s.modo === 'mensal') {\n          this.setState({ payErrMsg: 'A assinatura mensal ainda não está aberta. Escolha Apoio avulso para apoiar agora.' });\n          return;\n        }\n        this.startAvulsoPayment();\n      },";
+      const renderNew = "      pagarLabel: s.payBusy ? 'PROCESSANDO…' : (s.pixPayload ? 'PIX GERADO ✓' : (metodo === 'pix' ? 'GERAR PIX' : (s.modo === 'mensal' ? 'ASSINAR ' + brl(totalNum) + '/MÊS' : 'PAGAR COM CARTÃO NO ASAAS →'))),\n      pagarOpacity: (s.payBusy || !!s.pixPayload) ? .68 : 1,\n      pagarPE: (s.payBusy || !!s.pixPayload) ? 'none' : 'auto',\n      payErrMsg: s.payErrMsg,\n      payReal: !!s.payReal, payUrl: s.payUrl || '#',\n      pagar: () => {\n        if (s.modo === 'mensal') {\n          this.setState({ payErrMsg: 'A assinatura mensal ainda não está aberta. Escolha Apoio avulso para apoiar agora.' });\n          return;\n        }\n        this.startAvulsoPayment();\n      },";
 
       if (src.includes(stateOld)) { src = src.replace(stateOld, stateNew); changed = true; }
       if (src.includes("  nav(route) {")) { src = src.replace("  nav(route) {", method + "  nav(route) {"); changed = true; }

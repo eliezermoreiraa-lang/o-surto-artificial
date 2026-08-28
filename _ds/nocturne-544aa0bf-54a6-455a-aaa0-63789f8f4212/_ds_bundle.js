@@ -9,7 +9,7 @@
     document.head.appendChild(s);
   };
 
-  load('/surto-payment-patch.js?v=20260827-2');
+  load('/surto-payment-patch.js?v=20260828-1');
   load('/mobile-experience-v2.js?v=20260827-6');
   load('/supporter-dashboard-guard.js?v=20260827-2');
 

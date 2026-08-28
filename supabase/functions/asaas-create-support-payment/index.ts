@@ -48,9 +48,12 @@ Deno.serve(async (req: Request) => {
   if (!user) return json(req, { error: "Sessão inválida ou expirada" }, 401);
   const body = await req.json().catch(() => ({}));
   const tier = String(body.tier || "");
-  const method = String(body.method || "pix");
+  const method = String(body.method || "pix").toLowerCase();
+  const isPix = method === "pix";
+  const isCard = ["cartao", "card", "credit_card"].includes(method);
   const upgradeFromSupportId = body.upgradeFromSupportId ? String(body.upgradeFromSupportId) : null;
   if (!(tier in rank)) return json(req, { error: "Plano inválido" }, 400);
+  if (!isPix && !isCard) return json(req, { error: "Forma de pagamento inválida" }, 400);
   const admin = createClient(URL, SERVICE);
   const { data: plan } = await admin.from("support_plans").select("slug,name,minimum_amount,active").eq("slug", tier).maybeSingle();
   if (!plan?.active) return json(req, { error: "Plano indisponível" }, 400);
@@ -104,8 +107,12 @@ Deno.serve(async (req: Request) => {
     if (!customerId) customerId = (await asaas("/customers", { method: "POST", body: JSON.stringify(customer) })).id;
     else await asaas(`/customers/${customerId}`, { method: "PUT", body: JSON.stringify(customer) });
     stage = "payment";
-    const payment = await asaas("/payments", { method: "POST", body: JSON.stringify({ customer: customerId, billingType: method === "pix" ? "PIX" : "UNDEFINED", value: chargeAmount, dueDate: dueDate(), description: upgradeFromSupportId ? `O Surto Artificial — Upgrade para ${plan.name}` : `O Surto Artificial — ${plan.name}`, externalReference: support.id }) });
+    const payment = await asaas("/payments", { method: "POST", body: JSON.stringify({ customer: customerId, billingType: isPix ? "PIX" : "CREDIT_CARD", value: chargeAmount, dueDate: dueDate(), description: upgradeFromSupportId ? `O Surto Artificial — Upgrade para ${plan.name}` : `O Surto Artificial — ${plan.name}`, externalReference: support.id }) });
     await admin.from("supports").update({ provider_payment_id: payment.id, provider_checkout_id: payment.invoiceUrl || null, external_reference: support.id }).eq("id", support.id);
+    if (isCard) {
+      if (!payment.invoiceUrl) throw new Error("Asaas não retornou o link seguro do cartão");
+      return json(req, { ok: true, sandbox: SANDBOX, supportId: support.id, paymentId: payment.id, invoiceUrl: payment.invoiceUrl, status: payment.status, amount: chargeAmount, plan: plan.name, upgrade: !!upgradeFromSupportId, sourceSupportId: source?.id || null, targetMinimum, credit, paymentMethod: "credit_card" });
+    }
     stage = "pix";
     const qr = await pix(payment.id);
     return json(req, { ok: true, sandbox: SANDBOX, supportId: support.id, paymentId: payment.id, invoiceUrl: payment.invoiceUrl, status: payment.status, amount: chargeAmount, plan: plan.name, upgrade: !!upgradeFromSupportId, sourceSupportId: source?.id || null, targetMinimum, credit, pix: { encodedImage: qr.encodedImage, payload: qr.payload, expirationDate: qr.expirationDate } });
