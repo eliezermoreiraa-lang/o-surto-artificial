@@ -60,7 +60,7 @@
   }
   async function refreshSupportState(){
     if(!(window.supabase&&window.supabase.createClient))return setTimeout(refreshSupportState,100);
-    const sb=window.getSurtoSupabaseClient('https://ndfchglutpnbckpcrppy.supabase.co','sb_publishable_RQVP_F6Ix1ZxHhu9HzO9bA_yy9wfb8C',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:'surto-auth'}});
+    const sb=window.getSurtoSupabaseClient('https://ndfchglutpnbckpcrppy.supabase.co','sb_publishable_RQVP_F6Ix1ZxHhu9HzO9bA_yy9wfb8C',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce',storageKey:'surto-auth'}});
     const check=async()=>{supportCheckReady=false;try{const {data:s}=await sb.auth.getSession();if(!s?.session){hasPaidSupport=false;document.documentElement.dataset.surtoPaidGuard='signed-out';return}const data=await sharedDashboardData(sb);hasPaidSupport=!!data?.currentSupport;document.documentElement.dataset.surtoPaidGuard=hasPaidSupport?'paid':'no-support'}catch{hasPaidSupport=false;document.documentElement.dataset.surtoPaidGuard='error'}finally{supportCheckReady=true}};
     await check();sb.auth.onAuthStateChange(()=>setTimeout(check,0));
   }

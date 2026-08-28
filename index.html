@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="./surto-shared-supabase.js?v=20260827-2"></script>
+<script src="./surto-shared-supabase.js?v=20260828-1"></script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -15,6 +15,7 @@
 <script src="_ds/nocturne-544aa0bf-54a6-455a-aaa0-63789f8f4212/_ds_bundle.js?v=20260827-3"></script>
 <style>
 body{margin:0;background:#0B0D13;color:#e9e9ed;font-family:Inter,system-ui,sans-serif}
+html[data-surto-auth-callback="processing"] body::before{content:'CONCLUINDO SEU ACESSO…';position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;background:#0B0D13;color:#00E5FF;font:600 13px/1.4 Inter,system-ui,sans-serif;letter-spacing:.18em}
 @keyframes saMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @keyframes saGlow{0%,100%{opacity:.5;transform:translate3d(0,0,0) scale(1)}50%{opacity:.85;transform:translate3d(2%,-3%,0) scale(1.12)}}
 @keyframes saGlowB{0%,100%{opacity:.4;transform:translate3d(0,0,0) scale(1.05)}50%{opacity:.7;transform:translate3d(-3%,2%,0) scale(1)}}
@@ -2332,7 +2333,7 @@ class Component extends DCLogic {
     this._sb = window.getSurtoSupabaseClient(
       'https://ndfchglutpnbckpcrppy.supabase.co',
       'sb_publishable_RQVP_F6Ix1ZxHhu9HzO9bA_yy9wfb8C',
-      { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'surto-auth' } }
+      { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, flowType: 'pkce', storageKey: 'surto-auth' } }
     );
     return this._sb;
   }
@@ -2340,6 +2341,12 @@ class Component extends DCLogic {
   async initAuth() {
     const sb = await this.sb();
     if (!sb) { this.setState({ sbReady: true, authErr: 'Não foi possível conectar ao servidor. Recarregue a página.' }); return; }
+    const oauthResult = window.__surtoOAuthReady ? await window.__surtoOAuthReady : { ok: true, callback: false };
+    if (oauthResult && oauthResult.callback && !oauthResult.ok) {
+      this.setState({ sbReady: true, authBusy: false, authMode: 'login', authErr: 'Não foi possível concluir seu acesso com o Google. Tente novamente.' });
+      this.nav('auth');
+      return;
+    }
     this._authSub = sb.auth.onAuthStateChange((evt, session) => {
       this.applySession(session || null, false);
       if (evt === 'SIGNED_OUT') this.nav('home');
@@ -2367,6 +2374,14 @@ class Component extends DCLogic {
           oauthBack = true;
         }
       } catch (e) { /* sessionStorage bloqueado */ }
+      try {
+        const url = new URL(window.location.href);
+        if (window.__surtoOAuthCompleted || url.searchParams.get('oauth') === 'success') {
+          oauthBack = true;
+          url.searchParams.delete('oauth');
+          window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
+        }
+      } catch (e) { /* URL indisponível */ }
       const r = this.state.route;
       if (oauthBack || r === 'confirmaEmail' || r === 'auth') {
         this.setState({ authErr: null, authMsg: null, pendingEmail: '' });
@@ -2556,10 +2571,8 @@ class Component extends DCLogic {
 
   oauthRedirectUrl() {
     try {
-      const l = window.top && window.top !== window ? null : window.location;
-      const base = l || window.location;
-      return base.origin + base.pathname;
-    } catch (e) { return undefined; }
+      return window.location.origin + '/';
+    } catch (e) { return 'https://osurtoartificial.com.br/'; }
   }
 
   async doSignOut() {
