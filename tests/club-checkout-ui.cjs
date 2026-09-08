@@ -57,7 +57,21 @@ function fakeSupabase(){
   await page.waitForFunction(()=>Array.from(document.querySelectorAll('.club-seal')).every(img=>img.complete&&img.naturalWidth>0));
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'public overflow');
   if(process.env.QA_OUTPUT)await page.screenshot({path:path.join(process.env.QA_OUTPUT,'club-'+engine+'-'+width+'.png'),fullPage:true});
+  for(const tier of ['APOIADOR','APOIADOR DESTAQUE','APOIADOR VIP']){
+   await page.getByRole('button',{name:'Escolher '+tier,exact:true}).click();
+   await page.locator('.guest-account-dialog').waitFor();
+   assert.match(await page.locator('.guest-account-dialog').innerText(),/notificações corretamente/);
+   if(tier==='APOIADOR VIP'){
+    await page.locator('#guest-account-continue').click();
+    await page.getByText('CONTINUAR COM GOOGLE',{exact:true}).waitFor();
+    await publicClub();
+   }else await page.locator('#guest-account-back').click();
+  }
   await page.getByRole('button',{name:'Escolher APOIO LIVRE',exact:true}).click();
+  await page.locator('#guest-support-form').waitFor();
+  if(process.env.QA_OUTPUT)await page.screenshot({path:path.join(process.env.QA_OUTPUT,'club-guest-'+engine+'-'+width+'.png'),fullPage:true});
+  assert.equal(await page.getByText('CONTINUAR COM GOOGLE',{exact:true}).count(),0);
+  await page.locator('#guest-account-optional').click();
   await page.getByText('CONTINUAR COM GOOGLE',{exact:true}).waitFor();
   assert.equal(await page.evaluate(()=>window.qaPayments.length),0);
   assert.equal(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('surto-club-checkout')).tier),'free');
@@ -89,6 +103,7 @@ function fakeSupabase(){
   assert.equal(payments.length,1,'paid supporter must enter upgrade without new charge');
   await page.evaluate(()=>window.qaPaid=false);
   await publicClub();await page.getByRole('button',{name:'Escolher APOIO LIVRE',exact:true}).click();
+  await page.locator('#guest-account-optional').click();
   await page.locator('#sd-join-amount[type=text]').waitFor();
   await page.locator('#sd-join-amount').fill('100025');await page.locator('#sd-join-cpf').fill('12345678901');
   await page.locator('[data-join-method=cartao]').click();

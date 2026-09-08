@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const plans = [
-    {tier:'free',label:'APOIO LIVRE',price:'VOCÊ ESCOLHE',amount:10,tag:'UM GESTO DE CARINHO',text:'Apoio sem divulgação e sem aparição.',benefits:['Pode ser totalmente anônimo','Ajuda a pagar tokens, ferramentas e produções','Recebe todo o carinho da equipe do Surto']},
+    {tier:'free',label:'APOIO LIVRE',price:'VOCÊ ESCOLHE',amount:10,tag:'SEM LOGIN · CONTA OPCIONAL',text:'Apoio sem divulgação e sem aparição.',benefits:['Não precisa criar conta ou fazer login','Ajuda a pagar tokens, ferramentas e produções','Recebe todo o carinho da equipe do Surto']},
     {tier:'supporter',label:'APOIADOR',price:'R$ 50,00',amount:50,tag:'JUNTOS PELO SURTO',text:'Divulgação coletiva — não é participação como personagem.',benefits:['Bloco com até 6 apoiadores','Avatar e @ na tela','Área exclusiva do apoiador']},
     {tier:'highlight',label:'APOIADOR DESTAQUE',price:'R$ 100,00',amount:100,tag:'MAIS PRESENÇA NA TELA',text:'Divulgação com mais destaque — não é participação como personagem.',benefits:['Bloco com até 3 apoiadores','Maior presença visual','Prioridade na fila de divulgação']},
     {tier:'vip',label:'APOIADOR VIP',price:'R$ 300,00',amount:300,tag:'UMA CENA SÓ SUA',text:'Cena promocional individual — não é participação como personagem.',benefits:['Encerramento dedicado só a você','Briefing para cena personalizada','Prioridade máxima']}

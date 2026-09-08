@@ -11,8 +11,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="./surto-shared-supabase.js?v=20260828-2"></script>
 <script src="./support.js"></script>
-<script src="/club-support.js?v=20260908-1"></script>
-<link rel="stylesheet" href="/club-support.css?v=20260908-1">
+<script src="/club-support.js?v=20260908-2"></script>
+<script src="/guest-support.js?v=20260908-1" defer></script>
+<link rel="stylesheet" href="/club-support.css?v=20260908-2">
 <link rel="stylesheet" href="/token-meter.css?v=20260908-1">
 <link rel="stylesheet" href="/footer-social.css?v=20260908-1">
 <link rel="stylesheet" href="/launch-polish.css?v=20260908-1">
@@ -662,7 +663,8 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
       </article>
     </sc-for>
   </section>
-  <div class="club-trust"><span>Pix ou cartão de crédito</span><span>Pagamento seguro pelo Asaas</span><span>Sem renovação automática</span></div>
+  <section id="guest-club-checkout" hidden aria-label="Apoio Livre sem conta"></section>
+  <div class="club-trust"><span>Apoio Livre sem login</span><span>Pix ou cartão de crédito</span><span>Sem renovação automática</span></div>
   <section class="club-monthly">
     <div>
       <div class="club-eyebrow">CONTINUIDADE FAZ A DIFERENÇA</div>
@@ -2650,12 +2652,12 @@ class Component extends DCLogic {
     clearInterval(this._wallPollId);
   }
 
-  async chooseClubSupport(tier) {
+  async chooseClubSupport(tier, withAccount = false) {
     const plan = window.SurtoClub.plans.find(p => p.tier === tier);
     if (!plan || this._choosingClub) return;
+    if (tier === 'free' && !withAccount) { window.SurtoGuest.open(() => this.chooseClubSupport('free', true)); return; }
     this._choosingClub = true;
     try {
-      window.SurtoClub.remember(tier, plan.amount);
       // Old flow intents must not override the new unified checkout after login.
       try { sessionStorage.removeItem('surto-support-intent'); } catch (_) {}
       let session = this._session || this.state.session;
@@ -2663,6 +2665,8 @@ class Component extends DCLogic {
         const sb = await this.sb();
         if (sb) { const result = await sb.auth.getSession(); session = result.data?.session; }
       }
+      if (!session && tier !== 'free' && !(await window.SurtoGuest.requireAccount(plan.label))) return;
+      window.SurtoClub.remember(tier, plan.amount);
       this.setState({ authReturn: null, authMode: 'cadastro', authErr: null, authMsg: null });
       if (session) {
         this._session = session;

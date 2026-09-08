@@ -248,7 +248,7 @@
   }
 
   function joinHtml(m){
-    if(m.currentSupport){currentRoute='upgrade';return upgradeHtml(m)}
+    if(m.currentSupport&&checkoutTier!=='free'){currentRoute='upgrade';return upgradeHtml(m)}
     const plans=window.SurtoClub.plans;
     const selected=plans.find(x=>x.tier===checkoutTier);
     if(checkoutData?.pix&&selected){
