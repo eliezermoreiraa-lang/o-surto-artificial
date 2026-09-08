@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const root = path.resolve(__dirname, '..');
 const expected = [
   ['Instagram', 'https://www.instagram.com/osurtoartificial/'],
-  ['YouTube', 'https://www.youtube.com/@osurtoartificialEu'],
+  ['YouTube', 'https://www.youtube.com/@osurtoartificial'],
   ['TikTok', 'https://www.tiktok.com/@osurtoartificial'],
 ];
 (async () => {
