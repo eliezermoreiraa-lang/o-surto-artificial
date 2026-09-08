@@ -53,7 +53,7 @@ function fakeSupabase(){
   assert.equal(await page.locator('.club-plan').count(),4);
   assert.equal(await page.locator('.club-seal').count(),4);
   assert.equal(await page.locator('.club-plan button').count(),4);
-  assert.match(await page.locator('.club-monthly').innerText(),/assinatura automática ainda não/);
+  assert.match(await page.locator('.club-monthly').innerText(),/Cobrança automática mensal, somente com sua autorização/);
   await page.waitForFunction(()=>Array.from(document.querySelectorAll('.club-seal')).every(img=>img.complete&&img.naturalWidth>0));
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'public overflow');
   if(process.env.QA_OUTPUT)await page.screenshot({path:path.join(process.env.QA_OUTPUT,'club-'+engine+'-'+width+'.png'),fullPage:true});

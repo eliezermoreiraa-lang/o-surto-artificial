@@ -7,6 +7,7 @@ const assert = require('node:assert/strict');
 const root = path.resolve(__dirname, '..');
 const fixture = {
   ok: true, users: [], profiles: [], publicity: [], vipBriefings: [], appearances: [], episodes: [], productions: [], emails: [], reminders: { enabled: true, days: 30 },
+  subscriptions: [{id:'monthly',user_id:'a',tier:'supporter',amount:50,status:'active',next_due_date:'2026-10-08'}],
   supports: [
     { id: 'one', user_id: 'a', tier: 'supporter', amount: 50, payment_status: 'paid', paid_at: '2026-08-20T15:00:00Z' },
     { id: 'two', user_id: 'b', tier: 'vip', amount: 300, payment_status: 'paid', paid_at: '2026-09-02T15:00:00Z' },
@@ -41,6 +42,9 @@ const fixture = {
       }, fixture);
       await page.goto('https://finance.test/admin');
       await page.locator('#financeTitle').waitFor();
+      assert.match(await page.locator('.finance-overview').innerText(),/Assinaturas mensais/);
+      assert.match(await page.locator('.finance-overview').innerText(),/50,00\/mês contratados/);
+      assert.match(await page.locator('.finance-overview').innerText(),/08\/10\/2026/);
       assert.equal(await page.locator('#financeMonth').inputValue(), '2026-09');
       assert.match(await page.locator('.finance-stats').innerText(), /300,00/);
       await page.locator('#financeMonth').fill('2026-08');

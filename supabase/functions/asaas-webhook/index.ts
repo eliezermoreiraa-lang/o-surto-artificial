@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { resolveMonthlyEvent } from "../asaas-monthly-support/shared.mjs";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -108,6 +109,18 @@ Deno.serve(async (req: Request) => {
 
   const { data: existing } = await admin.from("asaas_webhook_events").select("id").eq("id", eventId).maybeSingle();
   if (existing) return response({ ok: true, duplicate: true });
+
+  try {
+    const monthly = await resolveMonthlyEvent(admin, payload);
+    if (monthly) {
+      const { error } = await admin.rpc('sync_monthly_event', { p_event: payload, p_contract: monthly.contract.id, p_remote: monthly.remote, p_payment: monthly.payment });
+      if (error) throw error;
+      return response({ ok: true, processed: true, monthly: true });
+    }
+  } catch (error) {
+    console.error('monthly_webhook_retry', { eventId });
+    return response({ error: 'Monthly event requires retry' }, 500);
+  }
 
   let support: any = null;
   if (externalReference) {

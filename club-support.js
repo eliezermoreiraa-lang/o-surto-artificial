@@ -21,9 +21,9 @@
   }
   const intentKey='surto-club-checkout';
   let pending=null;
-  function remember(tier,amount=10){
+  function remember(tier,amount=10,billingMode='one_time'){
     if(!plans.some(p=>p.tier===tier))return;
-    pending={tier,amount:Number.isFinite(amount)&&amount>=1?amount:10,at:Date.now()};
+    pending={tier,amount:Number.isFinite(amount)&&amount>=1?amount:10,billingMode:billingMode==='monthly'&&tier!=='free'?'monthly':'one_time',at:Date.now()};
     try{sessionStorage.setItem(intentKey,JSON.stringify(pending))}catch(_){}
   }
   function consume(){

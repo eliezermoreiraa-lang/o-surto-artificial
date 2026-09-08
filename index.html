@@ -11,7 +11,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="./surto-shared-supabase.js?v=20260828-2"></script>
 <script src="./support.js"></script>
-<script src="/club-support.js?v=20260908-2"></script>
+<script src="/club-support.js?v=20260908-monthly-1"></script>
+<script src="/monthly-support.js?v=20260908-monthly-1" defer></script>
 <script src="/guest-support.js?v=20260908-1" defer></script>
 <link rel="stylesheet" href="/club-support.css?v=20260908-2">
 <link rel="stylesheet" href="/token-meter.css?v=20260908-1">
@@ -24,7 +25,7 @@
 <helmet>
 <link rel="stylesheet" href="_ds/nocturne-544aa0bf-54a6-455a-aaa0-63789f8f4212/styles.css">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="_ds/nocturne-544aa0bf-54a6-455a-aaa0-63789f8f4212/_ds_bundle.js?v=20260828-2"></script>
+<script src="_ds/nocturne-544aa0bf-54a6-455a-aaa0-63789f8f4212/_ds_bundle.js?v=20260908-monthly-1"></script>
 <style>
 body{margin:0;background:#0B0D13;color:#e9e9ed;font-family:Inter,system-ui,sans-serif}
 html[data-surto-auth-callback="processing"] body::before{content:'CONCLUINDO SEU ACESSO…';position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;background:#0B0D13;color:#00E5FF;font:600 13px/1.4 Inter,system-ui,sans-serif;letter-spacing:.18em}
@@ -664,18 +665,18 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
     </sc-for>
   </section>
   <section id="guest-club-checkout" hidden aria-label="Apoio Livre sem conta"></section>
-  <div class="club-trust"><span>Apoio Livre sem login</span><span>Pix ou cartão de crédito</span><span>Sem renovação automática</span></div>
+  <div class="club-trust"><span>Apoio Livre sem login</span><span>Avulso: Pix ou cartão</span><span>Mensal: cartão com sua autorização</span></div>
   <section class="club-monthly">
     <div>
       <div class="club-eyebrow">CONTINUIDADE FAZ A DIFERENÇA</div>
       <h2>TODO MÊS,<br>UM NOVO IMPULSO PARA O SURTO.</h2>
-      <p>Novos episódios precisam de novos tokens. Se quiser estar sempre por perto, volte a apoiar a cada mês e ajude as próximas produções a continuarem.</p>
-      <a class="club-button" href="#planos-clube">ESCOLHER COMO APOIAR →</a>
-      <p class="club-monthly-note">Por enquanto, os apoios são avulsos. A assinatura automática ainda não está disponível. Você decide quando apoiar novamente.</p>
+      <p>Assine o apoio mensal no cartão e ajude a manter as produções no ar. Cada mensalidade confirmada gera um novo apoio com divulgação na fila de produção.</p>
+      <div class="club-monthly-options"><sc-for list="{{ clubMonthlyPlans }}" as="p"><button type="button" class="club-button" onClick="{{ p.choose }}">{{ p.buttonLabel }}</button></sc-for></div>
+      <p class="club-monthly-note">Cobrança automática mensal, somente com sua autorização. Sem fidelidade: cancele em Minha Assinatura. Apoio Livre e Pix continuam avulsos.</p>
     </div>
     <div class="club-cycle">
-      <div class="club-cycle-item"><span class="club-cycle-number">01</span><div><h3>Escolha seu apoio</h3><p>Apoio Livre, Apoiador, Destaque ou VIP. Uma opção para cada jeito de ajudar.</p></div></div>
-      <div class="club-cycle-item"><span class="club-cycle-number">02</span><div><h3>Ajude a próxima produção</h3><p>Sua contribuição apoia tokens, ferramentas e a criação dos episódios.</p></div></div>
+      <div class="club-cycle-item"><span class="club-cycle-number">01</span><div><h3>Escolha sua assinatura</h3><p>Apoiador R$ 50/mês, Destaque R$ 100/mês ou VIP R$ 300/mês.</p></div></div>
+      <div class="club-cycle-item"><span class="club-cycle-number">02</span><div><h3>Autorize no cartão</h3><p>Confira o valor mensal e informe seu cartão no ambiente seguro do Asaas.</p></div></div>
       <div class="club-cycle-item"><span class="club-cycle-number">03</span><div><h3>Acompanhe tudo na sua área</h3><p>Consulte seus apoios e, nas categorias com divulgação, acompanhe seu avatar e sua aparição.</p></div></div>
     </div>
   </section>
@@ -2652,7 +2653,7 @@ class Component extends DCLogic {
     clearInterval(this._wallPollId);
   }
 
-  async chooseClubSupport(tier, withAccount = false) {
+  async chooseClubSupport(tier, withAccount = false, billingMode = 'one_time') {
     const plan = window.SurtoClub.plans.find(p => p.tier === tier);
     if (!plan || this._choosingClub) return;
     if (tier === 'free' && !withAccount) { window.SurtoGuest.open(() => this.chooseClubSupport('free', true)); return; }
@@ -2666,7 +2667,7 @@ class Component extends DCLogic {
         if (sb) { const result = await sb.auth.getSession(); session = result.data?.session; }
       }
       if (!session && tier !== 'free' && !(await window.SurtoGuest.requireAccount(plan.label))) return;
-      window.SurtoClub.remember(tier, plan.amount);
+      window.SurtoClub.remember(tier, plan.amount, billingMode);
       this.setState({ authReturn: null, authMode: 'cadastro', authErr: null, authMsg: null });
       if (session) {
         this._session = session;
@@ -3183,6 +3184,7 @@ class Component extends DCLogic {
       clubeHeroCols: isMobile ? '1fr' : '1fr .72fr',
       clubePassosCols: isMobile ? '1fr 1fr' : 'repeat(4,1fr)',
       clubPlans: window.SurtoClub.plans.map(p => ({ ...p, sealAlt: 'Selo ' + p.label, buttonLabel: 'Escolher ' + p.label, choose: () => this.chooseClubSupport(p.tier) })),
+      clubMonthlyPlans: window.SurtoClub.plans.filter(p => p.tier !== 'free').map(p => ({ ...p, buttonLabel: p.label + ' · ' + p.price + '/MÊS →', choose: () => this.chooseClubSupport(p.tier, true, 'monthly') })),
       mensaisClube: [
         { id:'apoiador_m', nome:'Apoiador Mensal', preco:'R$ 50', freq:'/mês', desc:'Participação mensal garantida junto de outros apoiadores.', choose: () => { this.setState({ tier:'apoiador', modo:'mensal', valor:50, caminho:'aparecer' }); this.nav('modalidade'); } },
         { id:'destaque_m', nome:'Destaque Mensal', preco:'R$ 100', freq:'/mês', desc:'Prioridade máxima e destaque todos os meses.', choose: () => { this.setState({ tier:'destaque', modo:'mensal', valor:100, caminho:'aparecer' }); this.nav('modalidade'); } },

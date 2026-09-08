@@ -50,6 +50,7 @@
   let checkoutTier = null;
   let checkoutMethod = 'pix';
   let checkoutAmount = 10;
+  let monthlyTier = null;
   let lastNav = null;
 
   const norm = v => String(v || '').replace(/\s+/g, ' ').trim().toUpperCase();
@@ -266,6 +267,7 @@
   }
 
   function assinaturaHtml(m){
+    if(window.SurtoMonthly)return window.SurtoMonthly.manage(m);
     const s = m.subscription;
     if (!s) return `<h1 class="sd-title">Minha Assinatura</h1>${empty('Você não possui assinatura ativa','Seu apoio atual é avulso. Não existe renovação automática nem próxima cobrança mensal para esta conta.')}`;
     return `<h1 class="sd-title">Minha Assinatura</h1>${card('ASSINATURA ATIVA',`<h3>${esc(LABELS[s.tier] || s.tier)}</h3><div class="sd-money">${brl(s.amount)} / mês</div><div class="sd-list"><div><span>Status</span><b>${esc(s.status)}</b></div><div><span>Início</span><b>${dateBR(s.started_at || s.created_at)}</b></div><div><span>Próxima cobrança</span><b>${dateBR(s.next_due_date)}</b></div></div>`)}`;
@@ -313,7 +315,8 @@
 
   function htmlFor(route,m){
     const hasPromotionalSupport=!!m.currentSupport&&['supporter','highlight','vip'].includes(m.currentSupport.tier);
-    if (!hasPromotionalSupport && route !== 'home' && route !== 'apoios' && route !== 'join' && route !== 'upgrade') return lockedHtml(route);
+    if(route==='monthly')return window.SurtoMonthly.view(m,monthlyTier);
+    if (!hasPromotionalSupport && !['home','apoios','join','upgrade','assinatura'].includes(route)) return lockedHtml(route);
     if (route === 'join') return joinHtml(m);
     if (route === 'apoios') return apoiosHtml(m);
     if (route === 'aparicoes') return aparicoesHtml(m);
@@ -348,6 +351,11 @@
   }
 
   function bindRoot(root){
+    window.SurtoMonthly?.bind(root,{client:ensureClient,tier:monthlyTier,open:tier=>{monthlyTier=tier||null;currentRoute='monthly';window.scrollTo(0,0);schedule(false)},refresh:async()=>{await loadData(true);schedule(false)}});
+    if(currentRoute==='join'&&checkoutTier&&checkoutTier!=='free'){
+      const form=root.querySelector('.sd-checkout-form');
+      if(form){const button=document.createElement('button');button.className='sd-btn outline';button.textContent='PREFIRO ASSINAR TODO MÊS NO CARTÃO';button.onclick=()=>{monthlyTier=checkoutTier;currentRoute='monthly';schedule(false)};form.appendChild(button)}
+    }
     const moneyInput=root.querySelector('#sd-join-amount');
     if(checkoutTier==='free'&&moneyInput){
       moneyInput.value=window.SurtoClub.format(checkoutAmount);
@@ -499,7 +507,8 @@
 
       const m=await loadData(force);
       const intent=window.SurtoClub?.consume();
-      if(intent){currentRoute='join';checkoutTier=intent.tier;checkoutAmount=intent.amount;checkoutData=null;checkoutMethod='pix';upgradeData=null;upgradeTarget=null;}
+      if(intent){currentRoute=intent.billingMode==='monthly'?'monthly':'join';monthlyTier=intent.tier;checkoutTier=intent.tier;checkoutAmount=intent.amount;checkoutData=null;checkoutMethod='pix';upgradeData=null;upgradeTarget=null;}
+      if(new URLSearchParams(location.search).has('monthly')){currentRoute='assinatura';const u=new URL(location.href);u.searchParams.delete('monthly');history.replaceState(null,'',u.pathname+u.search+u.hash)}
       root.innerHTML=htmlFor(currentRoute,m);
       bindRoot(root);
       window.__surtoGetSupporterDashboardModel=()=>dataModel;
