@@ -5,6 +5,7 @@ const assert=require('node:assert/strict');
  try{
  const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
  if(process.env.TEST_LIVE_ASSETS!=='1')await page.route('**/mobile-experience-v2.js*',route=>route.fulfill({path:require('node:path').resolve('mobile-experience-v2.js'),contentType:'application/javascript'}));
+ if(process.env.TEST_LIVE_ASSETS!=='1')await page.route('**/supporter-dashboard-guard.js*',route=>route.fulfill({path:require('node:path').resolve('supporter-dashboard-guard.js'),contentType:'application/javascript'}));
  await page.goto('https://osurtoartificial.com.br',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.__surtoSharedSupabaseClient);
  const ok=await page.evaluate(async password=>{const r=await window.__surtoSharedSupabaseClient.auth.signInWithPassword({email:'launch-qa-20260908@example.invalid',password});return !!r.data.session},process.env.QA_PASSWORD);assert.equal(ok,true);
  await page.reload({waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.documentElement.dataset.surtoPaidGuard==='paid');
@@ -16,6 +17,11 @@ const assert=require('node:assert/strict');
   if(label==='ÁREA VIP'){await page.locator('#sd-vip-goal').waitFor().catch(async error=>{console.error(await root.innerText());throw error});assert.equal(await page.locator('#sd-vip-goal').inputValue(),'Teste de divulgação')}
  }
  assert.match(await root.innerText(),/Bem-vindo de volta/);
+ await page.locator('[data-mobile-route="home"]').click();
+ await page.locator('.sa-hero-cta').click();
+ await root.waitFor();
+ await page.waitForFunction(()=>document.querySelector('#surto-supporter-real-v2')?.innerText.includes('CATEGORIA MÁXIMA'));
+ assert.equal(await page.getByText('CONTINUAR COM GOOGLE',{exact:true}).count(),0);
  console.log(`PASS ${name}: all seven paid supporter tabs, completed profile read-only, saved VIP briefing, home navigation`);
  }finally{await browser.close()}
 }})().catch(e=>{console.error(e);process.exitCode=1});

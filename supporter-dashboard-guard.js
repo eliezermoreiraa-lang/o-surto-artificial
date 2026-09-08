@@ -118,15 +118,13 @@
       const r = el.getBoundingClientRect();
       return r.width > 0 && r.height > 0;
     }) || exact[0];
-    if (target) target.click();
+    if (target) { target.dataset.surtoAreaReplay = '1'; target.click(); }
   }
 
   function openLoggedClub(){
+    if(hasPaidSupport) window.__surtoOpenUpgrade?.();
+    else window.__surtoOpenSupportJoin?.();
     clickAccountEntry();
-    setTimeout(()=>{
-      if(hasPaidSupport) window.__surtoOpenUpgrade?.();
-      else window.__surtoOpenSupportJoin?.();
-    },420);
   }
 
   document.addEventListener('click', ev => {

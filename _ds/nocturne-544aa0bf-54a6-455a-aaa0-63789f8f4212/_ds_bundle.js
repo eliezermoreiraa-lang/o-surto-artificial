@@ -11,7 +11,7 @@
 
   load('/surto-payment-patch.js?v=20260828-2');
   load('/mobile-experience-v2.js?v=20260908-1');
-  load('/supporter-dashboard-guard.js?v=20260828-1');
+  load('/supporter-dashboard-guard.js?v=20260908-1');
 
   const startDashboard = () => {
     if (window.supabase && window.supabase.createClient) {
