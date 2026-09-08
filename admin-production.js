@@ -17,6 +17,8 @@
   let paymentFilter = 'all';
   let loadPromise = null;
   let episodeDraft = null;
+  let financeMonth = null;
+  let financeMode = 'month';
 
   const vipStyle=document.createElement('style');
   vipStyle.id='admin-vip-briefing-css';
@@ -93,7 +95,27 @@
     const avatar = data.publicity.filter(p => p.submission_completed_at && p.avatar_status !== 'ready').length;
     return { paid,total,pending,queue,avatar };
   }
-  function statCards(s) { return `<div class="stats"><div class="stat green"><strong>${money(s.total)}</strong><span>Total arrecadado e confirmado</span></div><div class="stat cyan"><strong>${s.paid.length}</strong><span>Apoios pagos</span></div><div class="stat red"><strong>${s.pending}</strong><span>Pagamentos pendentes</span></div><div class="stat"><strong>${s.queue}</strong><span>Apoiadores na fila</span></div></div>`; }
+  function financeOverview() {
+    const report = window.SurtoFinance.report(data.supports);
+    financeMonth ||= report.currentMonth;
+    const monthLabel = value => new Date(`${value}-15T12:00:00Z`).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'America/Sao_Paulo' });
+    const selected = financeMode === 'last30' ? report.last30 : report.months.find(row => row.month === financeMonth) || { ...window.SurtoFinance.summarize([]), tiers: [] };
+    const title = financeMode === 'last30' ? 'Últimos 30 dias' : monthLabel(financeMonth);
+    const range = financeMode === 'last30' ? `${date(report.startDay)} a ${date(report.today)} · inclui hoje` : financeMonth === report.currentMonth ? 'Mês vigente · valores confirmados até agora' : 'Mês completo · pela data de confirmação';
+    const tiers = selected.tiers.filter(row => row.tier !== 'other' || row.count);
+    return `<section class="finance-overview" aria-labelledby="financeTitle">
+      <div class="section-head finance-heading"><div><span class="eyebrow">CONTROLE FINANCEIRO</span><h2 id="financeTitle">Recebimentos de apoios</h2><p>Consulte o mês atual, meses anteriores ou os últimos 30 dias.</p></div><button id="refreshFinance" class="btn secondary small">ATUALIZAR DADOS</button></div>
+      <div class="finance-toolbar"><label for="financeMonth">Consultar mês<input id="financeMonth" type="month" value="${e(financeMonth)}" max="${report.currentMonth}"></label><div class="finance-presets"><button class="btn secondary small" data-finance-period="month" aria-pressed="${financeMode === 'month' && financeMonth === report.currentMonth}">MÊS ATUAL</button><button class="btn secondary small" data-finance-period="last30" aria-pressed="${financeMode === 'last30'}">ÚLTIMOS 30 DIAS</button></div></div>
+      <div class="finance-period" role="status"><h3>${e(title)}</h3><p>${e(range)} · horário de Brasília</p></div>
+      <div class="stats finance-stats"><div class="stat green"><span>Recebido no período (bruto)</span><strong>${money(selected.total)}</strong><small>Somente apoios confirmados</small></div><div class="stat cyan"><span>Apoios pagos no período</span><strong>${selected.count}</strong><small>Quantidade de apoios</small></div><div class="stat"><span>Apoiadores no período</span><strong>${selected.supporters}</strong><small>Pessoas únicas</small></div><div class="stat"><span>Valor médio por apoio</span><strong>${money(selected.average)}</strong><small>Recebido ÷ apoios pagos</small></div></div>
+      <p class="finance-note">Valores brutos registrados no site, antes das taxas do Asaas. Não representam lucro ou saldo disponível. Pendentes, falhas, cancelamentos e estornos não entram no recebido.</p>
+      ${report.undated.count ? `<p class="finance-warning">${report.undated.count} apoio(s) pago(s), no total de ${money(report.undated.total)}, sem data de confirmação. Incluídos apenas no acumulado, não nos períodos.</p>` : ''}
+      <div class="finance-details"><section class="panel panel-pad"><div class="section-head"><div><h2>Por categoria</h2><p>${e(title)}</p></div></div>${selected.count ? tiers.map(row => `<div class="finance-tier"><div><span>${e(labels[row.tier] || 'Outros')}</span><small>${row.count} apoio(s)</small></div><strong>${money(row.total)}</strong></div>`).join('') : '<p class="finance-empty">Nenhum apoio confirmado neste período.</p>'}</section>
+      <section class="panel panel-pad"><div class="section-head"><div><h2>Histórico mensal</h2><p>Selecione um mês para ver os detalhes. O mês atual ainda está em andamento.</p></div></div><div class="finance-history"><table class="table"><caption class="finance-sr-only">Recebimentos brutos por mês de confirmação</caption><thead><tr><th scope="col">MÊS</th><th scope="col">APOIOS PAGOS</th><th scope="col">RECEBIDO BRUTO</th></tr></thead><tbody>${report.months.map(row => `<tr class="${financeMode === 'month' && financeMonth === row.month ? 'selected' : ''}"><th scope="row"><button class="text-btn" data-finance-month="${row.month}">${e(monthLabel(row.month))}</button></th><td>${row.count}</td><td>${money(row.total)}</td></tr>`).join('')}</tbody></table></div></section></div>
+      <div class="finance-alltime"><span>Acumulado de todo o histórico <strong>${money(report.allTime.total)}</strong> bruto</span><span>${report.allTime.count} apoios pagos · ${report.allTime.supporters} apoiadores únicos</span></div>
+    </section>`;
+  }
+  function statCards(s) { return `${financeOverview()}<div class="section-head"><div><h2>Produção e pendências</h2><p>Situação atual de toda a operação · não muda com o filtro financeiro</p></div></div><div class="stats operation-stats"><div class="stat red"><strong>${s.pending}</strong><span>Pagamentos pendentes</span></div><div class="stat"><strong>${s.queue}</strong><span>Aparições na fila</span></div><div class="stat cyan"><strong>${s.avatar}</strong><span>Avatares aguardando produção</span></div></div>`; }
   function overview() {
     const s = stats(), m = maps();
     const queue = data.appearances.filter(a => !['published','cancelled'].includes(a.status)).slice(0,6);
@@ -136,6 +158,20 @@
     $('#content').innerHTML = content; bindContent();
   }
   function bindContent() {
+    $('#financeMonth')?.addEventListener('change', ev => {
+      const value = ev.target.value;
+      if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(value) || value > window.SurtoFinance.localDay(new Date()).slice(0, 7)) return;
+      financeMonth = value; financeMode = 'month'; render(); $('#financeMonth')?.focus();
+    });
+    document.querySelectorAll('[data-finance-period]').forEach(button => button.addEventListener('click', () => {
+      financeMode = button.dataset.financePeriod;
+      if (financeMode === 'month') financeMonth = window.SurtoFinance.localDay(new Date()).slice(0, 7);
+      render(); document.querySelector(`[data-finance-period="${financeMode}"]`)?.focus();
+    }));
+    document.querySelectorAll('[data-finance-month]').forEach(button => button.addEventListener('click', () => {
+      financeMonth = button.dataset.financeMonth; financeMode = 'month'; render(); $('#financeMonth')?.focus();
+    }));
+    $('#refreshFinance')?.addEventListener('click', () => load());
     document.querySelectorAll('[data-manage]').forEach(b=>b.addEventListener('click',()=>openSupporter(b.dataset.manage,b.dataset.support)));
     document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{currentView=b.dataset.go;render()}));
     $('#search')?.addEventListener('input',ev=>{search=ev.target.value;render()});

@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { supportHistory } from "./support-history.mjs";
 
 const URL = Deno.env.get("SUPABASE_URL")!;
 const ANON = Deno.env.get("SUPABASE_ANON_KEY")!;
@@ -112,7 +113,7 @@ async function dashboard() {
   const [users, profiles, supports, subscriptions, publicity, vipBriefings, appearances, episodes, productions, emails, settings] = await Promise.all([
     listAuthUsers(),
     admin.from("profiles").select("id,role,status,display_name,created_at"),
-    admin.from("supports").select("id,user_id,production_id,tier,billing_mode,amount,payment_status,paid_at,created_at,provider_payment_id,provider_checkout_id,productions(title,slug)").order("created_at", { ascending: false }),
+    supportHistory(admin),
     admin.from("subscriptions").select("id,user_id,tier,amount,status,next_due_date,started_at,created_at").order("created_at", { ascending: false }),
     admin.from("publicity_profiles").select("user_id,display_name,social_network,social_handle,social_url,notification_email,face_photo_path,body_photo_path,official_avatar_path,submission_completed_at,avatar_status,updated_at"),
     admin.from("vip_briefings").select("id,user_id,support_id,promotion_goal,scene_idea,reference_image_paths,status,submitted_at,updated_at"),
