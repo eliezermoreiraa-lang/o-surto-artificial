@@ -1,12 +1,15 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { isProductionWebhookReady } from "./production-readiness.mjs";
 
 const URL = Deno.env.get("SUPABASE_URL")!;
 const ANON = Deno.env.get("SUPABASE_ANON_KEY")!;
 const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const ASAAS_KEY = Deno.env.get("ASAAS_API_KEY")!;
-const ASAAS_URL = Deno.env.get("ASAAS_API_URL") || "https://api-sandbox.asaas.com/v3";
-const SANDBOX = ASAAS_URL.includes("sandbox");
+// Production credentials never fall back to the previous sandbox secrets.
+const ASAAS_KEY = Deno.env.get("ASAAS_PRODUCTION_API_KEY") || "";
+const ASAAS_WEBHOOK_TOKEN = Deno.env.get("ASAAS_PRODUCTION_WEBHOOK_TOKEN") || "";
+const ASAAS_URL = "https://api.asaas.com/v3";
+const SANDBOX = false;
 const rank: Record<string, number> = { free: 0, supporter: 1, highlight: 2, vip: 3 };
 const origins = new Set(["https://osurtoartificial.com.br", "https://www.osurtoartificial.com.br", "https://o-surto-artificial.vercel.app"]);
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
@@ -19,7 +22,7 @@ function cors(req: Request) {
 function json(req: Request, body: unknown, status = 200) { return new Response(JSON.stringify(body), { status, headers: { ...cors(req), "Content-Type": "application/json" } }); }
 function dueDate() { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(Date.now() + 172800000)); }
 async function asaas(path: string, init: RequestInit = {}) {
-  const response = await fetch(`${ASAAS_URL}${path}`, { ...init, headers: { "Content-Type": "application/json", "User-Agent": "O-Surto-Artificial/2.0", access_token: ASAAS_KEY, ...(init.headers || {}) } });
+  const response = await fetch(`${ASAAS_URL}${path}`, { ...init, signal: AbortSignal.timeout(15000), headers: { "Content-Type": "application/json", "User-Agent": "O-Surto-Artificial/2.0", access_token: ASAAS_KEY, ...(init.headers || {}) } });
   const text = await response.text();
   let data: any = null;
   try { data = text ? JSON.parse(text) : null; } catch { data = { raw: text }; }
@@ -39,7 +42,7 @@ async function pix(paymentId: string) {
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors(req) });
   if (req.method !== "POST") return json(req, { error: "Método não permitido" }, 405);
-  if (!ASAAS_KEY) return json(req, { error: "Pagamento ainda não configurado" }, 500);
+  if (!ASAAS_KEY || !ASAAS_WEBHOOK_TOKEN) return json(req, { error: "Pagamento ainda não configurado" }, 503);
   const auth = req.headers.get("Authorization");
   if (!auth) return json(req, { error: "Sessão obrigatória" }, 401);
   const client = createClient(URL, ANON, { global: { headers: { Authorization: auth } } });
@@ -54,6 +57,17 @@ Deno.serve(async (req: Request) => {
   const upgradeFromSupportId = body.upgradeFromSupportId ? String(body.upgradeFromSupportId) : null;
   if (!(tier in rank)) return json(req, { error: "Plano inválido" }, 400);
   if (!isPix && !isCard) return json(req, { error: "Forma de pagamento inválida" }, 400);
+  const cpf = String(body.cpfCnpj || "").replace(/\D/g, "");
+  if (![11, 14].includes(cpf.length)) return json(req, { error: "Informe um CPF ou CNPJ válido" }, 400);
+  // Do not create a charge while payment confirmations cannot reach this site.
+  try {
+    const webhooks = await asaas("/webhooks?limit=100", { method: "GET" });
+    if (!isProductionWebhookReady(webhooks, `${URL}/functions/v1/asaas-webhook`)) {
+      return json(req, { error: "Pagamentos temporariamente indisponíveis. Tente novamente em instantes.", code: "payment_confirmation_unavailable" }, 503);
+    }
+  } catch {
+    return json(req, { error: "Não foi possível verificar a conexão de pagamento. Tente novamente em instantes.", code: "payment_connection_unavailable" }, 503);
+  }
   const admin = createClient(URL, SERVICE);
   const { data: plan } = await admin.from("support_plans").select("slug,name,minimum_amount,active").eq("slug", tier).maybeSingle();
   if (!plan?.active) return json(req, { error: "Plano indisponível" }, 400);
@@ -101,8 +115,6 @@ Deno.serve(async (req: Request) => {
   try {
     const existing = await asaas(`/customers?externalReference=${encodeURIComponent(user.id)}&limit=1`, { method: "GET" });
     let customerId = existing?.data?.[0]?.id;
-    const cpf = String(body.cpfCnpj || (SANDBOX ? "24971563792" : "")).replace(/\D/g, "");
-    if (!cpf) return json(req, { error: "CPF/CNPJ é obrigatório" }, 400);
     const customer = { name: String(body.fullName || user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split("@")[0] || "Apoiador"), cpfCnpj: cpf, email: user.email, externalReference: user.id, notificationDisabled: true };
     if (!customerId) customerId = (await asaas("/customers", { method: "POST", body: JSON.stringify(customer) })).id;
     else await asaas(`/customers/${customerId}`, { method: "PUT", body: JSON.stringify(customer) });
