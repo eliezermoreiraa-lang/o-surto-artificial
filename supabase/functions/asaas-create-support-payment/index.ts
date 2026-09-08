@@ -75,7 +75,7 @@ Deno.serve(async (req: Request) => {
     if (!Number.isFinite(chargeAmount) || chargeAmount < targetMinimum) return json(req, { error: `O valor mínimo para ${plan.name} é R$ ${targetMinimum.toFixed(2).replace(".", ",")}` }, 400);
   }
 
-  const productionId = source?.production_id || (await admin.from("productions").select("id").in("status", ["airing", "final_weeks"]).order("created_at", { ascending: false }).limit(1).maybeSingle()).data?.id || null;
+  const productionId = source?.production_id || (await admin.from("productions").select("id").in("status", ["upcoming", "airing", "final_weeks"]).order("is_current", { ascending: false }).order("created_at", { ascending: false }).limit(1).maybeSingle()).data?.id || null;
   if (upgradeFromSupportId && chargeAmount === 0) {
     const now = new Date().toISOString();
     const { data: covered, error } = await admin.from("supports").insert({ user_id: user.id, production_id: productionId, tier, billing_mode: "one_time", minimum_amount: 0, amount: 0, payment_status: "paid", payment_provider: "upgrade_credit", paid_at: now, upgrade_from_support_id: source.id, upgrade_credit_amount: credit }).select("id").single();

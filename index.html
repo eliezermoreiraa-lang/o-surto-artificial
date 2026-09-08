@@ -7,6 +7,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="./surto-shared-supabase.js?v=20260828-2"></script>
 <script src="./support.js"></script>
+<link rel="stylesheet" href="/token-meter.css?v=20260908-1">
+<script src="/token-meter.js?v=20260908-1" defer></script>
 </head>
 <body>
 <x-dc>
@@ -114,7 +116,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
     <div class="sa-hero-copy">
       <div class="sa-hero-label" style="display:flex;align-items:center;gap:10px;margin-bottom:clamp(20px,3vh,30px);animation:saUp .8s both">
         <span style="width:8px;height:8px;border-radius:50%;background:#E50914;box-shadow:0 0 12px rgba(229,9,20,.9);animation:saPulse 1.7s infinite;flex:none"></span>
-        <span style="font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:color-mix(in srgb,#F5F5F5 72%,transparent);line-height:1.5">Aguardando apoiadores · Lalinha do Bairro</span>
+        <span style="font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:color-mix(in srgb,#F5F5F5 72%,transparent);line-height:1.5">Em breve · Lalinha do Bairro</span>
       </div>
       <h1 class="sa-hero-title" style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(50px,6.6vw,94px);line-height:.92;letter-spacing:.005em;margin:0;color:#F5F5F5;text-wrap:balance;animation:saUp .8s .06s both">O SURTO CONTINUA <span style="color:#E50914">COM VOCÊ.</span></h1>
       <p class="sa-hero-copytext" style="max-width:48ch;font-size:clamp(15px,1.5vw,17.5px);line-height:1.6;color:color-mix(in srgb,#F5F5F5 70%,transparent);margin:clamp(20px,3vh,28px) 0 clamp(28px,4vh,36px);text-wrap:pretty;animation:saUp .8s .14s both">Entre para o Clube do Surto e ajude as próximas produções a entrarem no ar. Você pode ter seu perfil, trabalho ou marca divulgado nas nossas novelinhas.</p>
@@ -142,6 +144,18 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
     </div>
   </div>
 </div>
+
+<section class="sa-token-section" aria-labelledby="token-title">
+  <div class="sa-token-card" data-token-meter>
+    <div class="sa-token-copy"><span class="sa-token-eyebrow">O COMBUSTÍVEL DAS NOSSAS HISTÓRIAS</span><h2 id="token-title">META DE <span>TOKENS</span></h2><p>Cada apoio abastece os próximos episódios. Acompanhe o quanto estamos perto da meta para levar a série até o final e ajudar a definir o ritmo das publicações.</p><button class="sa-token-cta" onClick="{{ go.clube }}">QUERO ABASTECER O SURTO <span aria-hidden="true">↗</span></button></div>
+    <div class="sa-token-display"><div class="sa-token-heading"><span class="sa-token-status" data-token-status>Consultando a meta…</span><strong data-token-percent>—</strong></div>
+      <div class="sa-token-track" data-token-track role="progressbar" aria-label="Meta de tokens" aria-valuemin="0" aria-valuemax="100" aria-busy="true"><div class="sa-token-fill" data-token-fill></div><div class="sa-token-ticks" aria-hidden="true"></div><span class="sa-token-spark" aria-hidden="true">ϟ</span></div>
+      <div class="sa-token-legend"><span><i class="low"></i>Reserva baixa</span><span><i class="building"></i>Ganhando força</span><span><i class="ready"></i>Perto da meta</span></div>
+      <p class="sa-token-explainer">O nível sobe com os apoios confirmados e diminui a cada novo episódio publicado: é o apoio virando produção.</p>
+      <small data-token-note>Indicador simbólico de apoio à produção, não uma contagem literal de tokens de IA.</small><button class="sa-token-retry" data-token-retry hidden>TENTAR ATUALIZAR</button>
+    </div>
+  </div>
+</section>
 
 <div class="sa-home-story" data-reveal style="max-width:1260px;margin:0 auto;padding:clamp(96px,13vw,168px) 20px 0">
   <h2 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(42px,6.4vw,88px);line-height:.92;margin:0;color:#F5F5F5">NÃO É SÓ ASSISTIR.<br><span style="color:#E50914">É APOIAR E SER DIVULGADO.</span></h2>
@@ -329,15 +343,15 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
       <div>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:clamp(22px,3vh,32px);animation:saUp .8s both">
           <span style="width:8px;height:8px;border-radius:50%;background:#E50914;box-shadow:0 0 12px rgba(229,9,20,.9);animation:saPulse 1.7s infinite;flex:none"></span>
-          <span style="font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:color-mix(in srgb,#F5F5F5 70%,transparent)">Agora em exibição</span>
+          <span style="font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:color-mix(in srgb,#F5F5F5 70%,transparent)">Série finalizada</span>
         </div>
         <h1 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(54px,8.5vw,126px);line-height:.88;letter-spacing:.005em;margin:0;color:#F5F5F5;animation:saUp .8s .06s both">A <span style="color:#E50914">URSUPA</span>DOLLra</h1>
         <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px;margin:clamp(20px,3vh,28px) 0;animation:saUp .8s .12s both">
-          <span style="font-size:13px;letter-spacing:.04em;color:#F5F5F5">EPISÓDIO 54</span>
+          <span style="font-size:13px;letter-spacing:.04em;color:#F5F5F5">HISTÓRIA CONCLUÍDA</span>
           <span style="width:1px;height:12px;background:color-mix(in srgb,#F5F5F5 26%,transparent)"></span>
-          <span style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#00E5FF">Últimas semanas</span>
+          <span style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#00E5FF">Finalizada</span>
           <span style="width:1px;height:12px;background:color-mix(in srgb,#F5F5F5 26%,transparent)"></span>
-          <span style="font-size:12px;color:color-mix(in srgb,#F5F5F5 56%,transparent)">Seg a Sex</span>
+          <span style="font-size:12px;color:color-mix(in srgb,#F5F5F5 56%,transparent)">Reviva esse surto nas nossas redes</span>
         </div>
         <div style="height:1px;max-width:440px;background:linear-gradient(90deg,#E50914,color-mix(in srgb,#00E5FF 50%,transparent) 55%,transparent);margin-bottom:clamp(22px,3vh,30px);animation:saWipe .9s .2s both"></div>
         <div onClick="{{ go.clube }}" style="display:inline-flex;align-items:center;gap:12px;cursor:pointer;height:58px;padding:0 30px;border-radius:8px;font-size:13px;letter-spacing:.14em;color:#F5F5F5;background:color-mix(in srgb,#E50914 16%,transparent);box-shadow:0 0 0 1px #E50914,0 0 36px rgba(229,9,20,.26);transition:background .22s,box-shadow .22s,transform .2s;animation:saUp .8s .22s both" style-hover="background:color-mix(in srgb,#E50914 38%,transparent);box-shadow:0 0 0 1px #E50914,0 0 52px rgba(229,9,20,.48);transform:translateY(-2px)">ENTRAR PARA O CLUBE <span>→</span></div>
@@ -354,6 +368,8 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
       </div>
     </div>
   </div>
+
+  <section class="sa-next-production" aria-labelledby="next-production-title"><img src="assets-min/poster-la-linha-do-bairro.webp" alt="Cartaz de Lalinha do Bairro"><div><span class="sa-token-eyebrow">O PRÓXIMO SURTO VEM AÍ</span><h2 id="next-production-title">Em breve: Lalinha do Bairro</h2><div class="sa-next-badges"><span>Em produção</span><span>Aguardando apoio</span></div><p>A UrsupaDOLLra chegou ao fim, mas o Surto continua. Ajude a próxima novelinha a entrar no ar.</p><button class="sa-token-cta" onClick="{{ go.clube }}">APOIAR A PRÓXIMA PRODUÇÃO ↗</button></div></section>
 
   <div data-reveal style="max-width:1260px;margin:0 auto;padding:clamp(96px,13vw,168px) 20px 0">
     <div style="display:grid;grid-template-columns:{{ exibSobreCols }};gap:clamp(32px,6vw,80px);align-items:start">
@@ -3351,7 +3367,7 @@ class Component extends DCLogic {
         ink: i % 2 === 0 ? '#E50914' : '#00E5FF',
         cols: isMobile ? '1fr' : '92px 1.05fr 1fr', span: isMobile ? '1 / -1' : 'auto' })),
       portfolio: [
-        { t:'A UrsupaDOLLra', cat:'Novelinha · série diária', d:'54 episódios no ar, de segunda a sexta', img:'assets-min/poster-ursupadollra.jpg', ratio: isMobile ? '4/3' : '16/11' },
+        { t:'A UrsupaDOLLra', cat:'Novelinha · finalizada', d:'História concluída · disponível nas nossas redes', img:'assets-min/poster-ursupadollra.jpg', ratio: isMobile ? '4/3' : '16/11' },
         { t:'O Surto Artificial', cat:'Identidade · canal', d:'Abertura, vinhetas e universo visual', img:'assets-min/hero-surto.jpg', ratio: isMobile ? '4/3' : '16/11' },
         { t:'Espaço para trabalho', cat:'Projeto de cliente', d:'Imagem, vídeo e descrição cadastráveis', img:'assets-min/logo-tv.jpg', ratio: isMobile ? '4/3' : '16/11' },
         { t:'Espaço para trabalho', cat:'Projeto de cliente', d:'Imagem, vídeo e descrição cadastráveis', img:'assets-min/hero-surto.jpg', ratio: isMobile ? '4/3' : '16/11' }
