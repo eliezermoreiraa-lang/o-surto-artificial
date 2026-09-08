@@ -65,7 +65,7 @@
     const check=async()=>{supportCheckReady=false;try{const {data:s}=await sb.auth.getSession();isSignedIn=!!s?.session;if(!isSignedIn){hasPaidSupport=false;document.documentElement.dataset.surtoPaidGuard='signed-out';return}const data=await sharedDashboardData(sb);hasPaidSupport=!!data?.currentSupport;document.documentElement.dataset.surtoPaidGuard=hasPaidSupport?'paid':'no-support'}catch{isSignedIn=false;hasPaidSupport=false;document.documentElement.dataset.surtoPaidGuard='error'}finally{supportCheckReady=true}};
     await check();sb.auth.onAuthStateChange(()=>setTimeout(check,0));
   }
-  const areaTexts=['CLUBE','CLUBE DO SURTO','MINHA ÁREA'];
+  const areaTexts=['MINHA ÁREA'];
   const upgradeTexts=['ESCOLHER MEU APOIO','ENTRAR PARA O CLUBE','ENTRAR PARA O CLUBE DO SURTO','QUERO ENTRAR PARA O CLUBE','ESCOLHER APOIADOR','ESCOLHER DESTAQUE','QUERO SER VIP'];
   function enterArea(openRoute){
     // Select the destination before mounting the area. A delayed reset could

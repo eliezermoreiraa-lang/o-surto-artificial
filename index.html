@@ -11,6 +11,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="./surto-shared-supabase.js?v=20260828-2"></script>
 <script src="./support.js"></script>
+<script src="/club-support.js?v=20260908-1"></script>
+<link rel="stylesheet" href="/club-support.css?v=20260908-1">
 <link rel="stylesheet" href="/token-meter.css?v=20260908-1">
 <link rel="stylesheet" href="/footer-social.css?v=20260908-1">
 <link rel="stylesheet" href="/launch-polish.css?v=20260908-1">
@@ -642,147 +644,41 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
 </sc-if>
 
 <sc-if value="{{ atClube }}">
-<div style="background:#0B0D13;animation:saIn .4s both">
-
-  <div style="position:relative;overflow:hidden;min-height:clamp(580px,88vh,880px);display:flex;align-items:center">
-    <div style="position:absolute;top:-18%;left:-6%;width:54vw;height:54vw;border-radius:50%;background:radial-gradient(circle,rgba(229,9,20,.42),transparent 66%);filter:blur(72px);animation:saGlow 18s ease-in-out infinite"></div>
-    <div style="position:absolute;bottom:-22%;right:-8%;width:48vw;height:48vw;border-radius:50%;background:radial-gradient(circle,rgba(0,229,255,.3),transparent 66%);filter:blur(80px);animation:saGlowB 22s ease-in-out infinite"></div>
-    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,13,19,.72) 0%,rgba(11,13,19,.38) 40%,rgba(11,13,19,.78) 80%,#0B0D13 100%)"></div>
-    <div style="position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(0,0,0,.26) 0 1px,transparent 1px 3px);mix-blend-mode:multiply;opacity:.5"></div>
-    <div style="position:absolute;left:0;right:0;height:100px;background:linear-gradient(180deg,transparent,rgba(0,229,255,.06),transparent);animation:saScan 11s linear infinite"></div>
-    <div style="position:relative;width:100%;max-width:1260px;margin:0 auto;padding:clamp(100px,12vh,140px) 20px clamp(60px,7vh,80px);display:grid;grid-template-columns:{{ clubeHeroCols }};gap:clamp(36px,5vw,64px);align-items:center">
-      <div>
-        <div style="font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:#E50914;margin-bottom:clamp(18px,2.5vh,26px);animation:saUp .8s both">Clube do Surto</div>
-        <h1 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(46px,6.4vw,94px);line-height:.92;margin:0;color:#F5F5F5;animation:saUp .8s .06s both;text-wrap:balance">FAÇA PARTE DE QUEM MANTÉM O <span style="color:#E50914">SURTO</span> ACONTECENDO.</h1>
-        <p style="font-size:clamp(15px,1.6vw,18px);line-height:1.6;color:color-mix(in srgb,#F5F5F5 72%,transparent);max-width:46ch;margin:clamp(18px,2.5vh,26px) 0 clamp(26px,3.5vh,36px);text-wrap:pretty;animation:saUp .8s .12s both">Escolha como quer apoiar e, nas categorias Apoiador, Destaque ou VIP, acompanhe sua divulgação na novelinha. Você não entra como personagem da história.</p>
-        <a href="#planos-clube" style="display:inline-flex;align-items:center;gap:12px;cursor:pointer;height:62px;padding:0 34px;border-radius:8px;font-size:13.5px;letter-spacing:.16em;text-decoration:none;color:#F5F5F5;background:#E50914;box-shadow:0 8px 32px rgba(229,9,20,.38);transition:background .22s,transform .2s,box-shadow .22s;animation:saUp .8s .18s both" style-hover="background:color-mix(in srgb,#E50914 82%,#ff3322);transform:translateY(-2px);box-shadow:0 12px 42px rgba(229,9,20,.52)">ESCOLHER MEU APOIO <span>→</span></a>
-      </div>
-      <div style="position:relative;animation:saIn 1.1s .1s both">
-        <div style="font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:#E50914;margin-bottom:10px;display:flex;align-items:center;gap:8px"><span style="width:5px;height:5px;border-radius:50%;background:#E50914;animation:saPulse 1.8s infinite;flex:none"></span>APOIADORES</div>
-        <sc-if value="{{ wallHasEntries }}">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:3px;border-radius:10px;overflow:hidden">
-          <sc-for list="{{ clubeFaces }}" as="a" hint-placeholder-count="12">
-            <a href="{{ a.socialLink }}" target="_blank" rel="noopener noreferrer" style="cursor:pointer;position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img sc-camel-src="{{ a.img }}" alt="{{ a.alt }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 15%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></a>
-          </sc-for>
-        </div>
-        </sc-if>
-        <sc-if value="{{ wallNoEntries }}"><div style="min-height:260px;display:grid;place-items:center;padding:28px;text-align:center;border-radius:10px;background:linear-gradient(135deg,rgba(229,9,20,.12),rgba(0,229,255,.08));box-shadow:0 0 0 1px color-mix(in srgb,#F5F5F5 10%,transparent);font-size:14px;line-height:1.6;color:color-mix(in srgb,#F5F5F5 62%,transparent)">Os avatares reais aparecem aqui depois que a produção finaliza cada apoiador.</div></sc-if>
-      </div>
+<div class="club-page">
+  <header class="club-intro">
+    <div class="club-eyebrow">CLUBE DO SURTO</div>
+    <h1>ESCOLHA SUA FORMA DE APOIO</h1>
+    <p>Seu apoio ajuda a transformar tokens em novos episódios. Compare as opções e escolha como apoiar: só pelo carinho ou com a divulgação do seu perfil, trabalho ou marca.</p>
+  </header>
+  <section id="planos-clube" class="club-grid" aria-label="Formas de apoio">
+    <sc-for list="{{ clubPlans }}" as="p" hint-placeholder-count="4">
+      <article class="{{ p.className }}">
+        <div class="club-plan-top"><span class="club-eyebrow">{{ p.tag }}</span><img class="club-seal" sc-camel-src="{{ p.seal }}" alt="{{ p.sealAlt }}" width="88" height="88"></div>
+        <h2>{{ p.label }}</h2>
+        <div class="club-price">{{ p.price }}</div>
+        <p>{{ p.text }}</p>
+        <ul class="club-benefits"><sc-for list="{{ p.benefits }}" as="b"><li>{{ b }}</li></sc-for></ul>
+        <button type="button" class="club-button" onClick="{{ p.choose }}" aria-label="{{ p.buttonLabel }}">ESCOLHER →</button>
+      </article>
+    </sc-for>
+  </section>
+  <div class="club-trust"><span>Pix ou cartão de crédito</span><span>Pagamento seguro pelo Asaas</span><span>Sem renovação automática</span></div>
+  <section class="club-monthly">
+    <div>
+      <div class="club-eyebrow">CONTINUIDADE FAZ A DIFERENÇA</div>
+      <h2>TODO MÊS,<br>UM NOVO IMPULSO PARA O SURTO.</h2>
+      <p>Novos episódios precisam de novos tokens. Se quiser estar sempre por perto, volte a apoiar a cada mês e ajude as próximas produções a continuarem.</p>
+      <a class="club-button" href="#planos-clube">ESCOLHER COMO APOIAR →</a>
+      <p class="club-monthly-note">Por enquanto, os apoios são avulsos. A assinatura automática ainda não está disponível. Você decide quando apoiar novamente.</p>
     </div>
-  </div>
-
-  <div data-reveal style="max-width:1260px;margin:0 auto;padding:clamp(80px,11vw,140px) 20px 0">
-    <h2 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(38px,5.4vw,72px);line-height:.94;margin:0 0 clamp(32px,5vw,56px);color:#F5F5F5">COMO FUNCIONA</h2>
-    <div style="display:grid;grid-template-columns:{{ clubePassosCols }};gap:0">
-      <div style="padding:clamp(20px,3vw,32px) clamp(16px,2.5vw,28px) clamp(20px,3vw,32px) 0;border-right:1px solid color-mix(in srgb,#F5F5F5 10%,transparent)">
-        <div style="font-size:clamp(40px,5vw,64px);font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;color:color-mix(in srgb,#E50914 38%,transparent);line-height:1;margin-bottom:14px">01</div>
-        <div style="font-size:clamp(16px,1.8vw,20px);font-weight:500;color:#F5F5F5;margin-bottom:8px">Escolha seu apoio</div>
-        <div style="font-size:13px;line-height:1.5;color:color-mix(in srgb,#F5F5F5 58%,transparent)">Apoio Livre, Apoiador, Destaque ou VIP.</div>
-      </div>
-      <div style="padding:clamp(20px,3vw,32px) clamp(16px,2.5vw,28px);border-right:1px solid color-mix(in srgb,#F5F5F5 10%,transparent)">
-        <div style="font-size:clamp(40px,5vw,64px);font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;color:color-mix(in srgb,#E50914 38%,transparent);line-height:1;margin-bottom:14px">02</div>
-        <div style="font-size:clamp(16px,1.8vw,20px);font-weight:500;color:#F5F5F5;margin-bottom:8px">Entre para o Clube</div>
-        <div style="font-size:13px;line-height:1.5;color:color-mix(in srgb,#F5F5F5 58%,transparent)">Pague e acesse a área exclusiva do apoiador.</div>
-      </div>
-      <div style="padding:clamp(20px,3vw,32px) clamp(16px,2.5vw,28px);border-right:1px solid color-mix(in srgb,#F5F5F5 10%,transparent)">
-        <div style="font-size:clamp(40px,5vw,64px);font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;color:color-mix(in srgb,#E50914 38%,transparent);line-height:1;margin-bottom:14px">03</div>
-        <div style="font-size:clamp(16px,1.8vw,20px);font-weight:500;color:#F5F5F5;margin-bottom:8px">Acompanhe sua aparição</div>
-        <div style="font-size:13px;line-height:1.5;color:color-mix(in srgb,#F5F5F5 58%,transparent)">Previsão de episódio e status em tempo real.</div>
-      </div>
-      <div style="padding:clamp(20px,3vw,32px) 0 clamp(20px,3vw,32px) clamp(16px,2.5vw,28px)">
-        <div style="font-size:clamp(40px,5vw,64px);font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;color:color-mix(in srgb,#E50914 38%,transparent);line-height:1;margin-bottom:14px">04</div>
-        <div style="font-size:clamp(16px,1.8vw,20px);font-weight:500;color:#F5F5F5;margin-bottom:8px">Faça parte do episódio</div>
-        <div style="font-size:13px;line-height:1.5;color:color-mix(in srgb,#F5F5F5 58%,transparent)">Seu avatar aparece na novelinha.</div>
-      </div>
+    <div class="club-cycle">
+      <div class="club-cycle-item"><span class="club-cycle-number">01</span><div><h3>Escolha seu apoio</h3><p>Apoio Livre, Apoiador, Destaque ou VIP. Uma opção para cada jeito de ajudar.</p></div></div>
+      <div class="club-cycle-item"><span class="club-cycle-number">02</span><div><h3>Ajude a próxima produção</h3><p>Sua contribuição apoia tokens, ferramentas e a criação dos episódios.</p></div></div>
+      <div class="club-cycle-item"><span class="club-cycle-number">03</span><div><h3>Acompanhe tudo na sua área</h3><p>Consulte seus apoios e, nas categorias com divulgação, acompanhe seu avatar e sua aparição.</p></div></div>
     </div>
-  </div>
-
-  <div id="planos-clube" data-reveal style="max-width:1260px;margin:0 auto;padding:clamp(80px,11vw,140px) 20px 0">
-    <h2 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(36px,5.2vw,72px);line-height:.94;margin:0 0 clamp(28px,3.5vw,40px);color:#F5F5F5">ESCOLHA COMO QUER APOIAR</h2>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:clamp(28px,3.5vw,44px)">
-      <sc-for list="{{ catTabs }}" as="t" hint-placeholder-count="4">
-        <div onClick="{{ t.sel }}" style="cursor:pointer;padding:13px 24px;border-radius:8px;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;transition:background .22s,box-shadow .22s;background:{{ t.bg }};box-shadow:{{ t.shadow }};color:{{ t.ink }}">{{ t.nome }}</div>
-      </sc-for>
-    </div>
-    <div style="display:grid;grid-template-columns:{{ catDetailCols }};gap:clamp(20px,3.5vw,48px);align-items:start">
-      <div style="background:color-mix(in srgb,#F5F5F5 4%,transparent);border-radius:12px;padding:clamp(24px,3.5vw,40px);box-shadow:0 0 0 1px color-mix(in srgb,#F5F5F5 10%,transparent)">
-        <div style="font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:color-mix(in srgb,#F5F5F5 50%,transparent);margin-bottom:20px">Seu apoio inclui</div>
-        <div style="display:grid;gap:0">
-          <sc-for list="{{ catBenefits }}" as="b" hint-placeholder-count="5">
-            <div style="display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid color-mix(in srgb,#F5F5F5 8%,transparent)">
-              <span style="color:#00E5FF;flex:none;font-size:14px">✓</span>
-              <span style="font-size:14.5px;color:color-mix(in srgb,#F5F5F5 88%,transparent)">{{ b }}</span>
-            </div>
-          </sc-for>
-        </div>
-      </div>
-      <div style="position:relative;overflow:hidden;border-radius:12px;padding:clamp(24px,3.5vw,40px);background:color-mix(in srgb,#E50914 10%,transparent);box-shadow:0 0 0 1px #E50914,0 0 60px rgba(229,9,20,.14)">
-        <div style="position:absolute;top:-30%;right:-20%;width:60%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(229,9,20,.26),transparent 68%);filter:blur(40px);pointer-events:none"></div>
-        <div style="position:relative">
-          <div style="font-family:'Bebas Neue',Inter,sans-serif;font-size:clamp(26px,3.4vw,44px);line-height:1;color:#F5F5F5;margin-bottom:10px">{{ catActive.nome }}</div>
-          <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:color-mix(in srgb,#F5F5F5 50%,transparent);margin-bottom:4px">A partir de</div>
-          <div style="font-size:clamp(36px,5.4vw,70px);font-weight:300;color:#F5F5F5;letter-spacing:-.02em;line-height:1;margin-bottom:clamp(14px,2vw,22px);white-space:nowrap">{{ catActive.valor }}</div>
-          <p style="font-size:14.5px;line-height:1.6;color:color-mix(in srgb,#F5F5F5 72%,transparent);margin:0 0 clamp(16px,2.5vw,24px);max-width:36ch">{{ catActive.desc }}</p>
-          <sc-if value="{{ catActive.badge }}">
-            <div style="display:inline-flex;align-items:center;gap:9px;padding:10px 16px;border-radius:8px;margin-bottom:clamp(16px,2.5vw,24px);background:color-mix(in srgb,{{ catActive.badge.color }} 12%,transparent);box-shadow:0 0 0 1px {{ catActive.badge.color }}">
-              <span style="width:7px;height:7px;border-radius:50%;background:{{ catActive.badge.color }};flex:none;animation:saPulse 1.8s infinite"></span>
-              <span style="font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:{{ catActive.badge.color }};font-weight:500;white-space:nowrap">{{ catActive.badge.text }}</span>
-            </div>
-          </sc-if>
-          <div onClick="{{ catActive.go }}" style="display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;height:64px;border-radius:8px;font-size:13.5px;letter-spacing:.16em;color:#F5F5F5;background:#E50914;box-shadow:0 8px 32px rgba(229,9,20,.38);transition:background .22s,transform .2s,box-shadow .22s" style-hover="background:color-mix(in srgb,#E50914 80%,#ff2233);transform:translateY(-2px);box-shadow:0 12px 40px rgba(229,9,20,.54)">{{ catActive.ctaLabel }} <span>→</span></div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:5px;margin-top:16px">
-            <span style="font-size:11px;color:color-mix(in srgb,#F5F5F5 48%,transparent);white-space:nowrap;display:flex;align-items:center;gap:5px"><span style="color:#00E5FF">✓</span> Pagamento seguro</span>
-            <span style="font-size:11px;color:color-mix(in srgb,#F5F5F5 44%,transparent);white-space:nowrap">Pix · Cartão · Asaas</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div data-reveal style="position:relative;overflow:hidden;margin-top:clamp(80px,11vw,140px)">
-    <div style="position:absolute;inset:0;background:radial-gradient(80% 100% at 12% 28%,rgba(0,229,255,.18),transparent 66%),radial-gradient(70% 90% at 88% 72%,rgba(229,9,20,.22),transparent 66%)"></div>
-    <div style="position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px);mix-blend-mode:multiply;opacity:.5"></div>
-    <div style="position:absolute;inset:0;background:linear-gradient(120deg,rgba(11,13,19,.9),rgba(11,13,19,.6) 50%,rgba(11,13,19,.88))"></div>
-    <div style="position:relative;max-width:1260px;margin:0 auto;padding:clamp(60px,9vw,110px) 20px">
-      <div style="display:grid;grid-template-columns:{{ catDetailCols }};gap:clamp(32px,5vw,64px);align-items:start">
-        <div>
-          <div style="font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:#00E5FF;margin-bottom:16px">Clube Mensal</div>
-          <h2 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(38px,5.2vw,72px);line-height:.92;margin:0 0 14px;color:#F5F5F5">FAÇA PARTE TODO MÊS.</h2>
-          <div style="font-size:clamp(17px,2vw,22px);color:#F5F5F5;margin-bottom:12px">Seu lugar no Surto, mês após mês.</div>
-          <p style="font-size:14.5px;line-height:1.6;color:color-mix(in srgb,#F5F5F5 64%,transparent);margin:0 0 clamp(20px,3vw,30px);max-width:46ch">Mantenha sua assinatura ativa e tenha uma nova divulgação reservada todos os meses de acordo com sua categoria.</p>
-          <div style="display:flex;align-items:center;gap:clamp(10px,1.8vw,18px)">
-            <div style="display:grid;justify-items:center;gap:8px"><div style="width:clamp(52px,6vw,72px);height:clamp(52px,6vw,72px);border-radius:50%;display:grid;place-items:center;font-size:clamp(16px,2vw,22px);color:#F5F5F5;background:color-mix(in srgb,#E50914 16%,transparent);box-shadow:0 0 0 1px #E50914">✓</div><div style="font-family:'Bebas Neue',Inter,sans-serif;font-size:clamp(14px,1.6vw,18px);letter-spacing:.06em;color:#F5F5F5">AGO</div></div>
-            <span style="color:#E50914">→</span>
-            <div style="display:grid;justify-items:center;gap:8px"><div style="width:clamp(52px,6vw,72px);height:clamp(52px,6vw,72px);border-radius:50%;display:grid;place-items:center;font-size:clamp(16px,2vw,22px);color:#F5F5F5;background:color-mix(in srgb,#E50914 16%,transparent);box-shadow:0 0 0 1px #E50914">✓</div><div style="font-family:'Bebas Neue',Inter,sans-serif;font-size:clamp(14px,1.6vw,18px);letter-spacing:.06em;color:#F5F5F5">SET</div></div>
-            <span style="color:#E50914">→</span>
-            <div style="display:grid;justify-items:center;gap:8px"><div style="width:clamp(52px,6vw,72px);height:clamp(52px,6vw,72px);border-radius:50%;display:grid;place-items:center;font-size:clamp(16px,2vw,22px);color:#F5F5F5;background:color-mix(in srgb,#E50914 16%,transparent);box-shadow:0 0 0 1px #E50914">✓</div><div style="font-family:'Bebas Neue',Inter,sans-serif;font-size:clamp(14px,1.6vw,18px);letter-spacing:.06em;color:#F5F5F5">OUT</div></div>
-          </div>
-        </div>
-        <div style="display:grid;gap:0">
-          <sc-for list="{{ mensaisClube }}" as="m" hint-placeholder-count="3">
-            <div onClick="{{ m.choose }}" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:clamp(18px,2.5vw,26px) 0;border-top:1px solid color-mix(in srgb,#F5F5F5 12%,transparent);transition:padding-left .25s,background .25s" style-hover="padding-left:12px;background:color-mix(in srgb,#E50914 6%,transparent)">
-              <div>
-                <div style="font-family:'Bebas Neue',Inter,sans-serif;font-size:clamp(20px,2.2vw,28px);line-height:1;color:#F5F5F5;margin-bottom:5px">{{ m.nome }}</div>
-                <div style="font-size:13px;color:color-mix(in srgb,#F5F5F5 56%,transparent)">{{ m.desc }}</div>
-              </div>
-              <div style="text-align:right;flex:none">
-                <div style="font-size:clamp(22px,2.6vw,32px);font-weight:300;color:#F5F5F5;white-space:nowrap">{{ m.preco }}</div>
-                <div style="font-size:11.5px;color:#00E5FF;letter-spacing:.06em">{{ m.freq }}</div>
-              </div>
-            </div>
-          </sc-for>
-          <div style="border-top:1px solid color-mix(in srgb,#F5F5F5 12%,transparent);padding-top:14px;font-size:12px;color:color-mix(in srgb,#F5F5F5 44%,transparent)">Assinantes têm prioridade antes de novas vagas avulsas.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div style="height:clamp(60px,8vw,100px)"></div>
+  </section>
 </div>
 </sc-if>
-
-
-
 <sc-if value="{{ atSobre }}">
 <div style="background:#0B0D13;animation:saIn .4s both">
   <div style="position:relative;overflow:hidden">
@@ -2754,6 +2650,29 @@ class Component extends DCLogic {
     clearInterval(this._wallPollId);
   }
 
+  async chooseClubSupport(tier) {
+    const plan = window.SurtoClub.plans.find(p => p.tier === tier);
+    if (!plan || this._choosingClub) return;
+    this._choosingClub = true;
+    try {
+      window.SurtoClub.remember(tier, plan.amount);
+      // Old flow intents must not override the new unified checkout after login.
+      try { sessionStorage.removeItem('surto-support-intent'); } catch (_) {}
+      let session = this._session || this.state.session;
+      if (!session) {
+        const sb = await this.sb();
+        if (sb) { const result = await sb.auth.getSession(); session = result.data?.session; }
+      }
+      this.setState({ authReturn: null, authMode: 'cadastro', authErr: null, authMsg: null });
+      if (session) {
+        this._session = session;
+        this.setState({ session, user: session.user });
+        window.__surtoOpenSupportJoin?.();
+        this.nav('appHome');
+      } else this.nav('auth');
+    } finally { this._choosingClub = false; }
+  }
+
   nav(route) {
     if (route.startsWith('app') && !(this._session || this.state.session)) {
       this.setState({ route: 'auth', authMode: 'login', navOpen: false, authErr: null,
@@ -3259,6 +3178,7 @@ class Component extends DCLogic {
       depCols: isMobile ? '1fr' : 'repeat(3,1fr)',
       clubeHeroCols: isMobile ? '1fr' : '1fr .72fr',
       clubePassosCols: isMobile ? '1fr 1fr' : 'repeat(4,1fr)',
+      clubPlans: window.SurtoClub.plans.map(p => ({ ...p, sealAlt: 'Selo ' + p.label, buttonLabel: 'Escolher ' + p.label, choose: () => this.chooseClubSupport(p.tier) })),
       mensaisClube: [
         { id:'apoiador_m', nome:'Apoiador Mensal', preco:'R$ 50', freq:'/mês', desc:'Participação mensal garantida junto de outros apoiadores.', choose: () => { this.setState({ tier:'apoiador', modo:'mensal', valor:50, caminho:'aparecer' }); this.nav('modalidade'); } },
         { id:'destaque_m', nome:'Destaque Mensal', preco:'R$ 100', freq:'/mês', desc:'Prioridade máxima e destaque todos os meses.', choose: () => { this.setState({ tier:'destaque', modo:'mensal', valor:100, caminho:'aparecer' }); this.nav('modalidade'); } },

@@ -268,7 +268,8 @@ const __ds_scope = {};
       };
     }
     const isFlow = ['caminho','planos','modalidade','previsao','auth','confirmaEmail','checkout','pago','perfil','confirmar'].includes(r);`;
-    if (src.includes(flowMarker)) { src = src.replace(flowMarker, flowReplacement); changed = true; }
+    // Clube do Surto is a public catalogue for both visitors and members.
+    // Keep go.clube unchanged; only payment CTAs enter the member checkout.
 
     if (!changed) {
       console.error('[O Surto Artificial] Nenhum patch foi aplicado; estrutura inesperada.');

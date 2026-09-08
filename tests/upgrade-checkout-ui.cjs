@@ -29,6 +29,7 @@ const scriptPath=path.resolve(__dirname,'../supporter-dashboard-real-v2.js');
   }}};
   window.supabase={createClient:()=>client};window.getSurtoSupabaseClient=()=>client;
  });
+ await page.addScriptTag({content:fs.readFileSync(path.resolve(__dirname,'../club-support.js'),'utf8')});
  await page.addScriptTag({content:script});
  await page.locator('#surto-supporter-real-v2').waitFor();
  await page.evaluate(()=>window.__surtoOpenUpgrade());

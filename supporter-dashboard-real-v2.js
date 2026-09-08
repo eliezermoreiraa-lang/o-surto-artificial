@@ -39,6 +39,7 @@
   let currentRoute = 'home';
   let rendering = false;
   let timer = null;
+  let scheduledRefresh = false;
   let upgradeData = null;
   let upgradeTarget = null;
   let upgradeMethod = 'pix';
@@ -48,6 +49,7 @@
   let checkoutData = null;
   let checkoutTier = null;
   let checkoutMethod = 'pix';
+  let checkoutAmount = 10;
   let lastNav = null;
 
   const norm = v => String(v || '').replace(/\s+/g, ' ').trim().toUpperCase();
@@ -247,12 +249,7 @@
 
   function joinHtml(m){
     if(m.currentSupport){currentRoute='upgrade';return upgradeHtml(m)}
-    const plans=[
-      {tier:'free',label:'APOIO LIVRE',price:'VOCÊ ESCOLHE',text:'Apoio sem divulgação e sem aparição.',benefits:['Pode ser totalmente anônimo','Ajuda a pagar tokens, ferramentas e produções','Recebe todo o carinho da equipe do Surto']},
-      {tier:'supporter',label:'APOIADOR',price:brl(50),text:'Divulgação coletiva — não é participação como personagem.',benefits:['Bloco com até 6 apoiadores','Avatar e @ na tela','Área exclusiva do apoiador']},
-      {tier:'highlight',label:'APOIADOR DESTAQUE',price:brl(100),text:'Divulgação com mais destaque — não é participação como personagem.',benefits:['Bloco com até 3 apoiadores','Maior presença visual','Prioridade na fila de divulgação']},
-      {tier:'vip',label:'APOIADOR VIP',price:brl(300),text:'Cena promocional individual — não é participação como personagem.',benefits:['Encerramento dedicado só a você','Briefing para cena personalizada','Prioridade máxima']}
-    ];
+    const plans=window.SurtoClub.plans;
     const selected=plans.find(x=>x.tier===checkoutTier);
     if(checkoutData?.pix&&selected){
       const confirmationCopy=selected.tier==='free'?'Obrigado por ajudar as próximas produções. O Apoio Livre não libera divulgação nem aparição.':'Após a confirmação, o Perfil de Divulgação e os demais recursos serão liberados.';
@@ -263,9 +260,9 @@
       const methodLabel=checkoutMethod==='pix'?'GERAR PAGAMENTO PIX →':'IR PARA O PAGAMENTO SEGURO COM CARTÃO →';
       const methodNote=checkoutMethod==='pix'?'O QR Code será exibido aqui para você pagar no aplicativo do seu banco.':'Você será levado ao ambiente seguro do Asaas para informar os dados do cartão uma única vez.';
       const methods=`<div class="sd-field"><label>Forma de pagamento</label><div class="sd-payment-methods"><button type="button" class="sd-payment-method ${checkoutMethod==='pix'?'active':''}" data-join-method="pix"><strong>PIX</strong><span>QR Code e confirmação rápida</span></button><button type="button" class="sd-payment-method ${checkoutMethod==='cartao'?'active':''}" data-join-method="cartao"><strong>CARTÃO DE CRÉDITO</strong><span>Pagamento seguro no Asaas</span></button></div></div>`;
-      return `<h1 class="sd-title">Concluir seu apoio</h1><p class="sd-lead">Você já está conectado. Escolha Pix ou cartão e conclua o pagamento sem fazer login novamente.</p><div class="sd-grid two">${card('APOIO ESCOLHIDO',`<h3>${esc(selected.label)}</h3><div class="sd-plan-price">${esc(selected.price)}</div><p>${esc(selected.text)}</p><ul class="sd-plan-list">${selected.benefits.map(item=>`<li>${esc(item)}</li>`).join('')}</ul><button class="sd-btn outline" data-change-plan>ESCOLHER OUTRA OPÇÃO</button>`,selected.tier==='vip'?'vip':'')}${card('DADOS PARA PAGAMENTO',`<div class="sd-checkout-form"><div class="sd-field"><label>Nome completo</label><input id="sd-join-name" autocomplete="name" value="${esc(m.user?.displayName||'')}"></div><div class="sd-field"><label>CPF</label><input id="sd-join-cpf" inputmode="numeric" autocomplete="off" placeholder="000.000.000-00" maxlength="14"></div>${selected.tier==='free'?'<div class="sd-field"><label>Valor do apoio livre</label><input id="sd-join-amount" type="number" min="1" step="1" value="10"></div>':`<input id="sd-join-amount" type="hidden" value="${fixed}">`}${methods}<div class="sd-msg" id="sd-join-msg"></div><button class="sd-btn" id="sd-create-join">${methodLabel}</button><div class="sd-checkout-note"><span id="sd-checkout-method-note">${methodNote}</span><br>O acesso aos recursos será liberado somente após a confirmação do pagamento.</div></div>`)}</div>`;
+      return `<h1 class="sd-title">Concluir seu apoio</h1><p class="sd-lead">Você já está conectado. Escolha Pix ou cartão e conclua o pagamento sem fazer login novamente.</p><div class="sd-grid two">${card('APOIO ESCOLHIDO',`<h3>${esc(selected.label)}</h3><div class="sd-plan-price">${esc(selected.price)}</div><p>${esc(selected.text)}</p><ul class="sd-plan-list">${selected.benefits.map(item=>`<li>${esc(item)}</li>`).join('')}</ul><button class="sd-btn outline" data-change-plan>ESCOLHER OUTRA OPÇÃO</button>`,selected.tier==='vip'?'vip':'')}${card('DADOS PARA PAGAMENTO',`<div class="sd-checkout-form"><div class="sd-field"><label>Nome completo</label><input id="sd-join-name" autocomplete="name" value="${esc(m.user?.displayName||'')}"></div><div class="sd-field"><label>CPF</label><input id="sd-join-cpf" inputmode="numeric" autocomplete="off" placeholder="000.000.000-00" maxlength="14"></div>${selected.tier==='free'?'<div class="sd-field"><label for="sd-join-amount">Valor do apoio livre <span class="sd-required">*</span></label><div class="club-money"><span aria-hidden="true">R$</span><input id="sd-join-amount" type="text" inputmode="numeric" autocomplete="off" aria-describedby="sd-amount-help" value="10,00"></div><small class="club-money-help" id="sd-amount-help">Mínimo de R$ 1,00. A vírgula é automática: digite 1025 para R$ 10,25.</small></div>':`<input id="sd-join-amount" type="hidden" value="${fixed}">`}${methods}<div class="sd-msg" id="sd-join-msg"></div><button class="sd-btn" id="sd-create-join">${methodLabel}</button><div class="sd-checkout-note"><span id="sd-checkout-method-note">${methodNote}</span><br>O acesso aos recursos será liberado somente após a confirmação do pagamento.</div></div>`)}</div>`;
     }
-    return `<h1 class="sd-title">Escolha sua forma de apoio</h1><p class="sd-lead">Você já está conectado. Escolha a categoria e continue direto para o mesmo pagamento com Pix ou cartão.</p><div class="sd-checkout-grid">${plans.map(x=>card('CLUBE DO SURTO',`<div class="sd-plan-card"><h3>${esc(x.label)}</h3><div class="sd-plan-price">${esc(x.price)}</div><p>${esc(x.text)}</p><ul class="sd-plan-list">${x.benefits.map(item=>`<li>${esc(item)}</li>`).join('')}</ul><button class="sd-btn" data-join-tier="${esc(x.tier)}">ESCOLHER →</button></div>`,x.tier==='vip'?'vip':'')).join('')}</div>`;
+    return `<h1 class="sd-title">Escolha sua forma de apoio</h1><p class="sd-lead">Você já está conectado. Escolha a categoria e continue direto para o mesmo pagamento com Pix ou cartão.</p><div class="sd-checkout-grid">${plans.map(x=>card('CLUBE DO SURTO',`<div class="sd-plan-card"><img class="club-seal" src="${esc(x.seal)}" alt="Selo ${esc(x.label)}" width="72" height="72"><h3>${esc(x.label)}</h3><div class="sd-plan-price">${esc(x.price)}</div><p>${esc(x.text)}</p><ul class="sd-plan-list">${x.benefits.map(item=>`<li>${esc(item)}</li>`).join('')}</ul><button class="sd-btn" data-join-tier="${esc(x.tier)}">ESCOLHER →</button></div>`,x.tier==='vip'?'vip':'')).join('')}</div>`;
   }
 
   function assinaturaHtml(m){
@@ -351,6 +348,11 @@
   }
 
   function bindRoot(root){
+    const moneyInput=root.querySelector('#sd-join-amount');
+    if(checkoutTier==='free'&&moneyInput){
+      moneyInput.value=window.SurtoClub.format(checkoutAmount);
+      window.SurtoClub.bindMoney(moneyInput,amount=>{checkoutAmount=amount});
+    }
     root.querySelectorAll('[data-route]').forEach(el => el.addEventListener('click',()=>openRoute(el.dataset.route),{once:true}));
     root.querySelectorAll('[data-join]').forEach(el=>el.addEventListener('click',()=>{currentRoute='join';checkoutData=null;checkoutTier=null;checkoutMethod='pix';window.scrollTo(0,0);schedule(false)},{once:true}));
     root.querySelectorAll('[data-change-plan]').forEach(el=>el.addEventListener('click',()=>{checkoutData=null;checkoutTier=null;checkoutMethod='pix';schedule(false)},{once:true}));
@@ -358,7 +360,7 @@
     root.querySelectorAll('[data-join-method]').forEach(el=>el.addEventListener('click',()=>{checkoutMethod=el.dataset.joinMethod==='cartao'?'cartao':'pix';root.querySelectorAll('[data-join-method]').forEach(button=>button.classList.toggle('active',button.dataset.joinMethod===checkoutMethod));const action=root.querySelector('#sd-create-join');if(action)action.textContent=checkoutMethod==='pix'?'GERAR PAGAMENTO PIX →':'IR PARA O PAGAMENTO SEGURO COM CARTÃO →';const note=root.querySelector('#sd-checkout-method-note');if(note)note.textContent=checkoutMethod==='pix'?'O QR Code será exibido aqui para você pagar no aplicativo do seu banco.':'Você será levado ao ambiente seguro do Asaas para informar os dados do cartão uma única vez.'}));
     const createJoin=root.querySelector('#sd-create-join');
     if(createJoin)createJoin.addEventListener('click',async()=>{
-      const msg=root.querySelector('#sd-join-msg');const fullName=root.querySelector('#sd-join-name')?.value.trim()||'';const cpfCnpj=(root.querySelector('#sd-join-cpf')?.value||'').replace(/\D/g,'');const amount=Number(root.querySelector('#sd-join-amount')?.value||0);
+      const msg=root.querySelector('#sd-join-msg');const fullName=root.querySelector('#sd-join-name')?.value.trim()||'';const cpfCnpj=(root.querySelector('#sd-join-cpf')?.value||'').replace(/\D/g,'');const amount=checkoutTier==='free'?window.SurtoClub.parse(root.querySelector('#sd-join-amount')?.value||''):Number(root.querySelector('#sd-join-amount')?.value||0);
       if(!fullName){msg.textContent='Informe seu nome completo.';return}if(cpfCnpj.length!==11){msg.textContent='Informe um CPF válido com 11 números.';return}if(!Number.isFinite(amount)||amount<1){msg.textContent='O apoio livre deve ser de pelo menos R$ 1,00.';return}
       const isCard=checkoutMethod==='cartao';createJoin.disabled=true;createJoin.textContent=isCard?'ABRINDO PAGAMENTO SEGURO…':'GERANDO PIX…';msg.textContent='';
       try{const sb=ensureClient();const {data,error}=await sb.functions.invoke('asaas-create-support-payment',{body:{tier:checkoutTier,method:checkoutMethod,amount,cpfCnpj,fullName}});if(error||!data?.ok)throw new Error(data?.error||'payment_failed');if(isCard){if(!data.invoiceUrl)throw new Error('missing_invoice_url');window.location.assign(data.invoiceUrl);return}if(!data.pix)throw new Error('missing_pix');checkoutData=data;schedule(false)}catch(e){msg.textContent=isCard?'Não foi possível abrir o pagamento seguro com cartão agora. Confira os dados e tente novamente.':'Não foi possível gerar o Pix agora. Confira os dados e tente novamente.';createJoin.disabled=false;createJoin.textContent=isCard?'IR PARA O PAGAMENTO SEGURO COM CARTÃO →':'GERAR PAGAMENTO PIX →'}
@@ -470,7 +472,7 @@
   }
 
   async function render(force=false){
-    if (rendering) return;
+    if (rendering) { if(force)schedule(true); return; }
     const nav = findNav();
     if (!nav) return;
     const shell = shellFor(nav);
@@ -496,6 +498,8 @@
       }
 
       const m=await loadData(force);
+      const intent=window.SurtoClub?.consume();
+      if(intent){currentRoute='join';checkoutTier=intent.tier;checkoutAmount=intent.amount;checkoutData=null;checkoutMethod='pix';upgradeData=null;upgradeTarget=null;}
       root.innerHTML=htmlFor(currentRoute,m);
       bindRoot(root);
       window.__surtoGetSupporterDashboardModel=()=>dataModel;
@@ -521,8 +525,9 @@
   }
 
   function schedule(force=false){
+    scheduledRefresh=scheduledRefresh||force;
     clearTimeout(timer);
-    timer=setTimeout(()=>render(force),45);
+    timer=setTimeout(()=>{const refresh=scheduledRefresh;scheduledRefresh=false;render(refresh)},45);
   }
 
   function boot(){

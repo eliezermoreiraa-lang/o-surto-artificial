@@ -6,6 +6,35 @@ import {stripTypeScriptTypes} from 'node:module';
 import {isProductionWebhookReady,requiredPaymentEvents} from '../supabase/functions/asaas-create-support-payment/production-readiness.mjs';
 const url='https://project.supabase.co/functions/v1/asaas-webhook';
 const hook={url,enabled:true,interrupted:false,apiVersion:3,sendType:'SEQUENTIALLY',events:requiredPaymentEvents};
+
+for(const amount of [10.25,1000.25])for(const method of ['pix','cartao'])test(`free support preserves ${amount} cents for ${method} through actual handler`,async()=>{
+ let handler,storedAmount,providerAmount;
+ const source=fs.readFileSync(new URL('../supabase/functions/asaas-create-support-payment/index.ts',import.meta.url),'utf8').replace(/^import .*;\r?\n/gm,'');
+ const from=table=>{
+  const chain=new Proxy({}, {get:(_,key)=>{
+   if(key==='then')return resolve=>Promise.resolve({data:null,error:null}).then(resolve);
+   if(key==='insert')return row=>{storedAmount=row.amount;return chain};
+   if(key==='single')return async()=>({data:{id:'support-test'}});
+   if(key==='maybeSingle')return async()=>({data:table==='support_plans'?{name:'Apoio Livre',active:true,minimum_amount:1}:table==='productions'?{id:'production-test'}:null});
+   return ()=>chain;
+  }});return chain;
+ };
+ const context=vm.createContext({Response,Request,AbortSignal,Intl,Date,Set,console,setTimeout,isProductionWebhookReady,
+  Deno:{env:{get:name=>name==='SUPABASE_URL'?'https://project.supabase.co':'private-test-value'},serve:fn=>{handler=fn}},
+  createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'test',email:'test@example.invalid'}}})},from}),
+  fetch:async(address,options)=>{
+   if(address.endsWith('/webhooks?limit=100'))return Response.json({data:[hook]});
+   if(address.includes('/customers?'))return Response.json({data:[]});
+   if(address.endsWith('/customers'))return Response.json({id:'customer-test'});
+   if(address.endsWith('/payments')){const body=JSON.parse(options.body);providerAmount=body.value;assert.equal(body.billingType,method==='pix'?'PIX':'CREDIT_CARD');return Response.json({id:'payment-test',invoiceUrl:'https://www.asaas.com/i/test'})}
+   if(address.endsWith('/pixQrCode'))return Response.json({payload:'simulated',encodedImage:'simulated'});
+   throw Error('Unexpected mocked request '+address);
+  }
+ });
+ vm.runInContext(stripTypeScriptTypes(source),context);
+ const response=await handler(new Request('https://project.supabase.co/functions/v1/asaas-create-support-payment',{method:'POST',headers:{authorization:'Bearer test','content-type':'application/json'},body:JSON.stringify({tier:'free',method,amount,cpfCnpj:'12345678901',fullName:'Teste'})}));
+ assert.equal(response.status,200);assert.equal((await response.json()).amount,amount);assert.equal(storedAmount,amount);assert.equal(providerAmount,amount);
+});
 test('ready only with all confirmation settings',()=>assert.equal(isProductionWebhookReady({data:[hook]},url),true));
 for(const [name,changes] of Object.entries({disabled:{enabled:false},interrupted:{interrupted:true},wrongUrl:{url:'https://other.example'},wrongVersion:{apiVersion:2},unordered:{sendType:'NON_SEQUENTIALLY'},missingEvent:{events:['PAYMENT_RECEIVED']}})){
  test(`refuses ${name}`,()=>assert.equal(isProductionWebhookReady({data:[{...hook,...changes}]},url),false));
