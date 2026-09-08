@@ -8,7 +8,7 @@ for(const [engine,driver,options] of [['Chrome',chromium,{channel:'chrome',args:
  const browser=await driver.launch({headless:true,...options});
  try{for(const width of [390,768,1440]){
   const page=await browser.newPage({viewport:{width,height:900},reducedMotion:'reduce'}),errors=[],failed=[];
-  page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400&&r.url().startsWith(origin))failed.push(r.url())});
+  page.on('pageerror',e=>{errors.push(e.message);console.error(engine,width,e.stack)});page.on('response',r=>{if(r.status()>=400&&r.url().startsWith(origin))failed.push(r.url())});
   if(!process.env.TEST_LIVE_ASSETS)await page.route(origin+'/**',route=>{const name=new URL(route.request().url()).pathname.slice(1)||'index.html';if(!['index.html','launch-polish.css'].includes(name))return route.continue();return route.fulfill({body:fs.readFileSync(path.join(root,name)),contentType:name.endsWith('.css')?'text/css':'text/html'})});
   await page.goto(origin,{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('.sa-hero-title')&&!document.body.innerText.includes('{{ m.label }}'));

@@ -67,21 +67,16 @@
   }
   const areaTexts=['CLUBE','CLUBE DO SURTO','MINHA ÁREA'];
   const upgradeTexts=['ESCOLHER MEU APOIO','ENTRAR PARA O CLUBE','ENTRAR PARA O CLUBE DO SURTO','QUERO ENTRAR PARA O CLUBE','ESCOLHER APOIADOR','ESCOLHER DESTAQUE','QUERO SER VIP'];
-  function openArea(){
-    const account=document.querySelector('.sa-account-button')||Array.from(document.querySelectorAll('div')).find(x=>x.children.length===0&&(x.textContent||'').trim()==='ENTRAR');
-    if(account){account.dataset.surtoAreaReplay='1';account.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))}
-    setTimeout(()=>window.__surtoOpenSupporterHome&&window.__surtoOpenSupporterHome(),420);
-  }
-  function openUpgrade(){
-    const account=document.querySelector('.sa-account-button')||Array.from(document.querySelectorAll('div')).find(x=>x.children.length===0&&(x.textContent||'').trim()==='ENTRAR');
-    if(account)account.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
-    setTimeout(()=>window.__surtoOpenUpgrade&&window.__surtoOpenUpgrade(),420);
-  }
-  function openJoin(){
+  function enterArea(openRoute){
+    // Select the destination before mounting the area. A delayed reset could
+    // overwrite a tab the supporter had already clicked after entering.
+    openRoute?.();
     const account=document.querySelector('.sa-account-button')||Array.from(document.querySelectorAll('div')).find(x=>x.children.length===0&&['ENTRAR','MINHA ÁREA'].includes((x.textContent||'').trim().toUpperCase()));
-    if(account)account.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
-    setTimeout(()=>window.__surtoOpenSupportJoin&&window.__surtoOpenSupportJoin(),420);
+    if(account){account.dataset.surtoAreaReplay='1';account.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))}
   }
+  function openArea(){enterArea(window.__surtoOpenSupporterHome)}
+  function openUpgrade(){enterArea(window.__surtoOpenUpgrade)}
+  function openJoin(){enterArea(window.__surtoOpenSupportJoin)}
   document.addEventListener('click',event=>{
     const el=event.target?.closest?.('a,button,div');if(!el||el.closest('#surto-supporter-real-v2'))return;
     const text=(el.textContent||'').replace(/\s+/g,' ').trim().toUpperCase();
