@@ -41,6 +41,10 @@
   let timer = null;
   let upgradeData = null;
   let upgradeTarget = null;
+  let upgradeMethod = 'pix';
+  let upgradeVipOnly = false;
+  let upgradeSubmitting = false;
+  let upgradeDraft = { fullName: '', cpfCnpj: '' };
   let checkoutData = null;
   let checkoutTier = null;
   let checkoutMethod = 'pix';
@@ -283,9 +287,14 @@
     const options=(m.upgrades||[]).filter(x=>x.available);
     if(!m.currentSupport)return joinHtml(m);
     if(!options.length)return `<h1 class="sd-title">Seu plano</h1>${card('CATEGORIA MÁXIMA','<h2>VOCÊ JÁ É APOIADOR VIP</h2><p>Seu plano já possui o maior nível de destaque e participação.</p>','vip')}`;
-    if(upgradeData&&upgradeTarget&&upgradeData.pix){
-      const target=options.find(x=>x.tier===upgradeTarget)||{label:LABELS[upgradeTarget],fullPrice:0,amountDue:upgradeData.amount};
-      return `<h1 class="sd-title">Upgrade para ${esc(target.label)}</h1><div class="sd-grid two">${card('RESUMO',`<h3>${esc(target.label)}</h3><div class="sd-list"><div><span>Valor da categoria</span><b>${brl(target.fullPrice)}</b></div><div><span>Crédito do apoio atual</span><b>− ${brl(m.currentCredit)}</b></div><div><span>Você paga agora</span><b style="color:#00E5FF">${brl(upgradeData.amount)}</b></div></div>`)}${card('PAGAMENTO PIX',`<div class="sd-pix"><img src="data:image/png;base64,${esc(upgradeData.pix.encodedImage)}" alt="QR Code Pix"><div><p>Escaneie ou copie o código Pix.</p><button class="sd-btn secondary" id="sd-copy-upgrade">COPIAR PIX</button><button class="sd-btn outline" id="sd-refresh-upgrade">JÁ PAGUEI · ATUALIZAR</button></div></div>`)}</div>`;
+    const target=options.find(x=>x.tier===upgradeTarget);
+    if(target){
+      const summary=`<h3>${esc(target.label)}</h3><div class="sd-list"><div><span>Valor da categoria</span><b>${brl(target.fullPrice)}</b></div><div><span>Crédito do apoio atual</span><b>− ${brl(m.currentCredit)}</b></div><div><span>Você paga agora</span><b style="color:#00E5FF">${brl(upgradeData?.amount??target.amountDue)}</b></div></div><p>Seu apoio atual continua válido. A categoria muda somente após a confirmação do pagamento.</p>`;
+      if(upgradeData){
+        const payment=upgradeData.pix?`<div class="sd-pix"><img src="data:image/png;base64,${esc(upgradeData.pix.encodedImage)}" alt="QR Code Pix"><div><p>Escaneie ou copie o código Pix.</p><button class="sd-btn secondary" id="sd-copy-upgrade">COPIAR PIX</button></div></div>`:`<p>Conclua o pagamento no ambiente seguro do Asaas. Os dados do cartão são informados somente lá.</p><a class="sd-link" href="${esc(upgradeData.invoiceUrl)}" rel="noopener">CONTINUAR PAGAMENTO COM CARTÃO →</a>`;
+        return `<h1 class="sd-title">Pagamento do upgrade</h1><div class="sd-grid two">${card('RESUMO DO UPGRADE',summary)}${card(upgradeData.pix?'PAGAMENTO PIX':'PAGAMENTO SEGURO COM CARTÃO',`${payment}<button class="sd-btn outline" id="sd-refresh-upgrade">JÁ PAGUEI · VERIFICAR</button><div class="sd-msg" id="sd-upgrade-status" role="status"></div>`)}</div>`;
+      }
+      return `<h1 class="sd-title">Concluir seu upgrade</h1><p class="sd-lead">Escolha Pix ou cartão de crédito. Você paga somente a diferença, sem fazer login novamente.</p><div class="sd-grid two">${card('RESUMO DO UPGRADE',`${summary}<button class="sd-btn outline" data-upgrade-back>${upgradeVipOnly?'VOLTAR À ÁREA VIP':'ESCOLHER OUTRA CATEGORIA'}</button>`,target.tier==='vip'?'vip':'')}${card('DADOS PARA PAGAMENTO',`<form class="sd-checkout-form" id="sd-upgrade-form"><p class="sd-form-note"><span class="sd-required">*</span> Campos obrigatórios</p><div class="sd-field"><label for="sd-upgrade-name">Nome completo <span class="sd-required">*</span></label><input id="sd-upgrade-name" autocomplete="name" required value="${esc(upgradeDraft.fullName||m.user?.displayName||'')}"></div><div class="sd-field"><label for="sd-upgrade-cpf">CPF <span class="sd-required">*</span></label><input id="sd-upgrade-cpf" autocomplete="off" inputmode="numeric" required maxlength="14" placeholder="000.000.000-00" value="${esc(upgradeDraft.cpfCnpj)}"></div><div class="sd-field"><label>Forma de pagamento</label><div class="sd-payment-methods"><button type="button" class="sd-payment-method ${upgradeMethod==='pix'?'active':''}" data-upgrade-method="pix" aria-pressed="${upgradeMethod==='pix'}"><strong>PIX</strong><span>QR Code para pagar no seu banco</span></button><button type="button" class="sd-payment-method ${upgradeMethod==='cartao'?'active':''}" data-upgrade-method="cartao" aria-pressed="${upgradeMethod==='cartao'}"><strong>CARTÃO DE CRÉDITO</strong><span>Pagamento seguro no Asaas</span></button></div></div><div class="sd-msg" id="sd-upgrade-msg" role="alert"></div><button type="submit" class="sd-btn" id="sd-create-upgrade">${upgradeMethod==='pix'?'GERAR PIX DO UPGRADE →':'IR PARA O PAGAMENTO SEGURO COM CARTÃO →'}</button><div class="sd-checkout-note" id="sd-upgrade-method-note">${upgradeMethod==='pix'?'O QR Code aparecerá aqui após você confirmar.':'Você informará os dados do cartão uma única vez, no ambiente seguro do Asaas.'}</div></form>`)}</div>`;
     }
     return `<h1 class="sd-title">Melhore seu destaque</h1><p class="sd-lead">Seu apoio atual vira crédito. Escolha qualquer categoria acima da sua — somente a diferença será cobrada.</p><div class="sd-grid cards">${options.map(x=>card('UPGRADE DISPONÍVEL',`<h3>${esc(x.label)}</h3><div class="sd-upgrade-price">${brl(x.amountDue)}</div><p>Valor da categoria: ${brl(x.fullPrice)}<br>Crédito do apoio atual: ${brl(m.currentCredit)}</p><button class="sd-btn" data-upgrade-tier="${esc(x.tier)}">ESCOLHER ${esc(x.label)} →</button>`,x.tier==='vip'?'vip':'')).join('')}</div>`;
   }
@@ -302,9 +311,6 @@
     const u = (m.upgrades || []).find(x => x.tier === 'vip');
     const due = u ? Number(u.amountDue || 0) : 300;
     const credit = Math.max(0,300-due);
-    if (upgradeData && upgradeData.pix) {
-      return `<h1 class="sd-title">Upgrade para Apoiador VIP</h1><div class="sd-grid two">${card('RESUMO DO UPGRADE',`<div class="sd-list"><div><span>Plano VIP</span><b>${brl(300)}</b></div><div><span>Crédito do seu apoio atual</span><b>− ${brl(credit)}</b></div><div><span>Total do upgrade</span><b style="color:#00E5FF">${brl(upgradeData.amount || due)}</b></div></div>`)}${card('PAGAMENTO PIX',`<div class="sd-pix"><img src="data:image/png;base64,${esc(upgradeData.pix.encodedImage)}" alt="QR Code Pix"><div><p>Escaneie ou copie o código Pix.</p><button class="sd-btn secondary" id="sd-copy-pix">COPIAR PIX</button><button class="sd-btn outline" id="sd-refresh-vip">JÁ PAGUEI · ATUALIZAR STATUS</button></div></div>`)}</div>`;
-    }
     return `<h1 class="sd-title">Área VIP</h1>${card('ACESSO RESTRITO',`<h2>VOCÊ NÃO TEM ACESSO À ÁREA VIP</h2><p>Para se tornar um apoiador VIP, ter sua aparição sozinho e ainda o apoio da equipe do Surto para sua cena, faça o upgrade.</p>${m.currentSupport ? `<div class="sd-credit"><span>Plano VIP</span><b>${brl(300)}</b><span>Crédito do seu apoio atual</span><b>− ${brl(credit)}</b><span>Você paga agora</span><strong>${brl(due)}</strong></div><button class="sd-btn vipbtn" id="sd-upgrade-vip">FAZER UPGRADE PARA VIP · ${brl(due)}</button>` : '<button class="sd-btn vipbtn" data-clube>CONHECER O APOIADOR VIP →</button>'}`,'vip')}`;
   }
 
@@ -339,6 +345,11 @@
     schedule(false);
   }
 
+  function startUpgrade(tier,vipOnly=false){
+    if(upgradeSubmitting)return;
+    currentRoute='upgrade';upgradeTarget=tier;upgradeData=null;upgradeMethod='pix';upgradeVipOnly=vipOnly;upgradeDraft={fullName:'',cpfCnpj:''};window.scrollTo(0,0);schedule(false);
+  }
+
   function bindRoot(root){
     root.querySelectorAll('[data-route]').forEach(el => el.addEventListener('click',()=>openRoute(el.dataset.route),{once:true}));
     root.querySelectorAll('[data-join]').forEach(el=>el.addEventListener('click',()=>{currentRoute='join';checkoutData=null;checkoutTier=null;checkoutMethod='pix';window.scrollTo(0,0);schedule(false)},{once:true}));
@@ -355,11 +366,39 @@
     const copyJoin=root.querySelector('#sd-copy-join');if(copyJoin)copyJoin.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(checkoutData.pix.payload);copyJoin.textContent='PIX COPIADO ✓'}catch(e){}});
     const refreshJoin=root.querySelector('#sd-refresh-join');if(refreshJoin)refreshJoin.addEventListener('click',async()=>{const msg=root.querySelector('#sd-join-status');refreshJoin.disabled=true;refreshJoin.textContent='VERIFICANDO…';await loadData(true);if(dataModel.currentSupport){checkoutData=null;checkoutTier=null;currentRoute='home';schedule(false);return}if(msg)msg.textContent='O pagamento ainda não foi identificado. Aguarde alguns instantes e tente novamente.';refreshJoin.disabled=false;refreshJoin.textContent='JÁ PAGUEI · VERIFICAR'});
     root.querySelectorAll('[data-upgrade]').forEach(el=>el.addEventListener('click',()=>{currentRoute='upgrade';upgradeData=null;upgradeTarget=null;window.scrollTo(0,0);schedule(false)},{once:true}));
-    root.querySelectorAll('[data-upgrade-tier]').forEach(el=>el.addEventListener('click',async()=>{
-      const tier=el.dataset.upgradeTier;el.disabled=true;el.textContent='GERANDO PIX…';
-      try{const sb=ensureClient();const {data,error}=await sb.functions.invoke('asaas-create-support-payment',{body:{tier,method:'pix',upgradeFromSupportId:dataModel.currentSupport.id}});if(error||!data?.ok)throw new Error('upgrade_failed');upgradeTarget=tier;upgradeData=data;if(data.alreadyCovered){await loadData(true);upgradeData=null;upgradeTarget=null;currentRoute='home'}schedule(false)}catch(e){el.disabled=false;el.textContent='TENTAR NOVAMENTE'}}));
+    root.querySelectorAll('[data-upgrade-tier]').forEach(el=>el.addEventListener('click',()=>startUpgrade(el.dataset.upgradeTier)));
+    root.querySelector('[data-upgrade-back]')?.addEventListener('click',()=>{currentRoute=upgradeVipOnly?'vip':'upgrade';upgradeTarget=null;upgradeData=null;schedule(false)});
+    root.querySelectorAll('[data-upgrade-method]').forEach(el=>el.addEventListener('click',()=>{
+      if(upgradeSubmitting)return;
+      upgradeMethod=el.dataset.upgradeMethod==='cartao'?'cartao':'pix';
+      root.querySelectorAll('[data-upgrade-method]').forEach(button=>{const active=button.dataset.upgradeMethod===upgradeMethod;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active))});
+      root.querySelector('#sd-create-upgrade').textContent=upgradeMethod==='pix'?'GERAR PIX DO UPGRADE →':'IR PARA O PAGAMENTO SEGURO COM CARTÃO →';
+      root.querySelector('#sd-upgrade-method-note').textContent=upgradeMethod==='pix'?'O QR Code aparecerá aqui após você confirmar.':'Você informará os dados do cartão uma única vez, no ambiente seguro do Asaas.';
+    }));
+    root.querySelector('#sd-upgrade-form')?.addEventListener('submit',async event=>{
+      event.preventDefault();if(upgradeSubmitting)return;
+      const msg=root.querySelector('#sd-upgrade-msg'),button=root.querySelector('#sd-create-upgrade');
+      const fullName=root.querySelector('#sd-upgrade-name').value.trim(),cpfCnpj=root.querySelector('#sd-upgrade-cpf').value.replace(/\D/g,'');
+      upgradeDraft={fullName,cpfCnpj};
+      if(!fullName){msg.textContent='Informe seu nome completo.';return}
+      if(cpfCnpj.length!==11){msg.textContent='Informe um CPF válido com 11 números.';return}
+      const tier=upgradeTarget,method=upgradeMethod,sourceId=dataModel.currentSupport?.id;
+      if(!sourceId||!(dataModel.upgrades||[]).some(x=>x.tier===tier&&x.available)){msg.textContent='Atualize sua área para conferir as opções de upgrade.';return}
+      upgradeSubmitting=true;root.querySelectorAll('button').forEach(el=>el.disabled=true);button.textContent=method==='pix'?'GERANDO PIX…':'ABRINDO PAGAMENTO SEGURO…';msg.textContent='';
+      try{
+        const {data,error}=await ensureClient().functions.invoke('asaas-create-support-payment',{body:{tier,method,cpfCnpj,fullName,upgradeFromSupportId:sourceId}});
+        if(error||!data?.ok){let message=data?.error;try{message=message||(await error?.context?.json())?.error}catch(_){}throw new Error(message||'Não foi possível iniciar o pagamento. Confira os dados e tente novamente.')}
+        if(data.alreadyCovered){await loadData(true);upgradeData=null;upgradeTarget=null;currentRoute='home';schedule(false);return}
+        if(method==='pix'&&!data.pix)throw new Error('Não foi possível exibir o QR Code. Consulte Meus Apoios antes de tentar novamente.');
+        if(method==='cartao'){const url=new URL(data.invoiceUrl);if(url.protocol!=='https:'||!(url.hostname==='asaas.com'||url.hostname.endsWith('.asaas.com')))throw new Error('O endereço de pagamento retornado não é válido.')}
+        if(currentRoute!=='upgrade'||upgradeTarget!==tier)return;
+        upgradeData=data;schedule(false);
+        if(method==='cartao')window.location.assign(data.invoiceUrl);
+      }catch(error){msg.textContent=error.message||'Não foi possível iniciar o pagamento. Tente novamente.';root.querySelectorAll('button').forEach(el=>el.disabled=false);button.textContent=method==='pix'?'GERAR PIX DO UPGRADE →':'IR PARA O PAGAMENTO SEGURO COM CARTÃO →'}
+      finally{upgradeSubmitting=false}
+    });
     const copyUpgrade=root.querySelector('#sd-copy-upgrade');if(copyUpgrade)copyUpgrade.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(upgradeData.pix.payload);copyUpgrade.textContent='PIX COPIADO ✓'}catch(e){}});
-    const refreshUpgrade=root.querySelector('#sd-refresh-upgrade');if(refreshUpgrade)refreshUpgrade.addEventListener('click',async()=>{refreshUpgrade.textContent='ATUALIZANDO…';await loadData(true);if(dataModel.currentTier===upgradeTarget){upgradeData=null;upgradeTarget=null;currentRoute='home'}schedule(false)});
+    const refreshUpgrade=root.querySelector('#sd-refresh-upgrade');if(refreshUpgrade)refreshUpgrade.addEventListener('click',async()=>{refreshUpgrade.disabled=true;refreshUpgrade.textContent='VERIFICANDO…';const msg=root.querySelector('#sd-upgrade-status');try{await loadData(true);if(dataModel.currentTier===upgradeTarget){upgradeData=null;upgradeTarget=null;currentRoute='home';schedule(false)}else msg.textContent='O pagamento ainda não foi confirmado. Aguarde alguns instantes e verifique novamente.'}catch(_){msg.textContent='Não foi possível verificar agora. Tente novamente.'}finally{refreshUpgrade.disabled=false;refreshUpgrade.textContent='JÁ PAGUEI · VERIFICAR'}});
 
     const save = root.querySelector('#sd-save-profile');
     if (save) save.addEventListener('click',async()=>{
@@ -427,19 +466,7 @@
     });
 
     const up = root.querySelector('#sd-upgrade-vip');
-    if (up) up.addEventListener('click',async()=>{
-      up.disabled=true; up.textContent='GERANDO PIX…';
-      try {
-        const sb=ensureClient();
-        const { data,error } = await sb.functions.invoke('asaas-create-support-payment',{body:{tier:'vip',method:'pix',upgradeFromSupportId:dataModel.currentSupport.id}});
-        if (error || !data || !data.ok || !data.pix) throw new Error('upgrade_failed');
-        upgradeData=data; schedule(false);
-      } catch(e) { up.disabled=false; up.textContent='TENTAR NOVAMENTE'; }
-    });
-    const copy = root.querySelector('#sd-copy-pix');
-    if (copy) copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(upgradeData.pix.payload);copy.textContent='PIX COPIADO ✓';}catch(e){}});
-    const refresh = root.querySelector('#sd-refresh-vip');
-    if (refresh) refresh.addEventListener('click',async()=>{refresh.textContent='ATUALIZANDO…';await loadData(true);if(dataModel.vipAccess)upgradeData=null;schedule(false);});
+    if (up) up.addEventListener('click',()=>startUpgrade('vip',true));
   }
 
   async function render(force=false){
