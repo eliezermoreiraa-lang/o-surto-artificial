@@ -8,6 +8,7 @@
 <script src="./surto-shared-supabase.js?v=20260828-2"></script>
 <script src="./support.js"></script>
 <link rel="stylesheet" href="/token-meter.css?v=20260908-1">
+<link rel="stylesheet" href="/footer-social.css?v=20260908-1">
 <script src="/token-meter.js?v=20260908-1" defer></script>
 </head>
 <body>
@@ -2290,11 +2291,19 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
           <div onClick="{{ f.open }}" style="cursor:pointer;font-size:13px;color:color-mix(in srgb,#e9e9ed 68%,transparent);transition:color .2s" style-hover="color:#e9e9ed">{{ f.label }}</div>
         </sc-for>
       </div>
-      <div style="display:grid;gap:10px">
-        <div style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:color-mix(in srgb,#e9e9ed 40%,transparent);margin-bottom:2px">redes</div>
-        <sc-for list="{{ footerRedes }}" as="f" hint-placeholder-count="3">
-          <div onClick="{{ f.open }}" style="cursor:pointer;font-size:13px;color:color-mix(in srgb,#e9e9ed 68%,transparent);transition:color .2s" style-hover="color:#e9e9ed">↗ {{ f.label }}</div>
-        </sc-for>
+      <div class="sa-footer-social">
+        <div class="sa-footer-social-title">SIGA O SURTO</div>
+        <nav class="sa-footer-social-links" aria-label="Redes sociais oficiais do Surto">
+          <a class="sa-social-link sa-social-instagram" href="https://www.instagram.com/osurtoartificial/" target="_blank" rel="noopener noreferrer" aria-label="Instagram oficial do Surto — abre em nova aba" title="Instagram · @osurtoartificial">
+            <span class="sa-social-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4.2"></circle><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"></circle></svg></span><span>Instagram</span>
+          </a>
+          <a class="sa-social-link sa-social-youtube" href="https://www.youtube.com/@osurtoartificialEu" target="_blank" rel="noopener noreferrer" aria-label="YouTube oficial do Surto — abre em nova aba" title="YouTube · @osurtoartificialEu">
+            <span class="sa-social-icon"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23.495 6.205a3.007 3.007 0 00-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 00.527 6.205a31.247 31.247 0 00-.522 5.805 31.247 31.247 0 00.522 5.783 3.007 3.007 0 002.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 002.088-2.088 31.247 31.247 0 00.5-5.783 31.247 31.247 0 00-.5-5.805z"></path><path fill="#fff" d="M9.6 15.6V8.4l6.3 3.6z"></path></svg></span><span>YouTube</span>
+          </a>
+          <a class="sa-social-link sa-social-tiktok" href="https://www.tiktok.com/@osurtoartificial" target="_blank" rel="noopener noreferrer" aria-label="TikTok oficial do Surto — abre em nova aba" title="TikTok · @osurtoartificial">
+            <span class="sa-social-icon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.27 8.27 0 004.84 1.56V6.79a4.85 4.85 0 01-1.07-.1z"></path></svg></span><span>TikTok</span>
+          </a>
+        </nav>
       </div>
       <div style="display:grid;gap:10px">
         <div style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:color-mix(in srgb,#e9e9ed 40%,transparent);margin-bottom:2px">sua conta</div>
@@ -3354,7 +3363,6 @@ class Component extends DCLogic {
       footerCols: isMobile ? '1fr 1fr' : '1.4fr 1fr 1fr 1fr',
       footerNav: [['Em Exibição','exibicao'],['Clube do Surto','clube'],['Apoiadores','apoiadores'],['Sobre','sobre'],['Contrate o Surto','contrate']]
         .map(([label, route]) => ({ label, open: () => this.nav(route) })),
-      footerRedes: ['Instagram','YouTube','TikTok'].map(label => ({ label, open: () => this.flash('Abrindo ' + label + '…') })),
       mural: muralReal,
       servicos: [
         ['Vídeos publicitários com IA','Produções e campanhas audiovisuais para marcas e projetos.'],
