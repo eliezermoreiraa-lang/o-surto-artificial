@@ -79,7 +79,7 @@
   function openJoin(){enterArea(window.__surtoOpenSupportJoin)}
   document.addEventListener('click',event=>{
     const el=event.target?.closest?.('a,button,div');if(!el||el.closest('#surto-supporter-real-v2'))return;
-    const text=(el.textContent||'').replace(/\s+/g,' ').trim().toUpperCase();
+    const text=(el.textContent||'').replace(/\s+/g,' ').trim().toUpperCase().replace(/\s*[→↗]\s*$/, '');
     if(el.dataset.surtoAreaReplay==='1'){delete el.dataset.surtoAreaReplay;return}
     if(areaTexts.includes(text)){
       if(!supportCheckReady){event.preventDefault();event.stopImmediatePropagation();setTimeout(()=>{if(hasPaidSupport)openArea();else{el.dataset.surtoReplay='1';el.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))}},900);return}
