@@ -13,6 +13,7 @@
 <script src="./support.js"></script>
 <link rel="stylesheet" href="/token-meter.css?v=20260908-1">
 <link rel="stylesheet" href="/footer-social.css?v=20260908-1">
+<link rel="stylesheet" href="/launch-polish.css?v=20260908-1">
 <script src="/token-meter.js?v=20260908-1" defer></script>
 </head>
 <body>
@@ -205,9 +206,9 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
   <div onClick="{{ go.clube }}" style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;margin-top:clamp(36px,5vw,54px);height:52px;padding:0 26px;border-radius:8px;font-size:12.5px;letter-spacing:.16em;color:#F5F5F5;box-shadow:0 0 0 1px color-mix(in srgb,#F5F5F5 24%,transparent);transition:box-shadow .22s,background .22s" style-hover="box-shadow:0 0 0 1px #00E5FF;background:color-mix(in srgb,#00E5FF 8%,transparent)">CONHECER O CLUBE <span>→</span></div>
 </div>
 
-<div data-reveal style="max-width:1260px;margin:0 auto;padding:clamp(96px,13vw,168px) 20px 0">
+<div class="sa-testimonials" data-reveal style="max-width:1260px;margin:0 auto;padding:clamp(96px,13vw,168px) 20px 0">
   <h2 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(32px,4.4vw,62px);line-height:.94;margin:0 0 clamp(32px,4vw,52px);color:#F5F5F5">VEJA O QUE O PESSOAL ESTÁ<br><span style="color:#E50914">COMENTANDO SOBRE A NOVELA</span></h2>
-  <div style="display:grid;grid-template-columns:{{ depCols }};gap:clamp(14px,2vw,22px)">
+  <div class="sa-testimonials-grid" style="display:grid;grid-template-columns:{{ depCols }};gap:clamp(14px,2vw,22px)">
     <div style="background:color-mix(in srgb,#F5F5F5 4%,transparent);border-radius:10px;padding:clamp(20px,2.5vw,28px);box-shadow:0 0 0 1px color-mix(in srgb,#E50914 28%,transparent);display:flex;flex-direction:column;gap:14px;color:#E50914;transition:transform .45s cubic-bezier(.2,.7,.3,1),box-shadow .45s,background .45s,color .35s" style-hover="transform:translateY(-7px);background:color-mix(in srgb,#F5F5F5 7%,transparent);box-shadow:0 0 0 1px #E50914,0 20px 48px rgba(0,0,0,.55),0 0 46px rgba(229,9,20,.2);color:#ff3d33">
       <div style="display:flex;align-items:center;gap:12px">
         <img src="assets-min/dep-jessie.jpg" alt="Jessie Sparkle" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex:none;box-shadow:0 0 0 1px color-mix(in srgb,#F5F5F5 14%,transparent);transition:transform .45s cubic-bezier(.2,.7,.3,1),box-shadow .45s,filter .45s" style-hover="transform:scale(1.08);box-shadow:0 0 0 1px currentColor,0 0 22px color-mix(in srgb,currentColor 40%,transparent);filter:saturate(1.1)">
@@ -263,7 +264,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
       <sc-for list="{{ marquee }}" as="a" hint-placeholder-count="16">
         <a href="{{ a.socialLink }}" target="_blank" rel="noopener noreferrer" style="cursor:pointer;text-decoration:none;display:grid;justify-items:center;gap:11px;width:clamp(74px,8vw,104px);flex:none;color:color-mix(in srgb,#F5F5F5 62%,transparent);transition:transform .3s,color .3s" style-hover="transform:translateY(-6px);color:#F5F5F5">
           <div style="width:100%;aspect-ratio:1;border-radius:50%;position:relative;overflow:hidden;background:radial-gradient(circle at 32% 26%,#2a2f3d,#111418);box-shadow:0 0 0 1px {{ a.ring }}{{ a.glow }};display:grid;place-items:center;transition:transform .3s" style-hover="transform:translateY(-6px)">
-            <img src="{{ a.img }}" alt="{{ a.alt }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 15%;filter:saturate(.9) contrast(1.04)">
+            <img sc-camel-src="{{ a.img }}" alt="{{ a.alt }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 15%;filter:saturate(.9) contrast(1.04)">
             <div style="position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(0,0,0,.24) 0 1px,transparent 1px 3px)"></div>
           </div>
           <div style="font-size:11px;color:inherit;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ a.h }}</div>
@@ -561,7 +562,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
   <div style="position:relative;overflow:hidden;min-height:clamp(430px,64vh,660px);display:flex;align-items:flex-end">
     <div style="position:absolute;inset:0;display:grid;grid-template-columns:{{ heroFacesCols }};filter:grayscale(.4) brightness(.55);opacity:.5">
       <sc-for list="{{ heroFaces }}" as="f" hint-placeholder-count="12">
-        <div style="position:relative;overflow:hidden;background:#11141B"><img src="{{ f.src }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 16%"></div>
+        <div style="position:relative;overflow:hidden;background:#11141B"><img sc-camel-src="{{ f.src }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 16%"></div>
       </sc-for>
     </div>
     <div style="position:absolute;inset:0;background:radial-gradient(72% 92% at 16% 18%,rgba(229,9,20,.34),transparent 68%),radial-gradient(62% 82% at 90% 80%,rgba(0,229,255,.2),transparent 66%)"></div>
@@ -587,7 +588,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
         <sc-for list="{{ mo.list }}" as="a" hint-placeholder-count="8">
           <a href="{{ a.socialLink }}" target="_blank" rel="noopener noreferrer" style="cursor:pointer;text-decoration:none;width:{{ a.card }};text-align:center;color:color-mix(in srgb,#F5F5F5 72%,transparent);transition:transform .32s cubic-bezier(.4,0,.2,1),color .3s" style-hover="transform:translateY(-6px);color:#F5F5F5">
             <div style="position:relative;width:{{ a.size }};height:{{ a.size }};margin:0 auto;border-radius:50%;overflow:hidden;background:#11141B;box-shadow:0 0 0 1px {{ a.ring }}{{ a.glow }};transition:box-shadow .3s,transform .3s" style-hover="box-shadow:{{ a.hoverGlow }};transform:scale(1.04)">
-              <img src="{{ a.img }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 15%;filter:saturate(.9) contrast(1.04)">
+              <img sc-camel-src="{{ a.img }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 15%;filter:saturate(.9) contrast(1.04)">
               <div style="position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(0,0,0,.2) 0 1px,transparent 1px 3px)"></div>
               <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(11,13,19,.5))"></div>
             </div>
@@ -623,7 +624,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
         <a href="{{ h.socialLink }}" target="_blank" rel="noopener noreferrer" style="cursor:pointer;text-decoration:none;display:grid;grid-template-columns:{{ hallCols }};align-items:center;gap:clamp(12px,2.4vw,28px);padding:clamp(16px,2.4vw,26px) 0;border-top:1px solid color-mix(in srgb,#F5F5F5 12%,transparent);transition:padding-left .3s,background .3s" style-hover="padding-left:14px;background:color-mix(in srgb,#F5F5F5 4%,transparent)">
           <div style="font-family:'Bebas Neue',Inter,sans-serif;font-size:clamp(32px,5vw,64px);line-height:.86;color:{{ h.ink }};font-variant-numeric:tabular-nums">{{ h.pos }}</div>
           <div style="position:relative;width:clamp(48px,6vw,74px);height:clamp(48px,6vw,74px);border-radius:50%;overflow:hidden;background:#11141B;box-shadow:0 0 0 1px {{ h.ring }}">
-            <img src="{{ h.img }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 15%;filter:saturate(.86) contrast(1.04)">
+            <img sc-camel-src="{{ h.img }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 15%;filter:saturate(.86) contrast(1.04)">
             <div style="position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(0,0,0,.2) 0 1px,transparent 1px 3px)"></div>
           </div>
           <div style="min-width:0;font-size:clamp(14px,1.8vw,20px);color:#F5F5F5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ h.h }}</div>
@@ -661,7 +662,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
         <sc-if value="{{ wallHasEntries }}">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:3px;border-radius:10px;overflow:hidden">
           <sc-for list="{{ clubeFaces }}" as="a" hint-placeholder-count="12">
-            <a href="{{ a.socialLink }}" target="_blank" rel="noopener noreferrer" style="cursor:pointer;position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img src="{{ a.img }}" alt="{{ a.alt }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 15%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></a>
+            <a href="{{ a.socialLink }}" target="_blank" rel="noopener noreferrer" style="cursor:pointer;position:relative;aspect-ratio:3/4;overflow:hidden;background:#111418"><img sc-camel-src="{{ a.img }}" alt="{{ a.alt }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 15%;filter:brightness(.88);transition:transform .4s" style-hover="transform:scale(1.07)"></a>
           </sc-for>
         </div>
         </sc-if>
@@ -2316,7 +2317,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
     </div>
     <div style="height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,#e9e9ed 12%,transparent) 48px,color-mix(in srgb,#e9e9ed 12%,transparent) calc(100% - 48px),transparent);margin:clamp(28px,4vw,44px) 0 18px"></div>
     <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between">
-      <div style="font-size:11.5px;color:color-mix(in srgb,#e9e9ed 38%,transparent)">© 2026 O Surto Artificial · todos os direitos reservados · protótipo de navegação</div>
+      <div style="font-size:11.5px;color:color-mix(in srgb,#e9e9ed 38%,transparent)">© 2026 O Surto Artificial · Todos os direitos reservados</div>
       <div style="display:flex;gap:18px">
         <a href="/termos.html" style="cursor:pointer;font-size:11.5px;color:color-mix(in srgb,#e9e9ed 45%,transparent);transition:color .2s;text-decoration:none" style-hover="color:#e9e9ed">Termos</a>
         <a href="/privacidade.html" style="cursor:pointer;font-size:11.5px;color:color-mix(in srgb,#e9e9ed 45%,transparent);transition:color .2s;text-decoration:none" style-hover="color:#e9e9ed">Privacidade</a>

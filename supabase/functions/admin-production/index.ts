@@ -268,7 +268,7 @@ Deno.serve(async (req: Request) => {
         .single();
       if (episodeError) throw episodeError;
 
-      const { data: previouslyAssigned } = await admin.from("appearances").select("id,support_id,status").eq("episode_id", episode.id);
+      const { data: previouslyAssigned } = await admin.from("appearances").select("id,support_id,status,published_url,estimated_date").eq("episode_id", episode.id);
       const toRelease = (previouslyAssigned || []).filter((a: any) => !selectedIds.includes(a.support_id) && a.status !== "published").map((a: any) => a.id);
       if (toRelease.length) {
         const { error } = await admin.from("appearances").update({ episode_id: null, estimated_episode_number: null, estimated_date: null, status: "queued", updated_at: now }).in("id", toRelease);
@@ -292,7 +292,9 @@ Deno.serve(async (req: Request) => {
           ? await admin.from("appearances").update(appearancePayload).eq("id", existing.id)
           : await admin.from("appearances").insert(appearancePayload);
         if (result.error) throw result.error;
-        if (support.user_id) {
+        const previous = (previouslyAssigned || []).find((a: any) => a.support_id === support.id);
+        const changed = !previous || previous.status !== status || previous.published_url !== publishedUrl || previous.estimated_date !== scheduledDate;
+        if (support.user_id && changed) {
           await admin.from("notifications").insert({
             user_id: support.user_id,
             type: status === "published" ? "appearance" : "info",

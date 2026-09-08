@@ -1,0 +1,20 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const base='https://ndfchglutpnbckpcrppy.supabase.co',key='sb_publishable_RQVP_F6Ix1ZxHhu9HzO9bA_yy9wfb8C';
+(async()=>{
+ const r=await fetch(base+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:key,'Content-Type':'application/json'},body:JSON.stringify({email:'launch-qa-20260908@example.invalid',password:process.env.QA_PASSWORD})});
+ const session=await r.json();assert.ok(session.access_token);const uid=session.user.id;
+ const headers={apikey:key,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'};
+ const call=async(name,body)=>{const r=await fetch(base+'/functions/v1/'+name,{method:'POST',headers,body:JSON.stringify(body)});const data=await r.json();assert.equal(r.status,200,`${name}: ${JSON.stringify(data)}`);return data};
+ const data=await call('admin-production',{action:'dashboard'});assert.ok(data.users&&data.supports);
+ const support=data.supports.find(s=>s.user_id===uid&&s.payment_status==='paid');assert.ok(support);
+ const avatar=uid+'/qa-avatar.png';
+ const upload=await fetch(base+'/storage/v1/object/supporter-avatars/'+avatar,{method:'POST',headers:{...headers,'Content-Type':'image/png','x-upsert':'true'},body:fs.readFileSync(path.join(__dirname,'../assets-min/logo-surto.png'))});assert.equal(upload.status,200);
+ await call('admin-production',{action:'register_avatar',user_id:uid,path:avatar});
+ const detail=await call('admin-production',{action:'supporter_detail',user_id:uid});assert.ok(detail.signed);
+ const body={action:'save_episode_batch',production_id:support.production_id,episode_number:9999,support_ids:[support.id],status:'published',scheduled_date:'2026-09-08',published_url:'https://www.youtube.com/@osurtoartificial',cover_image_url:'https://osurtoartificial.com.br/assets-min/logo-surto.png'};
+ await call('admin-production',body);await call('admin-production',body);
+ const model=await call('supporter-dashboard-data',{});assert.ok(model.episodes.some(e=>e.episodeNumber===9999&&e.coverImageUrl));
+ const wall=await fetch(base+'/rest/v1/wall_entries?user_id=eq.'+uid+'&is_visible=eq.true',{headers:{apikey:key}}).then(r=>r.json());
+ assert.equal(wall.length,1);assert.equal(wall[0].published_appearances,1);assert.equal(wall[0].social_url,'https://www.instagram.com/osurtoartificial/');
+ console.log('PASS: actual admin dashboard/detail, private download URLs, avatar upload, automatic public mural, batch episode publication, supporter episode/cover/link and hall count');
+})().catch(e=>{console.error(e);process.exitCode=1});

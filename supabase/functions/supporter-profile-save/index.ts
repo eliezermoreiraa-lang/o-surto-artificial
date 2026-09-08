@@ -25,7 +25,7 @@ Deno.serve(async (req: Request) => {
   if (!user) return json(req, { error: "Sessão inválida" }, 401);
 
   const admin = createClient(URL, SERVICE);
-  const { data: paidSupport } = await admin.from("supports").select("id").eq("user_id", user.id).eq("payment_status", "paid").limit(1).maybeSingle();
+  const { data: paidSupport } = await admin.from("supports").select("id").eq("user_id", user.id).eq("payment_status", "paid").in("tier", ["supporter", "highlight", "vip"]).limit(1).maybeSingle();
   if (!paidSupport) return json(req, { error: "Seu perfil será liberado após a confirmação do pagamento", code: "payment_required" }, 403);
 
   let payload: any = {};

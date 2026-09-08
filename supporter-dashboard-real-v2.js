@@ -473,7 +473,7 @@
       bindRoot(root);
       window.__surtoGetSupporterDashboardModel=()=>dataModel;
       window.dispatchEvent(new CustomEvent('surto:supporter-dashboard-rendered',{detail:{route:currentRoute}}));
-      if(currentRoute==='perfil'&&m.currentSupport){
+      if(currentRoute==='perfil'&&m.currentSupport&&['supporter','highlight','vip'].includes(m.currentSupport.tier)){
         if(typeof window.__surtoRenderSupporterProfile==='function'){
           await window.__surtoRenderSupporterProfile(root,m);
         }else{
