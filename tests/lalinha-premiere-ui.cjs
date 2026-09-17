@@ -38,14 +38,34 @@ const handles=['eurebequinhan','biancadellafancy','kayaconky','sarahvikaqueen','
    assert.match(await page.locator('h1').innerText(),/LALINHA.*DO BAIRRO/s);
    assert.match(await page.locator('.sa-archive-production').innerText(),/A UrsupaDOLLra/i);
    assert.match(await page.locator('.sa-archive-production').innerText(),/Novela finalizada/i);
-   assert.equal(await page.locator('.sa-cast-card').count(),9);
-   assert.deepEqual(await page.locator('.sa-cast-card').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('href'))),handles.map(h=>'https://www.instagram.com/'+h+'/'));
-   for(const card of await page.locator('.sa-cast-card').all()){
+   const cards=page.locator('.sa-cast-grid:not(.sa-cast-copy) .sa-cast-card');
+   assert.equal(await cards.count(),9);
+   assert.deepEqual(await cards.evaluateAll(nodes=>nodes.map(n=>n.getAttribute('href'))),handles.map(h=>'https://www.instagram.com/'+h+'/'));
+   for(const card of await cards.all()){
     await card.scrollIntoViewIfNeeded();
     await card.locator('img').evaluate(img=>img.decode());
     assert.equal(await card.locator('img').evaluate(img=>img.naturalWidth>0),true);
    }
-   assert.equal(await page.locator('.sa-cast-card').filter({hasText:'Samira Close'}).count(),1);
+   assert.equal(await cards.filter({hasText:'Samira Close'}).count(),1);
+   assert.equal(await page.locator('.sa-cast-track').evaluate(e=>getComputedStyle(e).animationName),'none','reduced motion');
+   assert.ok(await page.locator('.sa-cast-window').evaluate(e=>e.scrollWidth>e.clientWidth),'horizontal carousel');
+   await page.locator('.sa-cast-window').evaluate(e=>e.scrollLeft=0);
+   await page.emulateMedia({reducedMotion:'no-preference'});
+   await page.mouse.move(0,0);
+   await page.evaluate(()=>document.activeElement.blur());
+   const track=page.locator('.sa-cast-track');
+   assert.equal(await track.evaluate(e=>getComputedStyle(e).animationName),'saCastMarquee');
+   const moving=await track.evaluate(e=>new Promise(resolve=>{
+    const before=getComputedStyle(e).transform;
+    setTimeout(()=>resolve(before!==getComputedStyle(e).transform),250);
+   }));
+   assert.equal(moving,true,'automatic movement');
+   await page.locator('#sa-cast-pause').check();
+   assert.equal(await track.evaluate(e=>getComputedStyle(e).animationPlayState),'paused','pause control');
+   await page.locator('#sa-cast-pause').uncheck();
+   await cards.first().focus();
+   assert.equal(await track.evaluate(e=>getComputedStyle(e).animationPlayState),'paused','pause for keyboard');
+   await page.emulateMedia({reducedMotion:'reduce'});
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'cast overflow');
    if(process.env.QA_OUTPUT)await page.locator('.sa-lalinha-cast').screenshot({path:path.join(process.env.QA_OUTPUT,`lalinha-cast-${engine}-${width}.png`),style:'.sa-site-header{visibility:hidden!important}'});
    await page.getByText('ENTRAR PARA O CLUBE',{exact:false}).first().click();

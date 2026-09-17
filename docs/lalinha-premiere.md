@@ -1,5 +1,7 @@
 # Lalinha do Bairro — estreia
 
+Revisão a pedido do responsável: elenco em carrossel horizontal automático de 65 segundos por volta, em vez de grade. A segunda sequência mantém a passagem contínua, fica fora da navegação por teclado e é ignorada por leitores de tela. Pausa por controle explícito, foco e ponteiro; a preferência de movimento reduzido desliga a animação e permite rolagem manual. Verificados movimento real, pausa e links em Chrome/WebKit, celular e computador.
+
 Atualização editorial de 17/09/2026: início com indicador verde e etiquetas Em exibição / Precisando de apoio. Lalinha ocupa o destaque de Em Exibição; A UrsupaDOLLra permanece em seção própria, como nosso primeiro surto, finalizado.
 
 O elenco atual tem nove cartões únicos, com nome, arroba, link externo e texto alternativo. As fichas originais fornecidas pelo responsável foram preservadas: o CSS enquadra apenas o retrato frontal, sem geração de novas feições. Os arquivos estão em assets-min/lalinha-cast. A personagem fictícia de cabelo rosa e a ficha duplicada não foram incluídas.
