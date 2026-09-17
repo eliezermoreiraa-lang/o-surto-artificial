@@ -3,7 +3,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
 const root=path.resolve(__dirname,'..');
 const fixture=fs.readFileSync(path.join(__dirname,'monthly-ui.cjs'),'utf8');
 const fake=fixture.slice(fixture.indexOf('function fake(){'),fixture.indexOf('(async()=>{'));
-const handles=['eurebequinhan','biancadellafancy','kayaconky','sarahvikaqueen','fiuk','pabllovittar','liaclark','thaliabombinha','uriasss'];
+const handles=['eurebequinhan','biancadellafancy','kayaconky','samiraclose','fiuk','pabllovittar','liaclark','thaliabombinha','uriasss'];
 (async()=>{
  for(const [engine,driver,opts] of [['Chrome',chromium,{channel:'chrome',args:['--no-proxy-server']}],['WebKit',webkit,{}]]){
   const browser=await driver.launch({headless:true,...opts});
