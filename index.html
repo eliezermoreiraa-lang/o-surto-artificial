@@ -13,6 +13,7 @@
 <script src="./support.js"></script>
 <script src="/club-support.js?v=20260908-monthly-1"></script>
 <script src="/monthly-support.js?v=20260908-monthly-1" defer></script>
+<script src="/contract-form.js?v=20260923-1" defer></script>
 <script src="/guest-support.js?v=20260908-1" defer></script>
 <link rel="stylesheet" href="/club-support.css?v=20260908-2">
 <link rel="stylesheet" href="/token-meter.css?v=20260908-1">
@@ -872,7 +873,7 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
               <input placeholder="ex: R$ 5.000" style="height:56px;padding:0 18px;border:0;outline:0;border-radius:8px;background:color-mix(in srgb,#F5F5F5 5%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,#F5F5F5 12%,transparent);color:#F5F5F5;font-family:Inter,sans-serif;font-size:15px;transition:box-shadow .25s,background .25s" style-focus="box-shadow:0 0 0 1px #00E5FF,0 0 0 4px rgba(0,229,255,.14);background:color-mix(in srgb,#F5F5F5 8%,transparent)">
             </label>
           </div>
-          <div onClick="{{ enviarOrcamento }}" style="display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;height:64px;border-radius:8px;margin-top:6px;font-size:13px;letter-spacing:.16em;color:#F5F5F5;background:#E50914;box-shadow:0 8px 32px rgba(229,9,20,.36);transition:background .22s,transform .2s,box-shadow .22s" style-hover="background:color-mix(in srgb,#E50914 82%,#ff3322);transform:translateY(-2px);box-shadow:0 12px 42px rgba(229,9,20,.52)">ENVIAR PEDIDO DE ORÇAMENTO <span>→</span></div>
+          <button type="button" data-contract-submit onClick="{{ enviarOrcamento }}" style="display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;min-height:64px;padding:12px;border:0;font-family:inherit;border-radius:8px;margin-top:6px;font-size:13px;letter-spacing:.16em;color:#F5F5F5;background:#E50914;box-shadow:0 8px 32px rgba(229,9,20,.36);transition:background .22s,transform .2s,box-shadow .22s" style-hover="background:color-mix(in srgb,#E50914 82%,#ff3322);transform:translateY(-2px);box-shadow:0 12px 42px rgba(229,9,20,.52)">ENVIAR PEDIDO DE ORÇAMENTO <span>→</span></button>
           <div style="font-size:11.5px;color:color-mix(in srgb,#F5F5F5 42%,transparent);text-align:center">Sua solicitação será enviada para a equipe de O Surto Artificial.</div>
         </div>
       </div>
@@ -3310,7 +3311,7 @@ class Component extends DCLogic {
         k, cls: (s.tipoProd || 'Publicidade') === k ? 'btn-primary' : 'btn-secondary',
         pick: () => this.setState({ tipoProd: k })
       })),
-      enviarOrcamento: () => this.flash('Pedido enviado! Sua solicitação chegou para a equipe de O Surto Artificial.'),
+      enviarOrcamento: () => window.SurtoContractForm ? window.SurtoContractForm.submit() : this.flash('O formulário ainda está carregando. Tente novamente ou escreva para osurtoartificial@gmail.com.'),
       playTrailer: () => this.flash('Player abriria aqui — embed do YouTube/Instagram cadastrado no admin.'),
       episodios: [
         ['EP 54','O testamento tinha anexo','19/08/2026','A leitura do documento muda tudo.','no ar','Assistir',.6],
