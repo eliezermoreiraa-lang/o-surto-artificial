@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { supportPrice } from "../_shared/promotion.mjs";
 import { isProductionWebhookReady } from "./production-readiness.mjs";
 
 const URL = Deno.env.get("SUPABASE_URL")!;
@@ -71,7 +72,7 @@ Deno.serve(async (req: Request) => {
   const admin = createClient(URL, SERVICE);
   const { data: plan } = await admin.from("support_plans").select("slug,name,minimum_amount,active").eq("slug", tier).maybeSingle();
   if (!plan?.active) return json(req, { error: "Plano indisponível" }, 400);
-  const targetMinimum = Number(plan.minimum_amount);
+  const targetMinimum = tier === "free" ? Number(plan.minimum_amount) : supportPrice(tier);
   let chargeAmount = Number(body.amount);
   let credit = 0;
   let source: any = null;
@@ -83,9 +84,11 @@ Deno.serve(async (req: Request) => {
     if (rank[tier] <= rank[String(source.tier)]) return json(req, { error: "Escolha uma categoria superior à atual" }, 400);
     credit = Math.min(Number(source.amount || 0), targetMinimum);
     chargeAmount = Math.max(0, targetMinimum - credit);
+    if (body.expectedAmount !== chargeAmount) return json(req, { error: "O preço do upgrade mudou. Atualize a página e confira o valor.", code: "price_changed" }, 409);
   } else {
     const { data: active } = await admin.from("supports").select("id,tier,amount").eq("user_id", user.id).eq("payment_status", "paid").in("tier", ["supporter", "highlight", "vip"]).order("created_at", { ascending: false }).limit(1).maybeSingle();
     if (active && tier !== "free") return json(req, { error: "Você já é apoiador. Escolha um upgrade na sua área.", code: "upgrade_required", currentSupport: active }, 409);
+    if (tier !== "free" && chargeAmount !== targetMinimum) return json(req, { error: "O preço mudou ou a página está desatualizada. Atualize a página e confira o valor.", code: "price_changed" }, 409);
     if (!Number.isFinite(chargeAmount) || chargeAmount < targetMinimum) return json(req, { error: `O valor mínimo para ${plan.name} é R$ ${targetMinimum.toFixed(2).replace(".", ",")}` }, 400);
   }
 
