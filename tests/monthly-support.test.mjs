@@ -6,7 +6,7 @@ import {stripTypeScriptTypes} from 'node:module';
 import {monthlyEvents,consentVersion,prices,checkoutLink,monthlyCheckout,resolveMonthlyEvent} from '../supabase/functions/asaas-monthly-support/shared.mjs';
 import {isProductionWebhookReady,requiredPaymentEvents} from '../supabase/functions/asaas-create-support-payment/production-readiness.mjs';
 const id='aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa';
-const valid={action:'create',tier:'supporter',method:'cartao',consent:true,consentVersion};
+const valid={expectedAmount:25,action:'create',tier:'supporter',method:'cartao',consent:true,consentVersion};
 function harness({user='owner',row=null,providerError=null,missingEvents=false}={}){
   let handler;const calls=[],records=row?[structuredClone(row)]:[];
   let hook={id:'hook',url:'https://project.supabase.co/functions/v1/asaas-webhook',enabled:true,interrupted:false,apiVersion:3,sendType:'SEQUENTIALLY',events:[...requiredPaymentEvents,...(missingEvents?[]:monthlyEvents)]};
@@ -30,14 +30,16 @@ function harness({user='owner',row=null,providerError=null,missingEvents=false}=
     throw Error('Unexpected request '+path);
   };
   const source=fs.readFileSync(new URL('../supabase/functions/asaas-monthly-support/index.ts',import.meta.url),'utf8').replace(/^import .*;\r?\n/gm,'');
-  vm.runInNewContext(stripTypeScriptTypes(source),{Response,Request,Set,Date,Intl,console,monthlyEvents,consentVersion,prices,checkoutLink,monthlyCheckout,provider,isProductionWebhookReady,
+  vm.runInNewContext(stripTypeScriptTypes(source),{Response,Request,Set,Date,Intl,console,monthlyEvents,consentVersion,prices,checkoutLink,monthlyCheckout,provider,isProductionWebhookReady,supportPrice:()=>25,regularPrices:prices,
     Deno:{env:{get:n=>n==='SUPABASE_URL'?'https://project.supabase.co':'test-secret'},serve:fn=>handler=fn},
     createClient:()=>({auth:{getUser:async()=>({data:{user:user?{id:user}:null}})},from})});
   return {calls,records,send:async(body=valid,authorization='Bearer test')=>{const r=await handler(new Request('https://project.supabase.co/functions/v1/asaas-monthly-support',{method:'POST',headers:{authorization,'content-type':'application/json'},body:JSON.stringify(body)}));return {status:r.status,data:await r.json()}}};
 }
-test('monthly checkout is hosted, fixed price, recurring only, no card fields',async()=>{const h=harness();const out=await h.send({...valid,amount:1});assert.equal(out.status,200);const p=JSON.parse(h.calls.find(c=>c.path==='/checkouts').body);assert.deepEqual(p.billingTypes,['CREDIT_CARD']);assert.deepEqual(p.chargeTypes,['RECURRENT']);assert.equal(p.subscription.cycle,'MONTHLY');assert.equal(p.items[0].value,50);assert.equal(p.externalReference,'monthly:'+id);assert.equal(p.creditCard,undefined);assert.equal(h.records[0].consent_version,consentVersion)});
+test('monthly checkout is hosted, fixed price, recurring only, no card fields',async()=>{const h=harness();const out=await h.send({...valid,amount:1});assert.equal(out.status,200);const p=JSON.parse(h.calls.find(c=>c.path==='/checkouts').body);assert.deepEqual(p.billingTypes,['CREDIT_CARD']);assert.deepEqual(p.chargeTypes,['RECURRENT']);assert.equal(p.subscription.cycle,'MONTHLY');assert.equal(p.items[0].value,25);assert.equal(p.externalReference,'monthly:'+id);assert.equal(p.creditCard,undefined);assert.equal(h.records[0].consent_version,consentVersion)});
 for(const [name,body] of Object.entries({noConsent:{consent:false},wrongTerms:{consentVersion:'old'},pix:{method:'pix'},free:{tier:'free'},prototype:{tier:'toString'},upgrade:{upgradeFromSupportId:id}}))test('rejects '+name+' before creating checkout',async()=>{const h=harness();assert.equal((await h.send({...valid,...body})).status,400);assert.equal(h.calls.length,0);assert.equal(h.records.length,0)});
 test('requires real authenticated user',async()=>{const h=harness({user:null});assert.equal((await h.send()).status,401);assert.equal(h.calls.length,0)});
+test('rejects stale consent amount without creating a contract',async()=>{const h=harness();assert.equal((await h.send({...valid,expectedAmount:50})).status,409);assert.equal(h.records.length,0);assert.equal(h.calls.filter(c=>c.path==='/checkouts').length,0)});
+test('does not silently resume an older differently priced contract',async()=>{const h=harness({row:{id,user_id:'owner',tier:'supporter',amount:50,status:'pending',checkout_id:'checkout-123456',checkout_state:'ACTIVE'}});assert.equal((await h.send()).status,409);assert.equal(h.records[0].amount,50);assert.equal(h.records.length,1)});
 test('duplicate click resumes one existing checkout',async()=>{const h=harness();await h.send();const out=await h.send();assert.equal(out.status,200);assert.equal(out.data.resumed,true);assert.equal(h.records.length,1);assert.equal(h.calls.filter(c=>c.path==='/checkouts').length,1)});
 test('ambiguous timeout never creates second contract or charge',async()=>{const h=harness({providerError:{}});assert.equal((await h.send()).status,502);assert.equal((await h.send()).status,409);assert.equal(h.calls.filter(c=>c.path==='/checkouts').length,1)});
 test('adds monthly events without removing existing events',async()=>{const h=harness({missingEvents:true});assert.equal((await h.send()).status,200);const events=JSON.parse(h.calls.find(x=>x.path==='/webhooks/hook').body).events;for(const e of [...requiredPaymentEvents,...monthlyEvents])assert.ok(events.includes(e))});

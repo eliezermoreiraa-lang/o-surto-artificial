@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {supportPrice as campaignPrice} from '../supabase/functions/_shared/promotion.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
@@ -7,7 +8,7 @@ import {isProductionWebhookReady,requiredPaymentEvents} from '../supabase/functi
 const url='https://project.supabase.co/functions/v1/asaas-webhook';
 const hook={url,enabled:true,interrupted:false,apiVersion:3,sendType:'SEQUENTIALLY',events:requiredPaymentEvents};
 
-for(const amount of [10.25,1000.25])for(const method of ['pix','cartao'])test(`free support preserves ${amount} cents for ${method} through actual handler`,async()=>{
+for(const [tier,amount] of [['free',10.25],['free',1000.25],['supporter',25],['highlight',50],['vip',150]])for(const method of ['pix','cartao'])test(`${tier} support preserves ${amount} cents for ${method} through actual handler`,async()=>{
  let handler,storedAmount,providerAmount;
  const source=fs.readFileSync(new URL('../supabase/functions/asaas-create-support-payment/index.ts',import.meta.url),'utf8').replace(/^import .*;\r?\n/gm,'');
  const from=table=>{
@@ -19,7 +20,7 @@ for(const amount of [10.25,1000.25])for(const method of ['pix','cartao'])test(`f
    return ()=>chain;
   }});return chain;
  };
- const context=vm.createContext({Response,Request,AbortSignal,Intl,Date,Set,console,setTimeout,isProductionWebhookReady,
+ const context=vm.createContext({Response,Request,AbortSignal,Intl,Date,Set,console,setTimeout,isProductionWebhookReady,supportPrice:t=>campaignPrice(t,'2026-09-25T12:00:00-03:00'),
   Deno:{env:{get:name=>name==='SUPABASE_URL'?'https://project.supabase.co':'private-test-value'},serve:fn=>{handler=fn}},
   createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'test',email:'test@example.invalid'}}})},from}),
   fetch:async(address,options)=>{
@@ -32,7 +33,7 @@ for(const amount of [10.25,1000.25])for(const method of ['pix','cartao'])test(`f
   }
  });
  vm.runInContext(stripTypeScriptTypes(source),context);
- const response=await handler(new Request('https://project.supabase.co/functions/v1/asaas-create-support-payment',{method:'POST',headers:{authorization:'Bearer test','content-type':'application/json'},body:JSON.stringify({tier:'free',method,amount,cpfCnpj:'12345678901',fullName:'Teste'})}));
+ const response=await handler(new Request('https://project.supabase.co/functions/v1/asaas-create-support-payment',{method:'POST',headers:{authorization:'Bearer test','content-type':'application/json'},body:JSON.stringify({tier,method,amount,cpfCnpj:'12345678901',fullName:'Teste'})}));
  assert.equal(response.status,200);assert.equal((await response.json()).amount,amount);assert.equal(storedAmount,amount);assert.equal(providerAmount,amount);
 });
 test('ready only with all confirmation settings',()=>assert.equal(isProductionWebhookReady({data:[hook]},url),true));
