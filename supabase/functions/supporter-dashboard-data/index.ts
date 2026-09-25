@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { supportPrice } from "../_shared/promotion.mjs";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const URL = Deno.env.get("SUPABASE_URL")!;
@@ -61,7 +62,7 @@ Deno.serve(async (req: Request) => {
     }));
     vipBriefing.reference_images = signedImages.filter(Boolean);
   }
-  const upgrades = ["supporter", "highlight", "vip"].map(t => ({ tier: t, label: labels[t], fullPrice: mins[t], available: !currentTier || rank[t] > rank[currentTier], amountDue: Math.max(0, mins[t] - currentCredit) }));
+  const upgrades = ["supporter", "highlight", "vip"].map(t => ({ tier: t, label: labels[t], fullPrice: supportPrice(t), available: !currentTier || rank[t] > rank[currentTier], amountDue: Math.max(0, supportPrice(t) - currentCredit) }));
   return new Response(JSON.stringify({
     ok: true,
     user: { id: user.id, email: user.email, displayName: profile?.display_name || user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split("@")[0] || "Apoiador", memberSince: profile?.created_at || user.created_at },
