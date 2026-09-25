@@ -1,5 +1,5 @@
 export const monthlyEvents = ['CHECKOUT_CREATED','CHECKOUT_PAID','CHECKOUT_CANCELED','CHECKOUT_EXPIRED','SUBSCRIPTION_CREATED','SUBSCRIPTION_UPDATED','SUBSCRIPTION_INACTIVATED','SUBSCRIPTION_DELETED','PAYMENT_CREATED','PAYMENT_UPDATED','PAYMENT_OVERDUE','PAYMENT_CHARGEBACK_REQUESTED','PAYMENT_CHARGEBACK_DISPUTE','PAYMENT_AWAITING_CHARGEBACK_REVERSAL'];
-export const consentVersion = 'monthly-card-2026-09-08';
+export const consentVersion = 'monthly-card-2026-09-25-promo';
 export const prices = Object.freeze({supporter:50,highlight:100,vip:300});
 export function checkoutLink(id) {
   if (!/^[a-zA-Z0-9_-]{8,100}$/.test(id || '')) throw new Error('Invalid checkout identifier');

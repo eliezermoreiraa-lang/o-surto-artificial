@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2.95.3";
 import { monthlyEvents, consentVersion, prices, checkoutLink, monthlyCheckout, provider } from "./shared.mjs";
+import { supportPrice, regularPrices } from "../_shared/promotion.mjs";
 import { isProductionWebhookReady } from "../asaas-create-support-payment/production-readiness.mjs";
 
 const base=Deno.env.get('SUPABASE_URL')!;
@@ -54,13 +55,15 @@ Deno.serve(async(req:Request)=>{
     }
     const {data:plan,error:planError}=await admin.from('support_plans').select('active,minimum_amount').eq('slug',body.tier).maybeSingle();
     if(planError)throw planError;
-    if(!plan?.active||Number(plan.minimum_amount)!==prices[body.tier])return json({error:'Plano indisponível'},400);
+    if(!plan?.active||Number(plan.minimum_amount)!==regularPrices[body.tier])return json({error:'Plano indisponível'},400);
     const existing=async()=>{const {data,error}=await admin.from('subscriptions').select('*').eq('user_id',user.id).in('status',['pending','active','past_due']).maybeSingle();if(error)throw error;return data};
-    const resume=(c:any)=> c.status==='pending'&&c.checkout_id&&c.tier===body.tier&&c.checkout_state==='ACTIVE'
+    const resume=(c:any)=> Number(c.amount)!==body.expectedAmount ? json({error:'Sua contratação anterior possui outro valor. Confira Minha Assinatura antes de continuar.',code:'price_changed'},409) : c.status==='pending'&&c.checkout_id&&c.tier===body.tier&&c.checkout_state==='ACTIVE'
       ?json({ok:true,subscriptionId:c.id,invoiceUrl:checkoutLink(c.checkout_id),amount:c.amount,resumed:true})
       :json({error:c.status==='pending'?'Sua contratação está em andamento. Confira Minha Assinatura antes de tentar novamente.':'Você já possui uma assinatura. Gerencie ou cancele a atual em Minha Assinatura antes de contratar outra.',code:'subscription_exists'},409);
     const current=await existing();if(current)return resume(current);
-    const {data:c,error:insertError}=await admin.from('subscriptions').insert({user_id:user.id,tier:body.tier,amount:prices[body.tier],status:'pending',payment_provider:'asaas',consent_at:new Date().toISOString(),consent_version:consentVersion}).select('*').single();
+    const amount=supportPrice(body.tier);
+    if(body.expectedAmount!==amount)return json({error:'O preço mudou ou a página está desatualizada. Atualize a página e confira o valor antes de autorizar.',code:'price_changed'},409);
+    const {data:c,error:insertError}=await admin.from('subscriptions').insert({user_id:user.id,tier:body.tier,amount,status:'pending',payment_provider:'asaas',consent_at:new Date().toISOString(),consent_version:consentVersion}).select('*').single();
     if(insertError){if(insertError.code==='23505'){const previous=await existing();if(previous)return resume(previous)}throw insertError}
     let submitted=false;
     try{
