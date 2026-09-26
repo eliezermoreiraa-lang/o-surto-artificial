@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { supportPrice } from "../_shared/promotion.mjs";
+import { supportLifecycle } from "../_shared/support-lifecycle.mjs";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const URL = Deno.env.get("SUPABASE_URL")!;
@@ -37,13 +38,16 @@ Deno.serve(async (req: Request) => {
   const paidSupports = supports || [];
   const effective = paidSupports.slice().sort((a: any, b: any) => (rank[b.tier] - rank[a.tier]) || (new Date(b.created_at).getTime() - new Date(a.created_at).getTime()))[0] || null;
   const currentTier = effective?.tier || null;
-  const currentCredit = currentTier ? Math.min(Number(effective.amount || 0), mins[currentTier] || 0) : 0;
   const ids = paidSupports.map((s: any) => s.id);
   let appearances: any[] = [];
   if (ids.length) {
-    const { data } = await admin.from("appearances").select("id,support_id,episode_id,status,queue_priority,estimated_episode_number,estimated_date,confirmed_at,published_at,published_url,created_at,episodes(episode_number,scheduled_date,published_at,instagram_url,tiktok_url,youtube_url,cover_image_url)").in("support_id", ids).order("created_at", { ascending: false });
+    const { data, error } = await admin.from("appearances").select("id,support_id,episode_id,status,queue_priority,estimated_episode_number,estimated_date,confirmed_at,published_at,published_url,created_at,episodes(episode_number,scheduled_date,published_at,instagram_url,tiktok_url,youtube_url,cover_image_url)").in("support_id", ids).order("created_at", { ascending: false });
+    if (error) return new Response(JSON.stringify({ error: "Não foi possível verificar suas aparições. Tente novamente." }), { status: 503, headers: cors(req) });
     appearances = data || [];
   }
+  const lifecycle = supportLifecycle(paidSupports, appearances);
+  const upgradeSupport = lifecycle.available[0] || null;
+  const currentCredit = upgradeSupport ? Math.min(Number(upgradeSupport.amount || 0), mins[upgradeSupport.tier] || 0) : 0;
   const realEpisodes = appearances.filter((a: any) => a.status === "published" || a.published_at || a.episodes?.published_at).map((a: any) => ({
     appearanceId: a.id,
     episodeNumber: a.episodes?.episode_number || a.estimated_episode_number || null,
@@ -62,7 +66,7 @@ Deno.serve(async (req: Request) => {
     }));
     vipBriefing.reference_images = signedImages.filter(Boolean);
   }
-  const upgrades = ["supporter", "highlight", "vip"].map(t => ({ tier: t, label: labels[t], fullPrice: supportPrice(t), available: !currentTier || rank[t] > rank[currentTier], amountDue: Math.max(0, supportPrice(t) - currentCredit) }));
+  const upgrades = ["supporter", "highlight", "vip"].map(t => ({ tier: t, label: labels[t], fullPrice: supportPrice(t), available: !!upgradeSupport && rank[t] > rank[upgradeSupport.tier], amountDue: Math.max(0, supportPrice(t) - currentCredit) }));
   return new Response(JSON.stringify({
     ok: true,
     user: { id: user.id, email: user.email, displayName: profile?.display_name || user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split("@")[0] || "Apoiador", memberSince: profile?.created_at || user.created_at },
@@ -77,6 +81,8 @@ Deno.serve(async (req: Request) => {
     vipBriefing,
     currentTier,
     currentCredit,
+    upgradeSupport,
+    canPurchaseAgain: lifecycle.canPurchaseAgain,
     upgrades,
   }), { headers: cors(req) });
 });
