@@ -14,6 +14,7 @@
 <script src="/club-support.js?v=20260925-promo-1"></script>
 <script src="/monthly-support.js?v=20260925-promo-1" defer></script>
 <link rel="stylesheet" href="/promotion.css?v=20260925-1">
+<link rel="stylesheet" href="/about-editorial.css?v=20260926-1">
 <script src="/contract-form.js?v=20260923-1" defer></script>
 <script src="/guest-support.js?v=20260908-1" defer></script>
 <link rel="stylesheet" href="/club-support.css?v=20260908-2">
@@ -691,110 +692,68 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
 </div>
 </sc-if>
 <sc-if value="{{ atSobre }}">
-<div style="background:#0B0D13;animation:saIn .4s both">
-  <div style="position:relative;overflow:hidden">
-    <div style="position:absolute;top:-14%;left:-8%;width:52vw;height:52vw;border-radius:50%;background:radial-gradient(circle,rgba(229,9,20,.3),transparent 66%);filter:blur(80px);animation:saGlow 20s ease-in-out infinite"></div>
-    <div style="position:absolute;bottom:-24%;right:-10%;width:44vw;height:44vw;border-radius:50%;background:radial-gradient(circle,rgba(0,229,255,.22),transparent 66%);filter:blur(86px);animation:saGlowB 24s ease-in-out infinite"></div>
-    <div style="position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px);mix-blend-mode:multiply;opacity:.5"></div>
-    <div style="position:relative;max-width:1260px;margin:0 auto;padding:clamp(64px,10vh,120px) 20px clamp(40px,6vw,80px);display:grid;grid-template-columns:{{ eliCols }};gap:clamp(30px,5vw,76px);align-items:center">
-      <div style="position:relative;order:{{ eliPhotoOrder }};animation:saIn 1s .05s both">
-        <div style="position:absolute;left:-18px;top:-18px;right:28px;bottom:28px;border-radius:16px;background:linear-gradient(140deg,rgba(229,9,20,.55),rgba(0,229,255,.3));filter:blur(34px);opacity:.55;pointer-events:none"></div>
-        <div style="position:relative;border-radius:14px;overflow:hidden;aspect-ratio:{{ eliRatio }};background:#11141B;box-shadow:0 0 0 1px color-mix(in srgb,#F5F5F5 14%,transparent),0 30px 80px rgba(0,0,0,.6)">
-          <img src="assets-min/eli-moreira.jpg" alt="Eli Moreira, criador de O Surto Artificial" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 16%;filter:saturate(.74) contrast(1.08) brightness(.94);animation:saDrift 34s ease-in-out infinite alternate">
-          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,13,19,.12) 0%,transparent 38%,rgba(11,13,19,.74) 100%)"></div>
-          <div style="position:absolute;inset:0;background:radial-gradient(58% 48% at 88% 8%,rgba(0,229,255,.2),transparent 70%),radial-gradient(72% 60% at 6% 94%,rgba(229,9,20,.26),transparent 72%);mix-blend-mode:screen"></div>
-          <div style="position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(0,0,0,.26) 0 1px,transparent 1px 3px);mix-blend-mode:multiply;opacity:.5"></div>
-          <div style="position:absolute;left:0;right:0;height:90px;background:linear-gradient(180deg,transparent,rgba(245,245,245,.07),transparent);animation:saScan 15s linear infinite"></div>
-          <div style="position:absolute;left:16px;bottom:16px;display:flex;align-items:center;gap:8px;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:color-mix(in srgb,#F5F5F5 78%,transparent)"><span style="width:5px;height:5px;border-radius:50%;background:#E50914;animation:saPulse 1.8s infinite;flex:none"></span>bastidores</div>
-        </div>
-      </div>
-      <div style="order:{{ eliTextOrder }}">
-        <div style="font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:#E50914;margin-bottom:clamp(14px,2vh,20px);animation:saUp .8s both">Por trás do Surto</div>
-        <h1 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(48px,7vw,104px);line-height:.9;margin:0;color:#F5F5F5;animation:saUp .8s .05s both">ELI MOREIRA</h1>
-        <div style="font-size:clamp(15px,1.7vw,19px);color:#00E5FF;margin:12px 0 clamp(22px,3vh,32px);animation:saUp .8s .1s both">Criador de O Surto Artificial</div>
-        <p style="font-size:clamp(16px,1.8vw,19px);line-height:1.6;margin:0 0 clamp(20px,3vh,28px);max-width:52ch;color:#F5F5F5;text-wrap:pretty;animation:saUp .8s .14s both">Eu sou Eli Moreira, tenho 37 anos, sou um homem gay, paulistano, nascido e criado em São Paulo. Sou casado, pai de dois cachorros e três gatos e, provavelmente,</p>
-        <div style="position:relative;padding-left:clamp(14px,1.6vw,20px);animation:saUp .8s .2s both">
-          <div style="position:absolute;left:0;top:6px;bottom:8px;width:2px;background:linear-gradient(180deg,#E50914,rgba(0,229,255,.5))"></div>
-          <div style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(24px,3vw,44px);line-height:1;color:#F5F5F5">CRONICAMENTE ONLINE<br><span style="color:#00E5FF">HÁ TEMPO DEMAIS.</span></div>
-        </div>
-      </div>
+<main class="surto-about" aria-label="Sobre O Surto Artificial">
+  <section class="about-hero about-wrap" aria-labelledby="about-title">
+    <div class="about-hero-copy">
+      <div class="about-eyebrow"><span></span> POR TRÁS DO SURTO</div>
+      <h1 id="about-title">CRIATIVIDADE<br>HUMANA.<br><em>POSSIBILIDADES</em><br>ARTIFICIAIS.</h1>
+      <p class="about-intro">Eu sou <strong>Eli Moreira.</strong><br>Transformo referências, ideias e um pouco de caos em histórias que você quer continuar assistindo.</p>
+      <div class="about-hero-actions"><a class="about-button" href="#about-story">CONHEÇA MINHA HISTÓRIA <span aria-hidden="true">↘</span></a><button class="about-text-link" type="button" onClick="{{ go.contrate }}">VAMOS CRIAR JUNTOS <span aria-hidden="true">↗</span></button></div>
     </div>
-  </div>
+    <figure class="about-hero-photo">
+      <img src="assets-min/eli-about-creator-v1.webp" width="1536" height="1024" alt="Retrato de Eli Moreira com notebook, em uma composição de estúdio criada com IA a partir de suas fotos" fetchpriority="high">
+      <figcaption><strong>ELI MOREIRA</strong><span>Criação · Direção · Inteligência artificial</span></figcaption>
+    </figure>
+    <div class="about-hero-foot"><span>O SURTO ARTIFICIAL</span><span>HISTÓRIAS IMPROVÁVEIS. CRIAÇÃO DE VERDADE.</span><span>CRIAÇÃO INDEPENDENTE</span></div>
+  </section>
 
-  <div style="max-width:1260px;margin:0 auto;padding:clamp(46px,7vw,90px) 20px 0">
-    <div data-reveal style="display:grid;grid-template-columns:{{ editorialCols }};gap:clamp(18px,4vw,56px);align-items:start">
-      <div style="font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:#E50914;padding-top:9px">A história</div>
-      <div style="max-width:60ch">
-        <p style="font-size:clamp(15px,1.6vw,17px);line-height:1.7;color:color-mix(in srgb,#F5F5F5 72%,transparent);margin:0 0 22px;text-wrap:pretty">Minha relação com a internet vem de muito antes de O Surto Artificial. Cresci digitalmente entre memes, cultura pop, televisão, reality shows, personagens improváveis e aquele tipo de assunto extremamente específico que começa como curiosidade, vira hiperfoco e, quando você percebe, já ocupa uma parte preocupante do cérebro.</p>
-        <p style="font-size:clamp(15px,1.6vw,17px);line-height:1.7;color:color-mix(in srgb,#F5F5F5 72%,transparent);margin:0 0 22px;text-wrap:pretty">Também fui formado — no sentido mais internet possível da palavra — acompanhando o antigo <span style="color:#F5F5F5">Baú Esquizo</span> e, hoje, o <span style="color:#F5F5F5">Baú Explica</span>. Foi daí que nasceu boa parte do meu hiperfoco no universo do Rodrigo Apresentador e em todas as histórias, referências e absurdos que cercam esse imaginário.</p>
-        <p style="font-size:clamp(15px,1.6vw,17px);line-height:1.7;color:color-mix(in srgb,#F5F5F5 72%,transparent);margin:0;text-wrap:pretty">Com o avanço das ferramentas generativas, comecei a me profissionalizar no uso de <span style="color:#F5F5F5">inteligência artificial aplicada à criação</span>, explorando diferentes áreas como produção audiovisual, geração de imagens e vídeos, criação e continuidade de personagens, voz, edição e desenvolvimento de projetos através de <span style="color:#00E5FF">vibe coding</span>.</p>
-      </div>
-    </div>
+  <section class="about-disciplines about-wrap" aria-label="As frentes da criação">
+    <article><span class="about-index">01 / IMAGINAR</span><h2>IDEIA & ROTEIRO</h2><p>Cultura pop, humor e referências de internet viram o ponto de partida de cada história.</p></article>
+    <article><span class="about-index">02 / CONSTRUIR</span><h2>DESIGN & UNIVERSO VISUAL</h2><p>Personagens, cenários e continuidade visual para dar identidade a cada produção.</p></article>
+    <article><span class="about-index">03 / DAR VIDA</span><h2>DIREÇÃO & AUDIOVISUAL</h2><p>Imagem, voz, vídeo e edição encontram o ritmo que transforma uma ideia em episódio.</p></article>
+  </section>
 
-    <div data-reveal style="display:grid;grid-template-columns:{{ editorialCols }};gap:clamp(18px,4vw,56px);align-items:start;padding-top:clamp(44px,6.5vw,86px)">
-      <div style="font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:#E50914;padding-top:9px">Como começou</div>
-      <div style="max-width:60ch">
-        <p style="font-family:'Bebas Neue',Inter,sans-serif;font-size:clamp(22px,2.8vw,38px);line-height:1.04;color:#F5F5F5;margin:0 0 22px">O SURTO ARTIFICIAL COMEÇOU QUASE COMO UMA BRINCADEIRA.</p>
-        <p style="font-size:clamp(15px,1.6vw,17px);line-height:1.7;color:color-mix(in srgb,#F5F5F5 72%,transparent);margin:0 0 22px;text-wrap:pretty">A ideia inicial era recriar algumas cenas de novela substituindo personagens por figuras desse universo da internet. Rodrigo Apresentador acabou entrando no meio disso e algumas dessas cenas começaram a chamar atenção.</p>
-        <p style="font-size:clamp(16px,1.8vw,20px);line-height:1.45;color:#00E5FF;margin:0 0 22px">As pessoas passaram a acompanhar.</p>
-        <p style="font-size:clamp(15px,1.6vw,17px);line-height:1.7;color:color-mix(in srgb,#F5F5F5 72%,transparent);margin:0;text-wrap:pretty">Vieram os comentários, os pedidos por continuação, as teorias e a curiosidade para saber o que aconteceria no próximo capítulo.</p>
-      </div>
+  <section id="about-story" class="about-story about-wrap" aria-labelledby="about-story-title">
+    <div class="about-story-visual">
+      <figure class="about-portrait"><img src="assets-min/eli-about-story-v1.webp" width="1024" height="1280" loading="lazy" alt="Retrato editorial de Eli Moreira sentado, criado com IA a partir de suas fotos"></figure>
+      <div class="about-side-note"><span>FORA DA TIMELINE</span><p>Paulistano. Casado.<br>Pai de dois cachorros<br>e três gatos.</p></div>
     </div>
-  </div>
+    <div class="about-story-copy">
+      <div class="about-eyebrow">PRAZER, ELI.</div>
+      <h2 id="about-story-title">CRONICAMENTE ONLINE.<br><em>CRIATIVAMENTE INQUIETO.</em></h2>
+      <p class="about-lead">Tenho 37 anos, sou um homem gay, nascido e criado em São Paulo. E, provavelmente, cronicamente online há tempo demais.</p>
+      <p>Minha relação com a internet vem de muito antes de O Surto Artificial. Cresci digitalmente entre memes, cultura pop, televisão, reality shows, personagens improváveis e aquele tipo de assunto extremamente específico que começa como curiosidade, vira hiperfoco e, quando você percebe, já ocupa uma parte preocupante do cérebro.</p>
+      <p>Também fui formado — no sentido mais internet possível da palavra — acompanhando o antigo <strong>Baú Esquizo</strong> e, hoje, o <strong>Baú Explica</strong>. Foi daí que nasceu boa parte do meu hiperfoco no universo do Rodrigo Apresentador e em todas as histórias, referências e absurdos que cercam esse imaginário.</p>
+      <p>Com o avanço das ferramentas generativas, comecei a me profissionalizar no uso de <strong>inteligência artificial aplicada à criação</strong>, explorando produção audiovisual, geração de imagens e vídeos, criação e continuidade de personagens, voz, edição e desenvolvimento de projetos através de vibe coding.</p>
+    </div>
+  </section>
 
-  <div data-reveal style="position:relative;overflow:hidden;margin-top:clamp(48px,7vw,96px)">
-    <div style="position:absolute;inset:0;background:radial-gradient(74% 96% at 14% 24%,rgba(229,9,20,.24),transparent 66%),radial-gradient(66% 88% at 88% 78%,rgba(0,229,255,.16),transparent 66%)"></div>
-    <div style="position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(0,0,0,.24) 0 1px,transparent 1px 3px);mix-blend-mode:multiply;opacity:.5"></div>
-    <div style="position:relative;max-width:1260px;margin:0 auto;padding:clamp(52px,8vw,110px) 20px">
-      <div style="display:grid;gap:clamp(8px,1.2vw,14px)">
-        <div style="font-family:'Bebas Neue',Inter,sans-serif;font-size:clamp(30px,5vw,76px);line-height:.96;color:color-mix(in srgb,#F5F5F5 82%,transparent)">A BRINCADEIRA VIROU NOVELINHA.</div>
-        <div style="font-family:'Bebas Neue',Inter,sans-serif;font-size:clamp(30px,5vw,76px);line-height:.96;color:#00E5FF;padding-left:clamp(12px,3vw,52px)">A NOVELINHA VIROU PRODUÇÃO.</div>
-        <div style="font-family:'Bebas Neue',Inter,sans-serif;font-size:clamp(30px,5vw,76px);line-height:.96;color:#E50914;padding-left:clamp(24px,6vw,104px)">E A PRODUÇÃO VIROU O SURTO ARTIFICIAL.</div>
-      </div>
+  <section class="about-origin about-wrap" aria-labelledby="about-origin-title">
+    <div class="about-eyebrow">COMO TUDO COMEÇOU</div>
+    <div class="about-origin-grid">
+      <h2 id="about-origin-title">ERA UMA BRINCADEIRA.<br>VIROU NOVELINHA.<br><em>VIROU O SURTO.</em></h2>
+      <div><p>A ideia inicial era recriar algumas cenas de novela substituindo personagens por figuras desse universo da internet. Rodrigo Apresentador acabou entrando no meio disso e algumas dessas cenas começaram a chamar atenção.</p><p><strong>As pessoas passaram a acompanhar.</strong> Vieram os comentários, os pedidos por continuação, as teorias e a curiosidade para saber o que aconteceria no próximo capítulo.</p><p>Hoje, O Surto Artificial mistura inteligência artificial, audiovisual, humor, paródia, cultura de internet e uma quantidade pouco saudável de atenção aos detalhes para criar histórias que parecem ter escapado de alguma realidade paralela da televisão brasileira.</p></div>
     </div>
-  </div>
+  </section>
 
-  <div style="max-width:1260px;margin:0 auto;padding:clamp(48px,7.5vw,100px) 20px 0">
-    <div data-reveal style="display:grid;grid-template-columns:{{ editorialCols }};gap:clamp(18px,4vw,56px);align-items:start">
-      <div style="font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:#00E5FF;padding-top:9px">Hoje</div>
-      <div style="max-width:60ch">
-        <p style="font-size:clamp(15px,1.6vw,17px);line-height:1.7;color:color-mix(in srgb,#F5F5F5 72%,transparent);margin:0 0 22px;text-wrap:pretty">Hoje, O Surto Artificial mistura inteligência artificial, audiovisual, humor, paródia, cultura de internet e uma quantidade pouco saudável de atenção aos detalhes para criar histórias que parecem ter escapado de alguma realidade paralela da televisão brasileira.</p>
-        <p style="font-size:clamp(15px,1.6vw,17px);line-height:1.7;color:color-mix(in srgb,#F5F5F5 72%,transparent);margin:0 0 22px;text-wrap:pretty">Cada produção passa por várias etapas. Existe ideia, roteiro, direção, construção de personagens, criação visual, voz, vídeo, edição, continuidade e pós-produção. As ferramentas de inteligência artificial tornam possível experimentar formatos que antes exigiriam estruturas muito maiores, mas a tecnologia não cria o projeto sozinha.</p>
-        <p style="font-size:clamp(15px,1.6vw,17px);line-height:1.7;color:color-mix(in srgb,#F5F5F5 72%,transparent);margin:0;text-wrap:pretty">Por trás de cada episódio ainda existe uma pessoa escolhendo o que funciona, refazendo o que não funciona e tentando transformar uma ideia absurda em uma história que alguém queira acompanhar amanhã de novo.</p>
-      </div>
+  <section class="about-making about-wrap" aria-labelledby="about-making-title">
+    <div class="about-making-copy">
+      <div class="about-eyebrow">DO PRIMEIRO INSIGHT AO ÚLTIMO CORTE</div>
+      <h2 id="about-making-title">IA É FERRAMENTA.<br><em>O SURTO É HUMANO.</em></h2>
+      <p class="about-lead">As ferramentas abrem possibilidades.<br>As escolhas dão sentido à história.</p>
+      <p>Cada produção passa por várias etapas. Existe ideia, roteiro, direção, construção de personagens, criação visual, voz, vídeo, edição, continuidade e pós-produção. A inteligência artificial permite experimentar formatos que antes exigiriam estruturas muito maiores, mas a tecnologia não cria o projeto sozinha.</p>
+      <p>Por trás de cada episódio ainda existe uma pessoa escolhendo o que funciona, refazendo o que não funciona e tentando transformar uma ideia absurda em uma história que alguém queira acompanhar amanhã de novo.</p>
+      <ol class="about-process"><li><span>01</span>Ideia e roteiro</li><li><span>02</span>Personagens e criação visual</li><li><span>03</span>Voz, vídeo e direção</li><li><span>04</span>Edição e pós-produção</li></ol>
     </div>
+    <figure class="about-director-photo"><img src="assets-min/eli-about-director-v1.webp" width="1024" height="1280" loading="lazy" alt="Retrato de Eli Moreira com uma claquete de cinema, criado com IA a partir de suas fotos"><figcaption>A TECNOLOGIA AJUDA A CONSTRUIR.<br><strong>A VISÃO CONTINUA SENDO HUMANA.</strong></figcaption></figure>
+  </section>
 
-    <div data-reveal style="margin-top:clamp(44px,6.5vw,88px);padding-top:clamp(28px,4vw,44px);border-top:1px solid color-mix(in srgb,#F5F5F5 14%,transparent)">
-      <div style="font-family:'Bebas Neue',Inter,sans-serif;font-size:clamp(28px,4.4vw,66px);line-height:1;color:#F5F5F5;max-width:24ch">A TECNOLOGIA AJUDA A CONSTRUIR. <span style="color:#E50914">O SURTO CONTINUA SENDO HUMANO.</span></div>
-    </div>
-  </div>
-
-  <div data-reveal style="max-width:1260px;margin:0 auto;padding:clamp(56px,9vw,120px) 20px 0">
-    <div style="font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:#00E5FF;margin-bottom:16px">Como o Surto é feito</div>
-    <h2 style="font-family:'Bebas Neue',Inter,sans-serif;font-weight:400;font-size:clamp(34px,5.4vw,82px);line-height:.9;margin:0 0 clamp(34px,4.8vw,62px);color:#F5F5F5">IA É FERRAMENTA.<br><span style="color:#E50914">O SURTO É HUMANO.</span></h2>
-    <div style="display:grid;grid-template-columns:{{ processoCols }};gap:clamp(22px,3vw,16px) clamp(10px,1.6vw,20px)">
-      <sc-for list="{{ processo }}" as="p" hint-placeholder-count="7">
-        <div style="position:relative;padding-top:24px;transition:transform .3s" style-hover="transform:translateY(-5px)">
-          <div style="position:absolute;left:0;right:0;top:6px;height:1px;background:{{ p.line }}"></div>
-          <div style="position:absolute;left:0;top:2px;width:9px;height:9px;border-radius:50%;background:{{ p.dot }};box-shadow:0 0 14px {{ p.dot }}"></div>
-          <div style="font-family:'Bebas Neue',Inter,sans-serif;font-size:clamp(24px,2.8vw,38px);line-height:1;color:{{ p.num }};margin-bottom:7px">{{ p.n }}</div>
-          <div style="font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:{{ p.ink }}">{{ p.k }}</div>
-        </div>
-      </sc-for>
-    </div>
-    <div style="display:grid;grid-template-columns:{{ oficiosCols }};gap:1px;background:color-mix(in srgb,#F5F5F5 10%,transparent);margin-top:clamp(50px,7vw,96px)">
-      <sc-for list="{{ oficios }}" as="o" hint-placeholder-count="4">
-        <div style="background:#0B0D13;padding:clamp(22px,3vw,34px) clamp(18px,2.4vw,28px) clamp(26px,3.4vw,38px);transition:background .3s" style-hover="background:#11141B">
-          <div style="width:22px;height:2px;background:{{ o.ink }};margin-bottom:18px"></div>
-          <div style="font-family:'Bebas Neue',Inter,sans-serif;font-size:clamp(20px,2.2vw,28px);line-height:1.04;color:#F5F5F5;margin-bottom:9px">{{ o.k }}</div>
-          <div style="font-size:13px;line-height:1.55;color:color-mix(in srgb,#F5F5F5 56%,transparent)">{{ o.v }}</div>
-        </div>
-      </sc-for>
-    </div>
-    <p style="font-size:14.5px;line-height:1.64;color:color-mix(in srgb,#F5F5F5 56%,transparent);margin:clamp(28px,4vw,46px) 0 0;max-width:62ch;text-wrap:pretty">Trabalhamos continuamente com algumas das melhores tecnologias de inteligência artificial disponíveis para manter a evolução visual e técnica das produções.</p>
-  </div>
-  <div style="height:clamp(60px,9vw,110px)"></div>
-</div>
+  <section class="about-invite about-wrap" aria-labelledby="about-invite-title">
+    <div><div class="about-eyebrow">A PRÓXIMA IDEIA PODE SER A SUA</div><h2 id="about-invite-title">VAMOS CRIAR<br><em>ALGO IMPROVÁVEL?</em></h2><p>Produções audiovisuais para marcas, artistas, criadores e projetos especiais.</p></div>
+    <div class="about-invite-actions"><button class="about-button" type="button" onClick="{{ go.contrate }}">CONVERSE COM O SURTO <span aria-hidden="true">↗</span></button><button class="about-text-link" type="button" onClick="{{ go.exibicao }}">CONHEÇA NOSSAS HISTÓRIAS <span aria-hidden="true">→</span></button></div>
+  </section>
+  <p class="about-image-note about-wrap">Retratos desta página criados com inteligência artificial a partir de fotos de Eli Moreira — a mesma linguagem criativa que faz parte do projeto.</p>
+</main>
 </sc-if>
 
 <sc-if value="{{ atContrate }}">
