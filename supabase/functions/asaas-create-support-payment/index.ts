@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { supportPrice } from "../_shared/promotion.mjs";
+import { supportLifecycle } from "../_shared/support-lifecycle.mjs";
 import { isProductionWebhookReady } from "./production-readiness.mjs";
 
 const URL = Deno.env.get("SUPABASE_URL")!;
@@ -77,16 +78,22 @@ Deno.serve(async (req: Request) => {
   let credit = 0;
   let source: any = null;
 
+  const { data: paid, error: paidError } = await admin.from("supports").select("id,user_id,production_id,tier,amount,payment_status,created_at,upgrade_from_support_id,upgrade_credit_amount").eq("user_id", user.id).eq("payment_status", "paid");
+  if (paidError) return json(req, { error: "Não foi possível verificar seus apoios. Tente novamente." }, 503);
+  const paidIds = (paid || []).map((s: any) => s.id);
+  const appearanceResult = paidIds.length ? await admin.from("appearances").select("support_id,status,published_at").in("support_id", paidIds) : { data: [], error: null };
+  if (appearanceResult.error) return json(req, { error: "Não foi possível verificar suas aparições. Tente novamente." }, 503);
+  const lifecycle = supportLifecycle(paid || [], appearanceResult.data || []);
+
   if (upgradeFromSupportId) {
-    const { data } = await admin.from("supports").select("id,user_id,production_id,tier,amount,payment_status").eq("id", upgradeFromSupportId).eq("user_id", user.id).eq("payment_status", "paid").maybeSingle();
-    source = data;
-    if (!source) return json(req, { error: "Apoio atual não encontrado" }, 400);
+    source = lifecycle.available.find((s: any) => s.id === upgradeFromSupportId);
+    if (!source) return json(req, { error: "Este apoio já foi publicado ou utilizado e não pode gerar crédito de upgrade. Para aparecer novamente, escolha um novo apoio.", code: "support_not_upgradeable" }, 409);
     if (rank[tier] <= rank[String(source.tier)]) return json(req, { error: "Escolha uma categoria superior à atual" }, 400);
     credit = Math.min(Number(source.amount || 0), targetMinimum);
     chargeAmount = Math.max(0, targetMinimum - credit);
     if (body.expectedAmount !== chargeAmount) return json(req, { error: "O preço do upgrade mudou. Atualize a página e confira o valor.", code: "price_changed" }, 409);
   } else {
-    const { data: active } = await admin.from("supports").select("id,tier,amount").eq("user_id", user.id).eq("payment_status", "paid").in("tier", ["supporter", "highlight", "vip"]).order("created_at", { ascending: false }).limit(1).maybeSingle();
+    const active = lifecycle.available[0];
     if (active && tier !== "free") return json(req, { error: "Você já é apoiador. Escolha um upgrade na sua área.", code: "upgrade_required", currentSupport: active }, 409);
     if (tier !== "free" && chargeAmount !== targetMinimum) return json(req, { error: "O preço mudou ou a página está desatualizada. Atualize a página e confira o valor.", code: "price_changed" }, 409);
     if (!Number.isFinite(chargeAmount) || chargeAmount < targetMinimum) return json(req, { error: `O valor mínimo para ${plan.name} é R$ ${targetMinimum.toFixed(2).replace(".", ",")}` }, 400);
