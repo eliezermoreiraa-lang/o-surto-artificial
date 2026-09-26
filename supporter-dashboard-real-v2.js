@@ -192,7 +192,8 @@
   const card = (title,body,extra='') => `<section class="sd-card ${extra}"><div class="sd-kicker">${esc(title)}</div>${body}</section>`;
 
   function homeHtml(m){
-    const s = m.currentSupport;
+    const s = m.upgradeSupport || m.currentSupport;
+    if (m.canPurchaseAgain) return `<section class="sd-hero"><div class="sd-kicker">SUA APARIÇÃO FOI PUBLICADA ✓</div><h1>VAMOS APARECER DE NOVO?</h1><p>Seu apoio anterior já foi utilizado na publicação. Para uma nova aparição, escolha um novo apoio pelo valor vigente, sem crédito do apoio anterior. Seu histórico continua disponível em Minhas Aparições e Meus Episódios.</p>${m.subscription ? '<p>Sua assinatura mensal continua ativa. A próxima renovação confirmada gera um novo apoio; uma compra avulsa agora é adicional.</p>' : ''}</section>${joinHtml(m)}`;
     if (!s) return empty('Você ainda não possui nenhum apoio com divulgação','Escolha Apoiador, Destaque ou VIP para liberar os recursos de divulgação. O Apoio Livre ajuda a produção, mas não inclui divulgação.','<button class="sd-btn" data-join>CONHECER AS FORMAS DE APOIO →</button>');
     if (s.tier === 'free') {
       return `<section class="sd-hero"><div class="sd-kicker red">CLUBE DO SURTO</div><div class="sd-muted">Obrigado pelo seu apoio,</div><h1>${esc(m.user?.displayName||'APOIADOR')}</h1><div class="sd-badges"><span>APOIO LIVRE</span><span class="cyan">● PAGAMENTO CONFIRMADO</span></div><p>Seu apoio ajuda diretamente os tokens, as ferramentas e as próximas produções.</p></section><div class="sd-grid two">${card('SEU APOIO',`<h3>APOIO LIVRE</h3><div class="sd-money">${brl(s.amount)}</div><p>Esta categoria é anônima e não inclui divulgação, avatar ou aparição. Você continua com o carinho e o agradecimento de toda a equipe do Surto.</p>`)}${card('QUER SER DIVULGADO?',`<h3>ESCOLHA UMA CATEGORIA COM DIVULGAÇÃO</h3><p>Apoiador, Destaque e VIP liberam o Perfil de Divulgação e o acompanhamento na sua área. Nenhuma categoria transforma o apoiador em personagem da novela.</p><button class="sd-btn" data-upgrade>VER OPÇÕES COM DIVULGAÇÃO →</button>`,'accent')}</div>`;
@@ -249,8 +250,8 @@
   }
 
   function joinHtml(m){
-    if(m.currentSupport&&checkoutTier!=='free'){currentRoute='upgrade';return upgradeHtml(m)}
-    const plans=window.SurtoClub.plans;
+    if(m.upgradeSupport&&checkoutTier!=='free'){currentRoute='upgrade';return upgradeHtml(m)}
+    const plans=window.SurtoClub.plans.filter(x=>!m.canPurchaseAgain||x.tier!=='free');
     const selected=plans.find(x=>x.tier===checkoutTier);
     if(checkoutData?.pix&&selected){
       const confirmationCopy=selected.tier==='free'?'Obrigado por ajudar as próximas produções. O Apoio Livre não libera divulgação nem aparição.':'Após a confirmação, o Perfil de Divulgação e os demais recursos serão liberados.';
@@ -284,7 +285,7 @@
 
   function upgradeHtml(m){
     const options=(m.upgrades||[]).filter(x=>x.available);
-    if(!m.currentSupport)return joinHtml(m);
+    if(!m.upgradeSupport){currentRoute='join';return joinHtml(m)}
     if(!options.length)return `<h1 class="sd-title">Seu plano</h1>${card('CATEGORIA MÁXIMA','<h2>VOCÊ JÁ É APOIADOR VIP</h2><p>Seu plano já possui o maior nível de destaque e participação.</p>','vip')}`;
     const target=options.find(x=>x.tier===upgradeTarget);
     if(target){
@@ -299,6 +300,7 @@
   }
 
   function vipHtml(m){
+    if(m.canPurchaseAgain)return `<h1 class="sd-title">Sua aparição já foi publicada</h1><p class="sd-lead">Para uma nova divulgação, compre um novo apoio. O apoio publicado não gera crédito de upgrade.</p>${joinHtml(m)}`;
     if (m.vipAccess) {
       const p=m.publicityProfile||{};
       const profileReady=!!(p.display_name&&p.social_network&&p.social_handle&&p.notification_email&&p.public_consent);
@@ -309,7 +311,7 @@
     }
     const u = (m.upgrades || []).find(x => x.tier === 'vip');
     const due = u ? Number(u.amountDue || 0) : 300;
-    const credit = Math.max(0,300-due);
+    const credit = Number(m.currentCredit || 0);
     return `<h1 class="sd-title">Área VIP</h1>${card('ACESSO RESTRITO',`<h2>VOCÊ NÃO TEM ACESSO À ÁREA VIP</h2><p>Para se tornar um apoiador VIP, ter sua aparição sozinho e ainda o apoio da equipe do Surto para sua cena, faça o upgrade.</p>${m.currentSupport ? `<div class="sd-credit"><span>Plano VIP</span><b>${brl(300)}</b><span>Crédito do seu apoio atual</span><b>− ${brl(credit)}</b><span>Você paga agora</span><strong>${brl(due)}</strong></div><button class="sd-btn vipbtn" id="sd-upgrade-vip">FAZER UPGRADE PARA VIP · ${brl(due)}</button>` : '<button class="sd-btn vipbtn" data-clube>CONHECER O APOIADOR VIP →</button>'}`,'vip')}`;
   }
 
@@ -364,7 +366,7 @@
     root.querySelectorAll('[data-route]').forEach(el => el.addEventListener('click',()=>openRoute(el.dataset.route),{once:true}));
     root.querySelectorAll('[data-join]').forEach(el=>el.addEventListener('click',()=>{currentRoute='join';checkoutData=null;checkoutTier=null;checkoutMethod='pix';window.scrollTo(0,0);schedule(false)},{once:true}));
     root.querySelectorAll('[data-change-plan]').forEach(el=>el.addEventListener('click',()=>{checkoutData=null;checkoutTier=null;checkoutMethod='pix';schedule(false)},{once:true}));
-    root.querySelectorAll('[data-join-tier]').forEach(el=>el.addEventListener('click',()=>{checkoutTier=el.dataset.joinTier;checkoutData=null;checkoutMethod='pix';window.scrollTo(0,0);schedule(false)},{once:true}));
+    root.querySelectorAll('[data-join-tier]').forEach(el=>el.addEventListener('click',()=>{currentRoute='join';checkoutTier=el.dataset.joinTier;checkoutData=null;checkoutMethod='pix';window.scrollTo(0,0);schedule(false)},{once:true}));
     root.querySelectorAll('[data-join-method]').forEach(el=>el.addEventListener('click',()=>{checkoutMethod=el.dataset.joinMethod==='cartao'?'cartao':'pix';root.querySelectorAll('[data-join-method]').forEach(button=>button.classList.toggle('active',button.dataset.joinMethod===checkoutMethod));const action=root.querySelector('#sd-create-join');if(action)action.textContent=checkoutMethod==='pix'?'GERAR PAGAMENTO PIX →':'IR PARA O PAGAMENTO SEGURO COM CARTÃO →';const note=root.querySelector('#sd-checkout-method-note');if(note)note.textContent=checkoutMethod==='pix'?'O QR Code será exibido aqui para você pagar no aplicativo do seu banco.':'Você será levado ao ambiente seguro do Asaas para informar os dados do cartão uma única vez.'}));
     const createJoin=root.querySelector('#sd-create-join');
     if(createJoin)createJoin.addEventListener('click',async()=>{
@@ -374,7 +376,7 @@
       try{const sb=ensureClient();const {data,error}=await sb.functions.invoke('asaas-create-support-payment',{body:{tier:checkoutTier,method:checkoutMethod,amount,cpfCnpj,fullName}});if(error||!data?.ok)throw new Error(data?.error||'payment_failed');if(isCard){if(!data.invoiceUrl)throw new Error('missing_invoice_url');window.location.assign(data.invoiceUrl);return}if(!data.pix)throw new Error('missing_pix');checkoutData=data;schedule(false)}catch(e){msg.textContent=isCard?'Não foi possível abrir o pagamento seguro com cartão agora. Confira os dados e tente novamente.':'Não foi possível gerar o Pix agora. Confira os dados e tente novamente.';createJoin.disabled=false;createJoin.textContent=isCard?'IR PARA O PAGAMENTO SEGURO COM CARTÃO →':'GERAR PAGAMENTO PIX →'}
     });
     const copyJoin=root.querySelector('#sd-copy-join');if(copyJoin)copyJoin.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(checkoutData.pix.payload);copyJoin.textContent='PIX COPIADO ✓'}catch(e){}});
-    const refreshJoin=root.querySelector('#sd-refresh-join');if(refreshJoin)refreshJoin.addEventListener('click',async()=>{const msg=root.querySelector('#sd-join-status');refreshJoin.disabled=true;refreshJoin.textContent='VERIFICANDO…';await loadData(true);if(dataModel.currentSupport){checkoutData=null;checkoutTier=null;currentRoute='home';schedule(false);return}if(msg)msg.textContent='O pagamento ainda não foi identificado. Aguarde alguns instantes e tente novamente.';refreshJoin.disabled=false;refreshJoin.textContent='JÁ PAGUEI · VERIFICAR'});
+    const refreshJoin=root.querySelector('#sd-refresh-join');if(refreshJoin)refreshJoin.addEventListener('click',async()=>{const msg=root.querySelector('#sd-join-status');refreshJoin.disabled=true;refreshJoin.textContent='VERIFICANDO…';await loadData(true);if((dataModel.supports||[]).some(s=>s.id===checkoutData?.supportId)){checkoutData=null;checkoutTier=null;currentRoute='home';schedule(false);return}if(msg)msg.textContent='O pagamento ainda não foi identificado. Aguarde alguns instantes e tente novamente.';refreshJoin.disabled=false;refreshJoin.textContent='JÁ PAGUEI · VERIFICAR'});
     root.querySelectorAll('[data-upgrade]').forEach(el=>el.addEventListener('click',()=>{currentRoute='upgrade';upgradeData=null;upgradeTarget=null;window.scrollTo(0,0);schedule(false)},{once:true}));
     root.querySelectorAll('[data-upgrade-tier]').forEach(el=>el.addEventListener('click',()=>startUpgrade(el.dataset.upgradeTier)));
     root.querySelector('[data-upgrade-back]')?.addEventListener('click',()=>{currentRoute=upgradeVipOnly?'vip':'upgrade';upgradeTarget=null;upgradeData=null;schedule(false)});
@@ -392,7 +394,7 @@
       upgradeDraft={fullName,cpfCnpj};
       if(!fullName){msg.textContent='Informe seu nome completo.';return}
       if(cpfCnpj.length!==11){msg.textContent='Informe um CPF válido com 11 números.';return}
-      const tier=upgradeTarget,method=upgradeMethod,sourceId=dataModel.currentSupport?.id;
+      const tier=upgradeTarget,method=upgradeMethod,sourceId=dataModel.upgradeSupport?.id;
       if(!sourceId||!(dataModel.upgrades||[]).some(x=>x.tier===tier&&x.available)){msg.textContent='Atualize sua área para conferir as opções de upgrade.';return}
       upgradeSubmitting=true;root.querySelectorAll('button').forEach(el=>el.disabled=true);button.textContent=method==='pix'?'GERANDO PIX…':'ABRINDO PAGAMENTO SEGURO…';msg.textContent='';
       try{
