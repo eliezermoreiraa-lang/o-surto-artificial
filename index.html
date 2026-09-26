@@ -14,7 +14,7 @@
 <script src="/club-support.js?v=20260925-promo-1"></script>
 <script src="/monthly-support.js?v=20260925-promo-1" defer></script>
 <link rel="stylesheet" href="/promotion.css?v=20260925-1">
-<link rel="stylesheet" href="/about-editorial.css?v=20260926-1">
+<link rel="stylesheet" href="/about-editorial.css?v=20260926-2">
 <script src="/contract-form.js?v=20260923-1" defer></script>
 <script src="/guest-support.js?v=20260908-1" defer></script>
 <link rel="stylesheet" href="/club-support.css?v=20260908-2">
@@ -693,6 +693,9 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
 </sc-if>
 <sc-if value="{{ atSobre }}">
 <main class="surto-about" aria-label="Sobre O Surto Artificial">
+<div class="about-stage">
+  <div class="about-poster-wall" aria-hidden="true"><img src="assets-min/ursupadollra.jpg" alt=""><img src="assets-min/poster-la-linha-do-bairro.webp" alt=""><img src="assets-min/ursupadollra.jpg" alt=""><img src="assets-min/poster-la-linha-do-bairro.webp" alt=""></div>
+  <div class="about-light about-light-red" aria-hidden="true"></div><div class="about-light about-light-cyan" aria-hidden="true"></div>
   <section class="about-hero about-wrap" aria-labelledby="about-title">
     <div class="about-hero-copy">
       <div class="about-eyebrow"><span></span> POR TRÁS DO SURTO</div>
@@ -701,26 +704,36 @@ input::placeholder,textarea::placeholder{color:color-mix(in srgb,#F5F5F5 32%,tra
       <div class="about-hero-actions"><a class="about-button" href="#about-story">CONHEÇA MINHA HISTÓRIA <span aria-hidden="true">↘</span></a><button class="about-text-link" type="button" onClick="{{ go.contrate }}">VAMOS CRIAR JUNTOS <span aria-hidden="true">↗</span></button></div>
     </div>
     <figure class="about-hero-photo">
-      <img src="assets-min/eli-about-creator-v1.webp" width="1536" height="1024" alt="Retrato de Eli Moreira com notebook, em uma composição de estúdio criada com IA a partir de suas fotos" fetchpriority="high">
+      <img src="assets-min/eli-about-creator-cutout-v2.webp" width="1024" height="1280" alt="Retrato de Eli Moreira com notebook, criado com IA a partir de suas fotos" fetchpriority="high">
       <figcaption><strong>ELI MOREIRA</strong><span>Criação · Direção · Inteligência artificial</span></figcaption>
     </figure>
-    <div class="about-hero-foot"><span>O SURTO ARTIFICIAL</span><span>HISTÓRIAS IMPROVÁVEIS. CRIAÇÃO DE VERDADE.</span><span>CRIAÇÃO INDEPENDENTE</span></div>
+    <div class="about-floating-comment about-comment-one"><img src="assets-min/dep-lorelay.jpg" alt=""><div><span>LORELAY FOX · SOBRE A NOVELA</span><q>Estou belissimaaa</q></div></div>
+    <div class="about-floating-comment about-comment-two"><img src="assets-min/dep-jessie.jpg" alt=""><div><span>JESSIE SPARKLE · SOBRE A NOVELA</span><q>Eu to chorando ksksksksk</q></div></div>
+    <div class="about-floating-comment about-comment-three"><img src="assets-min/dep-marcelo.jpg" alt=""><div><span>MARCELO ARANTES · SOBRE A NOVELA</span><q>Que capítulo especial! Quanto escândalo!!!! Kkkkkk</q></div></div>
   </section>
+  <div class="about-ribbon"><div class="about-wrap"><span>O SURTO ARTIFICIAL</span><strong>HISTÓRIAS IMPROVÁVEIS.<br><em>CRIAÇÃO DE VERDADE.</em></strong><p>Do primeiro insight ao último corte.<br>Uma visão humana. Infinitas possibilidades.</p><span class="about-ribbon-end">CRIAÇÃO<br>INDEPENDENTE ↗</span></div></div>
+</div>
 
-  <section class="about-disciplines about-wrap" aria-label="As frentes da criação">
-    <article><span class="about-index">01 / IMAGINAR</span><h2>IDEIA & ROTEIRO</h2><p>Cultura pop, humor e referências de internet viram o ponto de partida de cada história.</p></article>
-    <article><span class="about-index">02 / CONSTRUIR</span><h2>DESIGN & UNIVERSO VISUAL</h2><p>Personagens, cenários e continuidade visual para dar identidade a cada produção.</p></article>
-    <article><span class="about-index">03 / DAR VIDA</span><h2>DIREÇÃO & AUDIOVISUAL</h2><p>Imagem, voz, vídeo e edição encontram o ritmo que transforma uma ideia em episódio.</p></article>
+  <section class="about-disciplines about-wrap" aria-labelledby="about-disciplines-title">
+    <header class="about-cards-heading"><div class="about-eyebrow">UMA IDEIA. MUITAS POSSIBILIDADES.</div><h2 id="about-disciplines-title">É ASSIM QUE O <em>SURTO GANHA VIDA.</em></h2></header>
+    <div class="about-portrait-cards">
+    <article><img class="about-card-person" src="assets-min/eli-about-story-cutout-v2.webp" alt="Eli em uma pose criativa e pensativa" loading="lazy"><div class="about-card-copy"><span class="about-index">01 / IMAGINAR</span><h3>IDEIA & ROTEIRO</h3><p>Cultura pop, humor e referências de internet viram o ponto de partida de cada história.</p></div></article>
+    <article><img class="about-card-person" src="assets-min/eli-about-creator-cutout-v2.webp" alt="Eli criando com seu notebook" loading="lazy"><div class="about-card-copy"><span class="about-index">02 / CONSTRUIR</span><h3>DESIGN & UNIVERSO VISUAL</h3><p>Personagens, cenários e continuidade visual para dar identidade a cada produção.</p></div></article>
+    <article><img class="about-card-person" src="assets-min/eli-about-director-cutout-v2.webp" alt="Eli com uma claquete de cinema" loading="lazy"><div class="about-card-copy"><span class="about-index">03 / DAR VIDA</span><h3>DIREÇÃO & AUDIOVISUAL</h3><p>Imagem, voz, vídeo e edição encontram o ritmo que transforma uma ideia em episódio.</p></div></article>
+    </div>
+    <div class="about-cards-action"><button class="about-button" type="button" onClick="{{ go.contrate }}">VAMOS CRIAR JUNTOS <span aria-hidden="true">↗</span></button></div>
   </section>
 
   <section id="about-story" class="about-story about-wrap" aria-labelledby="about-story-title">
     <div class="about-story-visual">
-      <figure class="about-portrait"><img src="assets-min/eli-about-story-v1.webp" width="1024" height="1280" loading="lazy" alt="Retrato editorial de Eli Moreira sentado, criado com IA a partir de suas fotos"></figure>
+      <div class="about-digital-world" aria-hidden="true"><div class="about-digital-window"><span>O SURTO / CREATIVE STUDIO</span><div class="about-digital-posters"><img src="assets-min/ursupadollra.jpg" alt="" loading="lazy"><img src="assets-min/poster-la-linha-do-bairro.webp" alt="" loading="lazy"></div><div class="about-timeline"><i></i><i></i><i></i><i></i></div></div><div class="about-digital-label">IDEIA → IMAGEM → HISTÓRIA</div></div>
+      <figure class="about-portrait"><img src="assets-min/eli-about-story-cutout-v2.webp" width="1024" height="1280" loading="lazy" alt="Retrato editorial de Eli Moreira sentado, criado com IA a partir de suas fotos"></figure>
       <div class="about-side-note"><span>FORA DA TIMELINE</span><p>Paulistano. Casado.<br>Pai de dois cachorros<br>e três gatos.</p></div>
     </div>
     <div class="about-story-copy">
-      <div class="about-eyebrow">PRAZER, ELI.</div>
-      <h2 id="about-story-title">CRONICAMENTE ONLINE.<br><em>CRIATIVAMENTE INQUIETO.</em></h2>
+      <div class="about-eyebrow">POR TRÁS DAS HISTÓRIAS</div>
+      <h2 id="about-story-title"><span>Prazer,</span><br><em>ELI MOREIRA.</em></h2>
+      <p class="about-story-role">CRIADOR DE O SURTO ARTIFICIAL</p>
       <p class="about-lead">Tenho 37 anos, sou um homem gay, nascido e criado em São Paulo. E, provavelmente, cronicamente online há tempo demais.</p>
       <p>Minha relação com a internet vem de muito antes de O Surto Artificial. Cresci digitalmente entre memes, cultura pop, televisão, reality shows, personagens improváveis e aquele tipo de assunto extremamente específico que começa como curiosidade, vira hiperfoco e, quando você percebe, já ocupa uma parte preocupante do cérebro.</p>
       <p>Também fui formado — no sentido mais internet possível da palavra — acompanhando o antigo <strong>Baú Esquizo</strong> e, hoje, o <strong>Baú Explica</strong>. Foi daí que nasceu boa parte do meu hiperfoco no universo do Rodrigo Apresentador e em todas as histórias, referências e absurdos que cercam esse imaginário.</p>
