@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {supportLifecycle} from '../supabase/functions/_shared/support-lifecycle.mjs';
 import {supportPrice as campaignPrice} from '../supabase/functions/_shared/promotion.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -20,7 +21,7 @@ for(const [tier,amount] of [['free',10.25],['free',1000.25],['supporter',25],['h
    return ()=>chain;
   }});return chain;
  };
- const context=vm.createContext({Response,Request,AbortSignal,Intl,Date,Set,console,setTimeout,isProductionWebhookReady,supportPrice:t=>campaignPrice(t,'2026-09-25T12:00:00-03:00'),
+ const context=vm.createContext({Response,Request,AbortSignal,Intl,Date,Set,console,setTimeout,isProductionWebhookReady,supportLifecycle,supportPrice:t=>campaignPrice(t,'2026-09-25T12:00:00-03:00'),
   Deno:{env:{get:name=>name==='SUPABASE_URL'?'https://project.supabase.co':'private-test-value'},serve:fn=>{handler=fn}},
   createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'test',email:'test@example.invalid'}}})},from}),
   fetch:async(address,options)=>{
