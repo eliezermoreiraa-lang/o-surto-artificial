@@ -2219,7 +2219,7 @@ const CATS = {
 class Component extends DCLogic {
   castRef = React.createRef();
   state = {
-    route: 'home', navOpen: false, w: 1280,
+    route: (typeof window !== 'undefined' && ['exibicao','clube','sobre','contrate','apoiadores'].includes(window.location.hash.slice(1))) ? window.location.hash.slice(1) : 'home', navOpen: false, w: 1280,
     tier: 'destaque', modo: 'avulso', valor: 100, caminho: null,
     pay: 'idle', demo: 'fila', perfilOk: false,
     cupom: '', cupomOk: false, admTab: 'todos', admSel: null, toast: null, vip: 'pendente',
@@ -2659,6 +2659,7 @@ class Component extends DCLogic {
   }
 
   nav(route) {
+    if (route === 'cursos') { window.location.assign('/cursos'); return; }
     if (route.startsWith('app') && !(this._session || this.state.session)) {
       this.setState({ route: 'auth', authMode: 'login', navOpen: false, authErr: null,
         authMsg: 'Entre na sua conta para acessar a Área do Apoiador.' });
@@ -2709,7 +2710,7 @@ class Component extends DCLogic {
     const isAdm = r.startsWith('adm');
     const isPublic = !isApp && !isAdm;
 
-    const menuDef = [['Início','home'],['Em Exibição','exibicao'],['Clube do Surto','clube'],['Apoiadores','apoiadores'],['Sobre','sobre'],['Contrate O Surto','contrate']];
+    const menuDef = [['Início','home'],['Em Exibição','exibicao'],['Clube do Surto','clube'],['Cursos','cursos'],['Apoiadores','apoiadores'],['Sobre','sobre'],['Contrate O Surto','contrate']];
     const menu = menuDef.map(([label, route]) => ({
       label, mobileLabel: label === 'Em Exibição' ? 'Exibição' : label === 'Clube do Surto' ? 'Clube' : label === 'Contrate O Surto' ? 'Contrate' : label, route, open: () => this.nav(route),
       color: r === route ? '#F5F5F5' : 'color-mix(in srgb,#F5F5F5 66%,transparent)',
@@ -3275,7 +3276,7 @@ class Component extends DCLogic {
       atNovelinha: r === 'novelinha' || r === 'exibicao', atComo: r === 'como', atApoiadores: r === 'apoiadores',
       portfolioCols: isMobile ? '1fr' : 'repeat(2,1fr)',
       footerCols: isMobile ? '1fr 1fr' : '1.4fr 1fr 1fr 1fr',
-      footerNav: [['Em Exibição','exibicao'],['Clube do Surto','clube'],['Apoiadores','apoiadores'],['Sobre','sobre'],['Contrate o Surto','contrate']]
+      footerNav: [['Em Exibição','exibicao'],['Clube do Surto','clube'],['Cursos','cursos'],['Apoiadores','apoiadores'],['Sobre','sobre'],['Contrate o Surto','contrate']]
         .map(([label, route]) => ({ label, open: () => this.nav(route) })),
       mural: muralReal,
       servicos: [

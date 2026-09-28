@@ -9,7 +9,7 @@
   const date = v => { if(!v)return '—';const raw=String(v);if(/^\d{4}-\d{2}-\d{2}$/.test(raw)){const [y,m,d]=raw.split('-');return `${d}/${m}/${y}`}return new Date(v).toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}) };
   const dateTime = v => v ? new Date(v).toLocaleString('pt-BR', { timeZone:'America/Sao_Paulo' }) : '—';
   const labels = { free:'Apoio livre',supporter:'Apoiador',highlight:'Destaque',vip:'VIP',one_time:'Avulso',monthly:'Mensal',paid:'Pago',pending:'Pendente',checkout_created:'Aguardando pagamento',failed:'Falhou',refunded:'Estornado',cancelled:'Cancelado',waiting_profile:'Aguardando perfil',waiting_avatar:'Aguardando avatar',queued:'Na fila',estimated:'Programado',confirmed:'Confirmado',in_production:'Em produção',published:'Publicado',reprogrammed:'Reprogramado',ready:'Pronto',awaiting:'Aguardando',sent:'Enviado',sending:'Enviando',submitted:'Enviado',in_review:'Em análise',approved:'Aprovado',change_requested:'Ajuste solicitado'};
-  const titleByView = {overview:'Visão geral',supporters:'Apoiadores',payments:'Pagamentos',queue:'Fila e avatares',episodes:'Episódios',emails:'E-mails'};
+  const titleByView = {overview:'Visão geral',supporters:'Apoiadores',payments:'Pagamentos',queue:'Fila e avatares',episodes:'Episódios',emails:'E-mails',courseLeads:'Cursos · Leads'};
   let currentView = 'overview';
   let data = null;
   let session = null;
@@ -161,6 +161,7 @@
   function render() {
     $('#pageTitle').textContent = titleByView[currentView];
     document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===currentView));
+    if (currentView === 'courseLeads') { window.SurtoCourseLeads.mount(sb, $('#content')); return; }
     const content = currentView==='overview'?overview():currentView==='supporters'?listView('supporters'):currentView==='payments'?listView('payments'):currentView==='queue'?queueView():currentView==='episodes'?episodeView():emailsView();
     $('#content').innerHTML = content; bindContent();
   }
